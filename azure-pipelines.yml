@@ -1,0 +1,43 @@
+trigger:
+- '*'
+
+pr:
+- '*'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: npm install
+  displayName: 'Install Node.js Dependencies'
+  workingDirectory: 'src'  # Ordner, in dem sich deine Anwendung befindet
+
+- script: npm install -g mocha
+  displayName: 'Install Mocha Globally'
+
+- script: npm test
+  displayName: 'Run Unit Tests'
+  workingDirectory: 'src'  # Ordner, in dem sich deine Tests befinden
+
+- script: |
+    cd src
+    npm install
+    npm run integration-test
+  displayName: 'Run Integration Tests'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-results.xml'
+    testRunTitle: 'Test Results'
+
+- script: npm run build
+  displayName: 'Build and Package Application'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  condition: succeeded()
+  inputs:
+    pathtoPublish: 'src/dist'  # Ordner, in dem deine gebauten Dateien liegen
+    artifactName: 'drop'
