@@ -16,9 +16,12 @@ steps:
 - script: python -m pip install --upgrade pip
   displayName: 'Upgrade pip'
 
+- script: ls -la annodashboard/
+  displayName: 'List contents of annodashboard directory'
+
 - script: pip install -r requirements.txt
   displayName: 'Install requirements'
-  workingDirectory: 'annodashboard/src'  
+  workingDirectory: annodashboard/src
 
 - script: python manage.py test #--testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner (Already in the settings.py)
   displayName: 'Run Django Unit Tests'
