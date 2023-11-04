@@ -21,7 +21,7 @@ steps:
 
 - script: pip install -r requirements.txt
   displayName: 'Install requirements'
-  workingDirectory: 'annodashboard' 
+  workingDirectory: 'annodashboard/requirements.txt' 
 
 - script: python manage.py test #--testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner (Already in the settings.py)
   displayName: 'Run Django Unit Tests'
