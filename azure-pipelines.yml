@@ -19,7 +19,11 @@ steps:
 - script: ls -la annodashboard/
   displayName: 'List contents of annodashboard directory'
 
-- script: pip install -r requirements.txt
+- script: RUN pip freeze > requirements.txt
+  displayName: 'freeze requirements'
+  workingDirectory: 'annodashboard'
+
+- script: pip install --no-cache-dir -r requirements.txt
   displayName: 'Install requirements'
   workingDirectory: 'annodashboard'
 
