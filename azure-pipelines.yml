@@ -19,9 +19,13 @@ steps:
 - script: ls -la annodashboard/
   displayName: 'List contents of annodashboard directory'
 
-- script: pip install -r requirements.txt
+- script: find . -regex '.*requirements.txt$'
+  displayName: 'find requirements'
+  workingDirectory: 'annodashboard'
+
+- script: pip install --no-cache-dir -r requirements.txt
   displayName: 'Install requirements'
-  workingDirectory: annodashboard/src
+  workingDirectory: 'annodashboard'
 
 - script: python manage.py test #--testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner (Already in the settings.py)
   displayName: 'Run Django Unit Tests'
