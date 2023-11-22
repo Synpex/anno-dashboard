@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os.path
+import platform
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -88,6 +89,8 @@ DATABASES = {
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -135,10 +138,17 @@ TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 # Configuration Tailwind
 TAILWIND_APP_NAME = 'dashboard'
 
-# NPM_BIN_PATH variable
-NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
+if platform.system() == "Windows":
+    NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
+else:
+    NPM_BIN_PATH = "/usr/bin/npm"
+
 
 # Internal IPs
 INTERNAL_IPS = ['127.0.0.1',]
+
+# Configuration for Tailwind CSS dists
+TAILWIND_CSS_PATH = 'css/dist/styles.css'
+
 
 
