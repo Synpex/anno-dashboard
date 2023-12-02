@@ -46,7 +46,16 @@ module.exports = {
         '../../**/*.py'
     ],
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                'custom-blue': '#C5D9E0',
+            },
+        },
+        fontFamily: {
+      'display': ['Oswald'],
+      'body': ['Oswald'],
+        },
+
     },
     plugins: [
         /**

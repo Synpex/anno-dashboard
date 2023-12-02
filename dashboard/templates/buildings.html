@@ -1,27 +1,14 @@
-{% extends 'base.html' %}
-{% block content %}
-<div style="width: 1440px; height: 139px; position: relative; background: white; border-bottom: 1.89px #C5D9E0 solid">
-  <div style="width: 414.20px; left: 38px; top: 45px; position: absolute">
-    <div style="width: 170.22px; height: 37.83px; left: 0px; top: 9.46px; position: absolute; flex-direction: column; justify-content: flex-start; align-items: flex-start; display: inline-flex">
-      <div style="width: 51.96px; height: 37.83px; background: #073854"></div>
-      <div style="width: 39.75px; height: 34.20px; background: #073854"></div>
-      <div style="width: 39.75px; height: 34.20px; background: #073854"></div>
-      <div style="width: 33.66px; height: 34.15px; background: #073854"></div>
-    </div>
-    <div style="width: 230.74px; height: 47.28px; left: 183.46px; top: 0px; position: absolute; color: #A60001; font-size: 41.61px; font-family: Oswald; font-weight: 300; text-transform: uppercase; line-height: 49.93px; word-wrap: break-word">Amsterdam</div>
+{% extends 'base.html' %} {% block content %}
+<section class="px-10 mt-24">
+  {# Search Bar #}
+  <div>
+    <input
+      type="text"
+      value="Search...eg. Schoonzichtlaan 162"
+      class="w-full text-gray-300 rounded-lg border-2 border-gray-400"
+    />
   </div>
-  <div style="width: 787px; height: 62px; left: 620px; top: 34px; position: absolute">
-    <div style="width: 569px; height: 36px; left: 0px; top: 11px; position: absolute; justify-content: flex-end; align-items: flex-start; gap: 77px; display: inline-flex">
-      <div style="color: black; font-size: 30px; font-family: Oswald; font-weight: 400; line-height: 36px; word-wrap: break-word">Buildings</div>
-      <div style="color: black; font-size: 30px; font-family: Oswald; font-weight: 400; line-height: 36px; word-wrap: break-word">Import</div>
-      <div style="color: #A60001; font-size: 30px; font-family: Oswald; font-weight: 400; text-decoration: underline; line-height: 36px; word-wrap: break-word">Users</div>
-      <div style="color: black; font-size: 30px; font-family: Oswald; font-weight: 400; line-height: 36px; word-wrap: break-word">Statistics</div>
-    </div>
-    <img style="width: 62px; height: 62px; left: 678px; top: 0px; position: absolute; border-radius: 100px; border: 1px rgba(213, 219, 229, 0.50) solid" src="https://via.placeholder.com/62x62" />
-    <div style="width: 28px; height: 28px; left: 759px; top: 15px; position: absolute">
-      <img style="width: 28px; height: 28px; left: 0px; top: 0px; position: absolute" src="https://via.placeholder.com/28x28" />
-      <div style="width: 98px; height: 85.40px; left: -53.20px; top: -39.20px; position: absolute; background: #868FA0"></div>
-    </div>
-  </div>
-</div>
+
+  {# TODO: Implement Map #} {# Map #}
+</section>
 {% endblock %}
