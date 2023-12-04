@@ -12,9 +12,19 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os.path
 import platform
 from pathlib import Path
+import djongo
+
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +36,7 @@ SECRET_KEY = 'django-insecure-&aacbf=n&fwpa@!ibc4rdj**4*_$vct48%&4xgh9l$^!_+j%17
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fal-1.upcode-dev.at', 'localhost']
 
 
 # Application definition
@@ -38,7 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dashboard',
+    'Core',
+    'buildings',
+    'rest_framework',
+    'users',
+    'drf_yasg',
     'tailwind',
     'django_browser_reload',
 ]
@@ -79,10 +93,34 @@ WSGI_APPLICATION = 'annodashboard.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+def get_env_variable(var_name):
+    """Get the environment variable or return exception."""
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = f'Set the {var_name} environment variable'
+        raise ImproperlyConfigured(error_msg)
+
+
 DATABASES = {
+    'buildings': {
+        'ENGINE': 'djongo',
+        'NAME': os.getenv('COSMOS_DB_NAME'),
+        'CLIENT': {
+            'host': os.getenv('COSMOS_DB_CONNECTION_STRING')
+        }
+    },
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',
+        'NAME': os.getenv('AZURE_SQL_DB_NAME'),
+        'USER': os.getenv('AZURE_SQL_USER'),
+        'PASSWORD': os.getenv('AZURE_SQL_PASSWORD'),
+        'HOST': os.getenv('AZURE_SQL_HOST'),
+        'PORT': '',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'connection_timeout': 60,  # Adjust the timeout as needed
+        }
     }
 }
 
@@ -90,6 +128,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+DATABASE_ROUTERS = ['annodashboard.router.BuildingsRouter']  # Replace with the actual path to your BuildingsRouter class
 
 
 # Password validation
@@ -136,7 +176,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 
 # Configuration Tailwind
-TAILWIND_APP_NAME = 'dashboard'
+TAILWIND_APP_NAME = 'Core'
 
 if platform.system() == "Windows":
     NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
@@ -150,5 +190,13 @@ INTERNAL_IPS = ['127.0.0.1',]
 # Configuration for Tailwind CSS dists
 TAILWIND_CSS_PATH = 'css/dist/styles.css'
 
+REST_FRAMEWORK = {
+    #'DEFAULT_AUTHENTICATION_CLASSES': [
+    #    'annodashboard.authenticate.APIKeyAuthentication',
+    #],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+}
+
+MY_API_KEY = os.environ.get('MY_DJANGO_API_KEY')
 
 

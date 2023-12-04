@@ -10,9 +10,13 @@ x-app: &default-app
 services:
   web:
     <<: *default-app
-    command: "python manage.py runserver 0.0.0.0:8000"
+    command: "python manage.py runserver 0.0.0.0:8001"
     ports:
-      - "8000:8000"
+      - "8001:8001"
+    depends_on:
+      - mssql
+      - azurite
+
 
   tailwind:
     <<: *default-app

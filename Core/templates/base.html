@@ -1,0 +1,131 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ANNO Amsterdam</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    {% tailwind_css %}
+  </head>
+
+  <body class="leading-normal tracking-normal">
+    <section>
+      <nav
+        class="bg-white fixed w-full z-20 top-0 start-0 border-b border-sky-700 dark:border-sky-700 dark:border-opacity-10"
+      >
+        <div
+          class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
+        >
+          <a
+            href="#"
+            class="flex items-center space-x-1 space-y-0 rtl:space-x-reverse"
+          >
+            <img
+              class="w-auto h-5 inline-flex ml-2"
+              src="../static/media/images/anno-logo.png"
+              alt=""
+            />
+            <span
+              class="text-red-800 text-2xl font-light sm:text-xl font-\[\'Oswald\'\]] uppercase"
+              >Amsterdam</span
+            >
+          </a>
+          <div
+            class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
+          >
+              {# TODO: Implement dynamic retrieval of userID #}
+            <a href="user123">
+              <img
+                class="w-auto h-11 inline-flex -my-5"
+                src="../static/media/images/profile.png"
+                alt=""
+              />
+            </a>
+            <a href="#">
+              <svg
+                class="ml-4 mt-1.5 w-[19px] h-[19px] text-gray-800 dark:text-white stroke-gray-600 fill-none"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill-black
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3"
+                />
+              </svg>
+            </a>
+            <button
+              type="button"
+              class="mega-menu-dropdown inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              aria-controls="navbar-sticky"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Open main menu</span>
+              {# TODO: Fix toggle menu #}
+              <svg
+                class="w-4 h-4"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 17 14"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M1 1h15M1 7h15M1 13h15"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            class="ml-72 items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+            id="navbar-sticky"
+          >
+            <ul
+              class="mega-menu-dropdown-button flex flex-col p-4 md:p-0 mt-4 font-\[\'Oswald\'\]] border border-gray-100 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:border-gray-700 font-semibold"
+            >
+              <li>
+                <a
+                  href="buildings"
+                  class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
+                  aria-current="page"
+                  >Buildings</a
+                >
+              </li>
+              <li>
+                <a
+                  href="import"
+                  class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
+                  aria-current="page"
+                  >Import</a
+                >
+              </li>
+              {# TODO: Implement authorization to access Users #}
+              <li>
+                <a
+                  href="users"
+                  class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
+                  aria-current="page"
+                  >Users</a
+                >
+              </li>
+              <li>
+                <a
+                  href="statistics"
+                  class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
+                  aria-current="page"
+                  >Statistics</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </section>
+    {% block content %} {% endblock %}
+  </body>
+</html>
+

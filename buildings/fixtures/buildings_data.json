@@ -1,0 +1,97 @@
+[
+    {
+        "model": "buildings.building",
+        "pk": 1,
+        "fields": {
+            "preview_image_url": "https://example.com/image1.jpg",
+            "latitude": 52.3731,
+            "longitude": 4.8932,
+            "address": "Dam Square, 1012 JL Amsterdam",
+            "construction_year": 1800,
+            "type_of_use": "Historical Site",
+            "tags": ["landmark", "tourist attraction"],
+            "description": "A historic building located in the heart of Amsterdam.",
+            "image_urls": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+            "timeline": {
+                "1800": "Construction completed.",
+                "2000": "Renovation for public access."
+            }
+        }
+    },
+    {
+        "model": "buildings.building",
+        "pk": 2,
+        "fields": {
+            "preview_image_url": "https://example.com/image3.jpg",
+            "latitude": 52.3752,
+            "longitude": 4.8839,
+            "address": "Prinsengracht 263-267, 1016 GV Amsterdam",
+            "construction_year": 1635,
+            "type_of_use": "Museum",
+            "tags": ["museum", "Anne Frank"],
+            "description": "The Anne Frank House, a museum dedicated to Jewish wartime diarist Anne Frank.",
+            "image_urls": ["https://example.com/image3.jpg", "https://example.com/image4.jpg"],
+            "timeline": {
+                "1635": "Original building establishment.",
+                "1945": "Anne Frank's hideout during WWII."
+            }
+        }
+    },
+  {
+        "model": "buildings.building",
+        "pk": 3,
+        "fields": {
+            "preview_image_url": "https://example.com/image5.jpg",
+            "latitude": 52.3600,
+            "longitude": 4.8852,
+            "address": "Museumstraat 1, 1071 XX Amsterdam",
+            "construction_year": 1885,
+            "type_of_use": "Museum",
+            "tags": ["art", "history", "Rijksmuseum"],
+            "description": "Rijksmuseum, a Dutch national museum dedicated to arts and history.",
+            "image_urls": ["https://example.com/image5.jpg", "https://example.com/image6.jpg"],
+            "timeline": {
+                "1885": "Museum opened to the public.",
+                "2013": "Reopening after a major renovation."
+            }
+        }
+    },
+    {
+        "model": "buildings.building",
+        "pk": 4,
+        "fields": {
+            "preview_image_url": "https://example.com/image7.jpg",
+            "latitude": 52.3590,
+            "longitude": 4.8918,
+            "address": "Stadhouderskade 78, 1072 AE Amsterdam",
+            "construction_year": 1867,
+            "type_of_use": "Cultural Attraction",
+            "tags": ["Heineken Experience", "brewery"],
+            "description": "Heineken Experience, a historic brewery and corporate visitor center for Heineken beer.",
+            "image_urls": ["https://example.com/image7.jpg", "https://example.com/image8.jpg"],
+            "timeline": {
+                "1867": "Original brewery establishment.",
+                "1988": "Transformation into a visitor center."
+            }
+        }
+    },
+    {
+        "model": "buildings.building",
+        "pk": 5,
+        "fields": {
+            "preview_image_url": "https://example.com/image9.jpg",
+            "latitude": 52.3744,
+            "longitude": 4.8945,
+            "address": "Damrak 243, 1012 ZJ Amsterdam",
+            "construction_year": 1890,
+            "type_of_use": "Hotel",
+            "tags": ["Victoria Hotel", "historic"],
+            "description": "Victoria Hotel, one of the first modern hotels in Amsterdam, near Central Station.",
+            "image_urls": ["https://example.com/image9.jpg", "https://example.com/image10.jpg"],
+            "timeline": {
+                "1890": "Hotel's grand opening.",
+                "1990": "Major renovation for modern amenities."
+            }
+        }
+    }
+]
