@@ -1,0 +1,157 @@
+{% extends 'base.html' %} {% block content %}
+<section>
+  <h1 class="text-2xl text-left font-\[\'Oswald\'\]] mt-24 ml-10 text-sky-900">
+    PIETER'S PROFILE
+  </h1>
+  <div class="mx-auto p-16 -mt-10 mb-24">
+    <div class="bg-white rounded shadow-md p-6 rounded-lg">
+      <div class="flex flex-wrap md:flex-nowrap">
+        <div class="w-full md:w-1/2 p-4 bg-sky-800 rounded-lg">
+          <div class="flex flex-col items-center">
+            <div
+              class="w-36 h-36 rounded-full overflow-hidden border-4 border-sky-100 mb-4"
+            >
+              <img
+                alt=""
+                class="w-full h-full object-cover"
+                height="192"
+                src="../static/media/images/profile.png"
+                width="192"
+              />
+            </div>
+            <button class="flex items-center text-red-600 mb-4 cursor-pointer">
+              <svg
+                class="w-[25px] h-[25px] text-gray-800 dark:text-white -mt-20 ml-28 bg-sky-800 bg-opacity-95 rounded-tl-sm"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 18"
+              >
+                <path
+                  fill="currentColor"
+                  d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z"
+                />
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M18 1H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
+                />
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="mb-4">
+            <label
+              class="block text-gray-700 text-sm text-slate-200 font-bold mb-2"
+            >
+              Name
+            </label>
+            {# TODO: Set user information dynamically #}
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              value="Pieter"
+            />
+          </div>
+          <div class="mb-4">
+            <label
+              class="block text-gray-700 text-sm text-slate-200 font-bold mb-2"
+            >
+              Email
+            </label>
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="email"
+              value="pieter@anno.amsterdam"
+            />
+          </div>
+          <div class="mb-6">
+            <label
+              class="block text-gray-700 text-sm text-slate-200 font-bold mb-2"
+            >
+              Telephone
+            </label>
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="tel"
+              value="+31 - 123 - 45 67 654"
+            />
+          </div>
+          <button
+            class="bg-red-800 hover:bg-red-900 text-white font-bold py-2 md:mx-44 rounded-3xl focus:outline-none focus:shadow-outline w-36"
+          >
+            Save
+          </button>
+        </div>
+
+        <div class="w-full md:w-1/2 p-4">
+          <div class="rounded shadow-md p-6 mb-6 bg-custom-blue -mt-3.5">
+            <h2 class="text-2xl font-\[\'Oswald\'\]] mb-4 text-sky-900">
+              YOUR POSSIBILITIES
+            </h2>
+            {# TODO: Dynamically set roles #}
+            <div class="mb-4 grid grid-cols-2">
+              <div
+                class="text-lg font-semi-bold font-\[\'Oswald\'\]] text-sky-900"
+              >
+                YOUR ROLE:
+              </div>
+              <div
+                class="text-center text-sm bg-red-800 w-auto text-white py-2 px-4 rounded"
+              >
+                Administrator
+              </div>
+            </div>
+            <div class="mb-4 grid grid-cols-2">
+              <div
+                class="text-md font-semi-bold font-\[\'Oswald\'\]] text-sky-900"
+              >
+                EDIT BUILDINGS:
+              </div>
+              <div
+                class="text-center text-sm bg-slate-200 w-auto text-sky-900 py-2 px-4 rounded"
+              >
+                Any building editable
+              </div>
+            </div>
+            <div class="mb-4 grid grid-cols-2">
+              <div
+                class="text-md font-semi-bold font-\[\'Oswald\'\]] text-sky-900"
+              >
+                IMPORT BUILDINGS:
+              </div>
+              <div
+                class="text-center text-sm bg-slate-200 w-auto text-sky-900 py-2 px-4 rounded"
+              >
+                Any building importable
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-custom-blue rounded shadow-md p-6 divide-y divide-sky-900 divide-opacity-30"
+          >
+            <div class="text-2xl font-\[\'Oswald\'\]] mb-4 text-sky-900">
+              PROFILE ACTIONS
+            </div>
+            <div>
+              <button
+                class="bg-sky-800 hover:bg-sky-900 text-white font-bold py-2 px-4 rounded-3xl focus:outline-none focus:shadow-outline w-52 md:mx-28 mt-6"
+              >
+                Reset Password
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
