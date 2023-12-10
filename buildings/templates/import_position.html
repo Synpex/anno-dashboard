@@ -1,0 +1,48 @@
+{% load static %} {% include 'navbar.html' %} {% block content %}
+<section class="px-10 mt-24">
+  <div class="container mx-auto px-4 py-8">
+    {# Status Bar #} {% include 'import_status_bar.html'%}
+
+    <div class="bg-gray-100">
+      <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap -mx-2">
+          <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
+            <label
+              for="longitude"
+              class="block text-sm font-medium text-gray-700"
+              >Longitude</label
+            >
+            <input
+              type="text"
+              id="longitude"
+              name="longitude"
+              value="52.377956"
+              class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div class="w-full md:w-1/2 px-2">
+            <label
+              for="latitude"
+              class="block text-sm font-medium text-gray-700"
+              >Latitude</label
+            >
+            <input
+              type="text"
+              id="latitude"
+              name="latitude"
+              value="4.897070"
+              class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    {# TODO: Implement Map #}
+
+    <div class="flex justify-center mt-8">
+      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
+      {% include 'next-button.html' %}
+    </div>
+  </div>
+</section>
+{% endblock %}

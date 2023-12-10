@@ -1,0 +1,50 @@
+  {# TODO: Background of each field in the status bar should be custom-blue #}
+  {# after each step is completed #}
+
+<div class="flex space-x-16 mb-8 border border-2 border-sky-900 rounded-lg">
+  <div class="w-1/6">
+    <a href="/buildings/import/detail"
+      ><button
+        class="w-full py-2 px-4 text-sky-900 rounded-l-md {% if request.path == '/buildings/import/detail' %} bg-sky-900 text-white {% endif %}"
+      >
+        Details
+      </button></a
+    >
+  </div>
+  <div class="w-1/6">
+    <a href="/buildings/import/images"
+      ><button
+        class="w-full py-2 px-4 text-sky-900 {% if request.path == '/buildings/import/images' %} bg-sky-900 text-white {% endif %}"
+      >
+        Images
+      </button></a
+    >
+  </div>
+  <div class="w-1/6">
+    <a href="/buildings/import/timeline"
+      ><button
+        class="w-full py-2 px-4 text-sky-900 {% if request.path == '/buildings/import/timeline' %} bg-sky-900 text-white {% endif %}"
+      >
+        Timeline
+      </button></a
+    >
+  </div>
+  <div class="w-1/6">
+    <a href="/buildings/import/position"
+      ><button
+        class="w-full py-2 px-4 text-sky-900 {% if request.path == '/dashboard/import/position' %} bg-sky-900 text-white {% endif %}"
+      >
+        Position
+      </button></a
+    >
+  </div>
+  <div class="w-1/6">
+    <a href="/buildings/import/review"
+      ><button
+        class="w-full py-2 text-gray-600 mr-1 rounded-r-md {% if request.path == '/buildings/import/review' %} bg-sky-900 text-white {% endif %}"
+      >
+        Review
+      </button></a
+    >
+  </div>
+</div>

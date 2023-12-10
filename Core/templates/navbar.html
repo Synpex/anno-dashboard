@@ -18,7 +18,7 @@
           class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
         >
           <a
-            href="#"
+            href="/"
             class="flex items-center space-x-1 space-y-0 rtl:space-x-reverse"
           >
             <img
@@ -34,7 +34,7 @@
           <div
             class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
           >
-              {# TODO: Implement dynamic retrieval of userID #}
+            {# TODO: Implement dynamic retrieval of userID #}
             <a href="user123">
               <img
                 class="w-auto h-11 inline-flex -my-5"
@@ -42,7 +42,7 @@
                 alt=""
               />
             </a>
-            <a href="#">
+            <a href="/login">
               <svg
                 class="ml-4 mt-1.5 w-[19px] h-[19px] text-gray-800 dark:text-white stroke-gray-600 fill-none"
                 aria-hidden="true"
@@ -89,7 +89,7 @@
             >
               <li>
                 <a
-                  href="buildings"
+                  href="/buildings"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
                   aria-current="page"
                   >Buildings</a
@@ -97,7 +97,7 @@
               </li>
               <li>
                 <a
-                  href="import"
+                  href="/buildings/import/detail"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
                   aria-current="page"
                   >Import</a
@@ -106,7 +106,7 @@
               {# TODO: Implement authorization to access Users #}
               <li>
                 <a
-                  href="users"
+                  href="/users"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
                   aria-current="page"
                   >Users</a
@@ -114,7 +114,7 @@
               </li>
               <li>
                 <a
-                  href="statistics"
+                  href="/statistics"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
                   aria-current="page"
                   >Statistics</a
@@ -128,4 +128,3 @@
     {% block content %} {% endblock %}
   </body>
 </html>
-

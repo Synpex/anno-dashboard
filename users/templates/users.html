@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block content %}
+{% load static %} {% include 'navbar.html' %} {% block content %}
 <section>
   <div class="px-3 pt-24 md:pt-20 flex flex-wrap justify-between items-center">
     <!-- Left section -->
@@ -100,6 +100,11 @@
     <div class="overflow-x-auto table-responsive">
       <table class="w-full bg-white">
         <thead>
+          {# TODO: Do something like this for each user #}
+          {# {#each contributors as user} #}
+          {# <img class="inline-block h-12 w-12 rounded-full ring-2 ring-white" src="{user.avatarUrl}" alt="{user.handle}" />#}
+          {# {/each} #}
+
           <tr>
             <th
               class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"

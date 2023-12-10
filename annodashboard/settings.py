@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'Core',
     'buildings',
     'rest_framework',
+    'stats',
     'users',
     'drf_yasg',
     'tailwind',

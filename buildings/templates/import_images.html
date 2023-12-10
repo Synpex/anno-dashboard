@@ -1,0 +1,29 @@
+{% load static %} {% include 'navbar.html' %} {% block content %}
+<section class="px-10 mt-24">
+  <div class="container mx-auto px-4 py-8">
+    {# Status Bar #} {% include 'import_status_bar.html'%}
+    <div class="flex justify-center items-center bg-gray-100">
+      <form
+        class="p-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 font-\[\'Oswald\'\]]"
+      >
+        {# <input type="file" id="upload" alt="" />#}
+        <label
+          for="upload"
+          class="btn-same-height bg-sky-900 px-12 justify-center items-center rounded-3xl text-white flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          Upload Pictures to the Building
+        </label>
+        <button
+          class="btn-same-height border-2 rounded-3xl border-sky-900 px-12 text-sky-900 font-\[\'Oswald\'\]] flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          Browse Google Maps for Images
+        </button>
+      </form>
+    </div>
+    <div class="flex justify-center mt-8">
+      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
+      {% include 'next-button.html' %}
+    </div>
+  </div>
+</section>
+{% endblock %}

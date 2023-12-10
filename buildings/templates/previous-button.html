@@ -1,0 +1,29 @@
+{% if request.path == '/buildings/import/images' %}
+<a
+  href="/buildings/import/detail"
+  class="border-2 rounded-3xl px-6 ml-96 border-sky-900 text-sky-900 font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+>
+  <p class="mt-1">Previous</p>
+</a>
+{% endif %} {% if request.path == '/buildings/import/timeline' %}
+<a
+  href="/buildings/import/images"
+  class="border-2 rounded-3xl px-6 ml-96 border-sky-900 text-sky-900 font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+>
+  <p class="mt-1">Previous</p>
+</a>
+{% endif %} {% if request.path == '/buildings/import/position' %}
+<a
+  href="/buildings/import/timeline"
+  class="border-2 rounded-3xl px-6 ml-96 border-sky-900 text-sky-900 font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+>
+  <p class="mt-1">Previous</p>
+</a>
+{% endif %} {% if request.path == '/buildings/import/review' %}
+<a
+  href="/buildings/import/position"
+  class="border-2 rounded-3xl px-6 ml-96 border-sky-900 text-sky-900 font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+>
+  <p class="mt-1">Previous</p>
+</a>
+{% endif %}

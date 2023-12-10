@@ -1,0 +1,56 @@
+{% load static %} {% include 'navbar.html' %} {% block content %}
+<section class="px-10 mt-24">
+  <div class="container mx-auto px-4 py-8">
+    {# Status Bar #} {% include 'import_status_bar.html'%}
+    <div
+      class="bg-white shadow rounded-lg p-4 flex items-center justify-between"
+    >
+      <div class="flex items-center">
+        <label for="year" class="block text-sm font-medium text-gray-700 mr-4"
+          >Year</label
+        >
+        <input
+          type="text"
+          id="year"
+          name="year"
+          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
+          placeholder="1903"
+        />
+      </div>
+      <div class="flex-1 ml-4">
+        <input
+          type="text"
+          id="event"
+          name="event"
+          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
+          placeholder="Half of the building burned"
+        />
+      </div>
+      <button
+        class="ml-4 bg-sky-900 p-2 rounded-full text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        <svg
+          class="w-[12px] h-[12px] text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 18 18"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 1v16M1 9h16"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex justify-center mt-8">
+      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
+      {% include 'next-button.html' %}
+    </div>
+  </div>
+</section>
+{% endblock %}

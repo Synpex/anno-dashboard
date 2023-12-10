@@ -49,7 +49,7 @@ Thumbs.db
 *.wmv
 
 # Project files
-/dashboard/templates/buildings.html
-/dashboard/templates/login.html
+/Core/templates/buildings.html
+/Core/templates/login.html
 
 
