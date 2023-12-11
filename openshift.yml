@@ -1,57 +1,100 @@
+trigger:
+- main
+ 
+variables:
+- name: dockerComposeFile
+  value: 'docker-compose.yml'
+- group: 'docker-secrets' # Variable group storing Docker registry, username, and password
+ 
 stages:
-  - stage: Build
-    jobs:
-      - job: BuildJob
-        steps:
-          - script: |
-              echo "Starting Build Process"
-              # Install Python dependencies
-              pip install -r requirements.txt
-              # Collect static files for web application
-              python manage.py collectstatic --noinput
-
-  - stage: Test
-    jobs:
-      - job: UnitTestJob
-        steps:
-          - script: |
-              echo "Running Unit Tests"
-              # Running Django unit tests
-              python manage.py test
-
-      - job: IntegrationTestJob
-        steps:
-          - script: |
-              echo "Running Integration Tests"
-              # Running integration tests across containers
-              # [Insert specific commands for your integration tests here]
-
-  - stage: Deploy
-    jobs:
-      - job: DeployJob
-        steps:
+- stage: BuildAndTest
+  displayName: 'Build and Test Stage'
+  jobs:
+  - job: BuildAndTestJob
+    displayName: 'Build and Run Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+    - task: DockerCompose@0
+      displayName: 'Run Docker Compose Up'
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerComposeFile: '**/$(dockerComposeFile)'
+        action: 'Run services'
+        dockerComposeCommandOptions: 'up -d web tailwind'
+        detach: true
+ 
+    - script: |
+        echo "Running Unit Tests"
+        docker exec web python manage.py test
+      displayName: 'Execute Unit Tests'
+ 
+    - task: DockerCompose@0
+      displayName: 'Run Docker Compose Down'
+      inputs:
+        dockerComposeFile: '**/$(dockerComposeFile)'
+        action: 'Run a Docker Compose command'
+        dockerComposeCommandOptions: 'down'
+ 
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  jobs:
+  - deployment: DeployToProduction
+    displayName: 'Deploy to Production'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
           - script: |
               echo "Logging into OpenShift"
-              oc login --token=#YOUR_OC_TOKEN# --server=#YOUR_OPENSHIFT_SERVER#
-
+              oc login --token=$(ocToken) --server=$(openShiftServer)
+            displayName: 'Login to OpenShift'
+ 
           - script: |
-              echo "Updating Containers"
-              # Update each container. This example assumes containers are defined in OpenShift DeploymentConfigs
-              # You may have to adjust commands based on your actual container setup
-              oc rollout latest dc/container1
-              oc rollout latest dc/container2
-              # [Repeat for other containers]
-              # Monitor rollout status
-              oc rollout status dc/container1
-              oc rollout status dc/container2
-              # [Repeat for other containers]
-
+              echo "Deploying MSSQL and MongoDB services"
+              # Commands to deploy persistent MSSQL and MongoDB services
+              # Ensure you have the necessary configurations and secrets for these services
+              oc apply -f mssql-deployment.yaml
+              oc apply -f mongodb-deployment.yaml
+            displayName: 'Deploy Database Services'
+ 
           - script: |
-              echo "Applying Configurations and Secrets"
-              # Update environment variables or secrets if needed
-              # [Insert commands for updating configs and secrets]
-
+              echo "Deploying Application"
+              # Command to deploy the application, possibly using kubectl or oc
+              # Adjust the commands based on your actual container setup
+              oc set image deployment/myapp web=$(dockerRegistry)/$(dockerRepository):$(Build.BuildId)
+              oc rollout latest deployment/myapp
+            displayName: 'Deploy Application'
+ 
           - script: |
-              echo "Verifying Deployment"
-              # Post-deployment verification steps
-              # [Insert verification scripts, e.g., checking service availability]
+             echo "Starting Post Deployment Verification"
+    
+            # Define the application URL
+            APP_URL="http://myapp.example.com" # Replace with your application's URL
+
+            # Simple check to see if the application's main page is up and responding
+            echo "Checking if the application is up and running"
+            response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_URL)
+
+            if [ "$response" -eq 200 ] ; then
+              echo "Application is responding correctly."
+            else
+              echo "Application is not responding. HTTP Status: $response"
+             exit 1 # Exit with error if the application is not responding
+            fi
+
+            # Add additional checks here
+            # For example, checking the status of specific endpoints or functionalities
+            APP_ENDPOINT="$APP_URL/"
+            response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_ENDPOINT)
+            if [ "$response" -ne 200 ]; then
+               echo "Health endpoint check failed. HTTP Status: $response"
+               exit 1
+            fi
+
+             echo "Post Deployment Verification Completed Successfully"
+             displayName: 'Verify Deployment'
