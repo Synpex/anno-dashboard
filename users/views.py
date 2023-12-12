@@ -14,7 +14,7 @@ def profile_view(request):
     context = {
         # TODO: Implement dynamic retrieval of userID
         # 'section': f'{user}',
-        'section': 'user123',
+        'section': 'user',
         # Add more context variables here
     }
     return render(request, 'profile.html', context)
