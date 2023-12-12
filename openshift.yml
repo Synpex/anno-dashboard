@@ -1,0 +1,178 @@
+trigger:
+- main
+ 
+variables:
+- name: dockerComposeFile
+  value: 'docker-compose.yml'
+- group: 'docker-secrets' # Variable group storing Docker registry, username, and password
+ 
+stages:
+- stage: BuildAndTest
+  displayName: 'Build and Test Stage'
+  jobs:
+  - job: BuildAndTestJob
+    displayName: 'Build and Run Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+    - task: DockerCompose@0
+      displayName: 'Run Docker Compose Up'
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerComposeFile: '**/$(dockerComposeFile)'
+        action: 'Run services'
+        dockerComposeCommandOptions: 'up -d web tailwind'
+        detach: true
+ 
+    - script: |
+        echo "Running Unit Tests"
+        docker exec web python manage.py test
+      displayName: 'Execute Unit Tests'
+ 
+    - task: DockerCompose@0
+      displayName: 'Run Docker Compose Down'
+      inputs:
+        dockerComposeFile: '**/$(dockerComposeFile)'
+        action: 'Run a Docker Compose command'
+        dockerComposeCommandOptions: 'down'
+ 
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  jobs:
+  - deployment: DeployToProduction
+    displayName: 'Deploy to Production'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Logging into OpenShift"
+              oc login --token=$(ocToken) --server=$(openShiftServer)
+            displayName: 'Login to OpenShift'
+
+          - script: |
+              echo "Deploying MSSQL Service"
+            # Ensure the path to the MSSQL YAML file is correct
+            oc apply -f path/to/mssql-deployment.yaml
+            echo "MSSQL Service Deployed Successfully"
+
+            echo "Deploying MongoDB Service"
+            # Ensure the path to the MongoDB YAML file is correct
+            oc apply -f path/to/mongodb-deployment.yaml
+            echo "MongoDB Service Deployed Successfully"
+          displayName: 'Deploy Database Services'
+
+ 
+          - script: |
+              echo "Deploying Application"
+
+            # Set the image for your application deployment
+
+            # Replace 'myapp', 'web', 'dockerRegistry', 'dockerRepository', and 'Build.BuildId' with your actual values
+            oc set image deployment/myapp web=$(dockerRegistry)/$(dockerRepository):$(Build.BuildId)
+
+            # Trigger a new rollout
+            oc rollout latest deployment/myapp
+
+            # Check the rollout status until it completes or fails
+            oc rollout status deployment/myapp -w
+
+            # Optional: Expose the service if not already exposed
+            # oc expose svc/myapp
+
+            # Optional: Get the URL of the deployed application (if applicable)
+            # APP_URL=$(oc get route myapp -o jsonpath='{.spec.host}')
+            # echo "Application deployed at: $APP_URL"
+          displayName: 'Deploy Application'
+
+ 
+          - script: |
+             echo "Starting Post Deployment Verification"
+    
+            # Define the application URL
+            APP_URL="http://myapp.example.com" # Replace with your application's URL
+
+            # Simple check to see if the application's main page is up and responding
+            echo "Checking if the application is up and running"
+            response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_URL)
+
+            if [ "$response" -eq 200 ] ; then
+              echo "Application is responding correctly."
+            else
+              echo "Application is not responding. HTTP Status: $response"
+             exit 1 # Exit with error if the application is not responding
+            fi
+
+            # Add additional checks here
+            # For example, checking the status of specific endpoints or functionalities
+            APP_ENDPOINT="$APP_URL/"
+            response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_ENDPOINT)
+            if [ "$response" -ne 200 ]; then
+               echo "Health endpoint check failed. HTTP Status: $response"
+               exit 1
+            fi
+
+             echo "Post Deployment Verification Completed Successfully"
+            displayName: 'Verify Deployment'
+
+
+             - script: |
+                echo "Starting Step XYZ"
+
+              # Attempt to perform a task, capturing any errors
+              { 
+                # Replace the following line with the actual command for the task
+                echo "Executing Task..."; 
+              } || {
+                # This block executes if the task fails
+                echo "Task failed. Capturing logs for debugging."
+
+              # Capture logs or error details. Adjust the command based on your logging setup
+              # For example, 'docker logs mycontainer' or 'kubectl logs mypod'
+              echo "Retrieving logs..."
+              docker logs mycontainer > task_error_logs.txt
+
+              # Optionally, upload logs to a storage location or notify team members
+              # For example, using 'az storage blob upload' or sending an email/notification
+
+               # Exit with an error status to halt the pipeline or trigger alerts
+              exit 1
+            }
+
+              echo "Step XYZ Completed Successfully"
+            displayName: 'Execute Step XYZ with Error Handling'
+
+              - script: |
+                echo "Starting Post Deployment Verification"
+    
+              # Define the application URL
+               APP_URL="http://myapp.example.com" # Replace with your application's URL
+
+              # Simple check to see if the application's main page is up and responding
+              echo "Checking if the application is up and running"
+              response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_URL)
+
+              if [ "$response" -eq 200 ] ; then
+                echo "Application is responding correctly."
+              else
+                echo "Application is not responding. HTTP Status: $response"
+                exit 1 # Exit with error if the application is not responding
+              fi
+
+              # Additional checks can be added here
+              # For example, checking the status of specific endpoints or functionalities
+              APP_ENDPOINT="$APP_URL/"
+               response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_ENDPOINT)
+               if [ "$response" -ne 200 ]; then
+                 echo "Health endpoint check failed. HTTP Status: $response"
+                 exit 1
+               fi
+
+              echo "Post Deployment Verification Completed Successfully"
+            displayName: 'Verify Deployment'
+
+
