@@ -53,22 +53,42 @@ stages:
               echo "Logging into OpenShift"
               oc login --token=$(ocToken) --server=$(openShiftServer)
             displayName: 'Login to OpenShift'
- 
+
           - script: |
-              echo "Deploying MSSQL and MongoDB services"
-              # Commands to deploy persistent MSSQL and MongoDB services
-              # Ensure you have the necessary configurations and secrets for these services
-              oc apply -f mssql-deployment.yaml
-              oc apply -f mongodb-deployment.yaml
-            displayName: 'Deploy Database Services'
+              echo "Deploying MSSQL Service"
+            # Ensure the path to the MSSQL YAML file is correct
+            oc apply -f path/to/mssql-deployment.yaml
+            echo "MSSQL Service Deployed Successfully"
+
+            echo "Deploying MongoDB Service"
+            # Ensure the path to the MongoDB YAML file is correct
+            oc apply -f path/to/mongodb-deployment.yaml
+            echo "MongoDB Service Deployed Successfully"
+          displayName: 'Deploy Database Services'
+
  
           - script: |
               echo "Deploying Application"
-              # Command to deploy the application, possibly using kubectl or oc
-              # Adjust the commands based on your actual container setup
-              oc set image deployment/myapp web=$(dockerRegistry)/$(dockerRepository):$(Build.BuildId)
-              oc rollout latest deployment/myapp
-            displayName: 'Deploy Application'
+
+            # Set the image for your application deployment
+
+            # Replace 'myapp', 'web', 'dockerRegistry', 'dockerRepository', and 'Build.BuildId' with your actual values
+            oc set image deployment/myapp web=$(dockerRegistry)/$(dockerRepository):$(Build.BuildId)
+
+            # Trigger a new rollout
+            oc rollout latest deployment/myapp
+
+            # Check the rollout status until it completes or fails
+            oc rollout status deployment/myapp -w
+
+            # Optional: Expose the service if not already exposed
+            # oc expose svc/myapp
+
+            # Optional: Get the URL of the deployed application (if applicable)
+            # APP_URL=$(oc get route myapp -o jsonpath='{.spec.host}')
+            # echo "Application deployed at: $APP_URL"
+          displayName: 'Deploy Application'
+
  
           - script: |
              echo "Starting Post Deployment Verification"
@@ -97,4 +117,62 @@ stages:
             fi
 
              echo "Post Deployment Verification Completed Successfully"
-             displayName: 'Verify Deployment'
+            displayName: 'Verify Deployment'
+
+
+             - script: |
+                echo "Starting Step XYZ"
+
+              # Attempt to perform a task, capturing any errors
+              { 
+                # Replace the following line with the actual command for the task
+                echo "Executing Task..."; 
+              } || {
+                # This block executes if the task fails
+                echo "Task failed. Capturing logs for debugging."
+
+              # Capture logs or error details. Adjust the command based on your logging setup
+              # For example, 'docker logs mycontainer' or 'kubectl logs mypod'
+              echo "Retrieving logs..."
+              docker logs mycontainer > task_error_logs.txt
+
+              # Optionally, upload logs to a storage location or notify team members
+              # For example, using 'az storage blob upload' or sending an email/notification
+
+               # Exit with an error status to halt the pipeline or trigger alerts
+              exit 1
+            }
+
+              echo "Step XYZ Completed Successfully"
+            displayName: 'Execute Step XYZ with Error Handling'
+
+              - script: |
+                echo "Starting Post Deployment Verification"
+    
+              # Define the application URL
+               APP_URL="http://myapp.example.com" # Replace with your application's URL
+
+              # Simple check to see if the application's main page is up and responding
+              echo "Checking if the application is up and running"
+              response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_URL)
+
+              if [ "$response" -eq 200 ] ; then
+                echo "Application is responding correctly."
+              else
+                echo "Application is not responding. HTTP Status: $response"
+                exit 1 # Exit with error if the application is not responding
+              fi
+
+              # Additional checks can be added here
+              # For example, checking the status of specific endpoints or functionalities
+              APP_ENDPOINT="$APP_URL/"
+               response=$(curl --write-out %{http_code} --silent --output /dev/null $APP_ENDPOINT)
+               if [ "$response" -ne 200 ]; then
+                 echo "Health endpoint check failed. HTTP Status: $response"
+                 exit 1
+               fi
+
+              echo "Post Deployment Verification Completed Successfully"
+            displayName: 'Verify Deployment'
+
+
