@@ -1,13 +1,3 @@
-{% load static tailwind_tags %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>ANNO Amsterdam</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    {% tailwind_css %}
-  </head>
 
   <body class="leading-normal tracking-normal">
     <section>
@@ -35,7 +25,7 @@
             class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
           >
             {# TODO: Implement dynamic retrieval of userID #}
-            <a href="user123">
+            <a href="/user">
               <img
                 class="w-auto h-11 inline-flex -my-5"
                 src="../static/media/images/profile.png"
@@ -126,5 +116,4 @@
       </nav>
     </section>
     {% block content %} {% endblock %}
-  </body>
-</html>
+  </section>

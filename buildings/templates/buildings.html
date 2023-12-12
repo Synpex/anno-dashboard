@@ -1,10 +1,16 @@
+
+{% load static tailwind_tags %}
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Buildings</title>
-    <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
-  </head>
+<html lang="en">
+    <head>
+        <title>ANNO Amsterdam</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+        {% tailwind_css %}
+    </head>
   <body>
     {% include 'navbar.html' %} {% block content %}
     <section class="px-10 mt-24">
@@ -23,12 +29,15 @@
     {% endblock %}
 
     <script>
-        mapboxgl.accessToken = {{ mapbox_access_token }};
-        var map = new mapboxgl.Map({
+        document.addEventListener('DOMContentLoaded', function (){
+            mapboxgl.accessToken = '{{ mapbox_access_token }}';
+            var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v10',
             center: {lat: 52.377956, lng: 4.897070}
             {#  other parameters to use: dragPan, minZoom  #}
         });
+        });
+
     </script>
   </body>
