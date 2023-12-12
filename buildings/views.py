@@ -1,16 +1,18 @@
 from django.shortcuts import render
-from django.conf import settings
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+
+# This decorator ensures that only authenticated users can access the dashboard
+@login_required
 def buildings_view(request):
     # You can add your logic here to pass context to your dashboard template
-    mapbox_access_token = settings.MAPBOX_ACCESS_TOKEN
+    # mapbox_access_token = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxMHlnZWNuMDM1cjJpbzExcTlqaGJ6NCJ9._P7uUlMRTrZCiFyzQCGTjw'
     context = {
         'section': 'buildings',
-        'map_box_token' : mapbox_access_token,
         # Add more context variables here
     }
     return render(request, 'buildings.html', context)
-
+@login_required
 def import_detail_view(request):
     # You can add your logic here to pass context to your dashboard template
     context = {
@@ -18,7 +20,7 @@ def import_detail_view(request):
         # Add more context variables here
     }
     return render(request, 'import_detail.html', context)
-
+@login_required
 def import_images_view(request):
     # You can add your logic here to pass context to your dashboard template
     context = {
@@ -27,6 +29,7 @@ def import_images_view(request):
     }
     return render(request, 'import_images.html', context)
 
+@login_required
 
 def import_timeline_view(request):
     # You can add your logic here to pass context to your dashboard template
@@ -35,6 +38,7 @@ def import_timeline_view(request):
         # Add more context variables here
     }
     return render(request, 'import_timeline.html', context)
+@login_required
 
 def import_position_view(request):
     # You can add your logic here to pass context to your dashboard template
@@ -43,6 +47,7 @@ def import_position_view(request):
         # Add more context variables here
     }
     return render(request, 'import_position.html', context)
+@login_required
 
 def import_review_view(request):
     # You can add your logic here to pass context to your dashboard template
