@@ -35,14 +35,14 @@
             class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
           >
             {# TODO: Implement dynamic retrieval of userID #}
-            <a href="user123">
+            <a href={% url 'profile' %}>
               <img
                 class="w-auto h-11 inline-flex -my-5"
                 src="../static/media/images/profile.png"
                 alt=""
               />
             </a>
-            <a href="/login">
+            <a href="{% url 'logout' %}">
               <svg
                 class="ml-4 mt-1.5 w-[19px] h-[19px] text-gray-800 dark:text-white stroke-gray-600 fill-none"
                 aria-hidden="true"

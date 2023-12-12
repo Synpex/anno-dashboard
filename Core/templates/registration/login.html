@@ -1,0 +1,87 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ANNO Amsterdam</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    {% tailwind_css %}
+</head>
+
+<body class="bg-sky-900">
+    <div class="w-full mt-16">
+        <div class="flex justify-center items-center">
+            <img src="{% static 'media/images/anno-logo-white.png' %}" class="w-32 md:w-44"/>
+        </div>
+        <p class="text-amber-700 md:text-xl font-\[\'Oswald\'\]] uppercase flex justify-center items-center">Amsterdam</p>
+
+        <p class="text-gray-300 text-md font-\[\'Oswald\'\]] uppercase flex justify-center items-center mt-3">Sign in</p>
+        <p class="text-center text-gray-300 md: text-md font-light font-\[\'Oswald\'\]]">Welcome to Anno Amsterdam! Please log in here:</p>
+    </div>
+
+    <div>
+        <div class="flex-1 md:ml-96 md:mr-96 mt-4">
+            <!-- Django login form -->
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <svg class="w-4 h-4 text-gray-800 dark:text-white fill-gray-400 absolute ml-40 md:ml-3 m-2"
+                         aria-hidden="true"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 14 18">
+                        <!-- SVG path for icon -->
+                    </svg>
+                    <input type="text"
+                           name="{{ form.username.html_name }}"
+                           id="{{ form.username.id_for_label }}"
+                           class="ml-48 md:ml-8 md:mr-8 py-1 md:w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block text-gray-900 border-2 rounded-md"
+                           placeholder="Username"
+                           value="{{ form.username.value|default_if_none:'' }}">
+                </div>
+                <div class="mb-4">
+                    <svg class="w-4 h-4 text-gray-800 dark:text-white fill-gray-400 absolute ml-40 md:ml-3 mt-4"
+                         aria-hidden="true"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 14 18">
+                        <!-- SVG path for icon -->
+                    </svg>
+                    <input type="password"
+                           name="{{ form.password.html_name }}"
+                           id="{{ form.password.id_for_label }}"
+                           class="ml-48 md:ml-8 md:mr-8 mt-2 py-1 md:w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block text-gray-900 border-2 rounded-md"
+                           placeholder="Password">
+                </div>
+
+                <button type="submit" class="ml-80 md:ml-36 md:mr-10 bg-amber-900 hover:bg-amber-800 text-gray-300 text-md rounded-xl py-3 px-8 uppercase w-48 md:w-60">Log in</button>
+
+                 {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <p class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+                <!-- ... rest of your form ... -->
+            </form>
+
+
+        </div>
+    </div>
+
+    <div class="flex mt-10 mx-10 md:mx-10 -space-x-3 md:-space-x-4">
+        <img src="{% static 'media/images/buildingsvector.png' %}" class="h-28 md:h-40"/>
+        <img src="{% static 'media/images/buildingsvector.png' %}" class="h-28 md:h-40"/>
+        <img src="{% static 'media/images/buildingsvector.png' %}" class="h-28 md:h-40"/>
+    </div>
+
+    <script>
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        var x = document.getElementById("vector4");
+        if (w <= 369 && h <= 571) {
+            x.hidden = true;
+        }
+    </script>
+</body>
+</html>
