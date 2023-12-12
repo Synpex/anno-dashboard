@@ -120,7 +120,6 @@ DATABASES = {
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
-            'connection_timeout': 60,  # Adjust the timeout as needed
         }
     }
 }
@@ -150,6 +149,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Redirect to 'login' page if not authenticated
+LOGIN_URL = 'login'
+
+# Set redirection to dashboard after login
+LOGIN_REDIRECT_URL = 'dashboard'
 
 
 # Internationalization
