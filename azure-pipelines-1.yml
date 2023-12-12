@@ -1,0 +1,56 @@
+trigger:
+- main  # Adjust this to the branch you want to trigger builds
+
+resources:
+- repo: self
+
+variables:
+  # Variables for Docker Hub
+  dockerRegistryServiceConnection: 'DockerHubConnection'  # Replace with your Docker Hub service connection name
+  imageName: 'annodashboard'  # Replace with your image name
+
+stages:
+- stage: Build
+  displayName: Build and Test
+  jobs:
+  - job: Build
+    displayName: Build Image
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+      submodules: true
+
+    - task: Docker@2
+      displayName: Build Docker Image
+      inputs:
+        command: build
+        dockerfile: '**/Dockerfile'  # Adjust if your Dockerfile is in a specific directory
+        tags: |
+          $(Build.BuildId)
+
+    - task: Docker@2
+      displayName: Push Image to Docker Hub
+      inputs:
+        command: push
+        repository: $(imageName)
+        dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
+        tags: |
+          $(Build.BuildId)
+
+- stage: Test
+  displayName: Run Tests
+  jobs:
+  - job: DjangoTests
+    displayName: Django Unit Tests
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+      submodules: true
+
+    - script: |
+        docker run $(imageName):$(Build.BuildId) python manage.py test
+      displayName: Run Django Unit Tests
+
+# Add more stages/jobs as needed for integration tests, linting, etc.
