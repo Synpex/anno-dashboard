@@ -1,7 +1,7 @@
 {% load static %} {% include 'navbar.html' %} {% block content %}
 <section>
   <h1 class="text-2xl text-left font-\[\'Oswald\'\]] mt-24 ml-10 text-sky-900">
-    {{ request.user.first_name |default:"User's Profile" }}
+    {{ request.user.username|default:"User" }}'s Profile
   </h1>
   <div class="mx-auto p-16 -mt-10 mb-24">
     <div class="bg-white rounded shadow-md p-6 rounded-lg">
@@ -54,11 +54,11 @@
             >
               Name
             </label>
-            {# TODO: Set user information dynamically #}
             <input
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
-              value="{{ request.user.get_full_name  }}"
+              value="{{ request.user.get_full_name}}"
+              disabled
             />
           </div>
           <div class="mb-4">
