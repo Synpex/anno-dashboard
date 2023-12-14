@@ -1,55 +1,55 @@
 trigger:
-- main 
+  - main 
 
 resources:
-- repo: self
+  - repo: self
 
 variables:
   dockerRegistryServiceConnection: 'AzureContainerRegistryConnection'  
   imageName: 'annodashboard'  
   tag: '$(Build.BuildId)'
 
-- stage: Build
-  displayName: Build and Test
-  jobs:
-  - job: Build
-    displayName: Build Image
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - checkout: self
-      submodules: true
+stages:
+  - stage: Build
+    displayName: Build and Test
+    jobs:
+      - job: Build
+        displayName: Build Image
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            submodules: true
 
-    - task: Docker@2
-      displayName: Build Docker Image
-      inputs:
-        command: build
-        dockerfile: '**/Dockerfile'
-        repository: $(imageName)
-        tags: |
-          $(tag)
+          - task: Docker@2
+            displayName: Build Docker Image
+            inputs:
+              command: build
+              dockerfile: '**/Dockerfile'
+              repository: $(imageName)
+              tags: |
+                $(tag)
 
-    - task: Docker@2
-      displayName: Push Image to ACR
-      inputs:
-        command: push
-        repository: $(imageName)
-        dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+          - task: Docker@2
+            displayName: Push Image to ACR
+            inputs:
+              command: push
+              repository: $(imageName)
+              dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
 
+  - stage: Test
+    displayName: Run Tests
+    jobs:
+      - job: DjangoTests
+        displayName: Django Unit Tests
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            submodules: true
 
-- stage: Test
-  displayName: Run Tests
-  jobs:
-  - job: DjangoTests
-    displayName: Django Unit Tests
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - checkout: self
-      submodules: true
-
-    - script: |
-        docker run $(imageName):$(tag) python manage.py test
-      displayName: Run Django Unit Tests
+          - script: |
+              docker run $(imageName):$(tag) python manage.py test
+            displayName: Run Django Unit Tests
