@@ -8,6 +8,8 @@ variables:
   dockerRegistryServiceConnection: 'AzureContainerRegistryConnection'  
   imageName: 'annodashboard'  
   tag: '$(Build.BuildId)'
+  
+pool: upcode-dev.at
 
 stages:
   - stage: Build
