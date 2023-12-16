@@ -1,67 +1,55 @@
 trigger:
-- '*'
+  - main 
 
-pr:
-- '*'
+resources:
+  - repo: self
 
-pool:
-  vmImage: 'ubuntu-latest'
+variables:
+  dockerRegistryServiceConnection: 'AzureContainerRegistryConnection'  
+  imageName: 'annodashboard'  
+  tag: '$(Build.BuildId)'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.8'
-  displayName: 'Use Python 3.8'
+stages:
+  - stage: Build
+    displayName: Build and Test
+    jobs:
+      - job: Build
+        displayName: Build Image
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            submodules: true
 
-- script: python -m pip install --upgrade pip
-  displayName: 'Upgrade pip'
+          - task: Docker@2
+            displayName: Build Docker Image
+            inputs:
+              command: build
+              dockerfile: '**/Dockerfile'
+              repository: $(imageName)
+              tags: |
+                $(tag)
 
-- script: ls -la annodashboard/
-  displayName: 'List contents of annodashboard directory'
+          - task: Docker@2
+            displayName: Push Image to ACR
+            inputs:
+              command: push
+              repository: $(imageName)
+              dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
 
-- script: find . -regex '.*requirements.txt$'
-  displayName: 'find requirements'
-  workingDirectory: 'annodashboard'
+  - stage: Test
+    displayName: Run Tests
+    jobs:
+      - job: DjangoTests
+        displayName: Django Unit Tests
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            submodules: true
 
-- script: pip install --no-cache-dir -r requirements.txt
-  displayName: 'Install requirements'
-  workingDirectory: 'annodashboard'
-
-- script: python manage.py test #--testrunner=xmlrunner.extra.djangotestrunner.XMLTestRunner (Already in the settings.py)
-  displayName: 'Run Django Unit Tests'
-  workingDirectory: 'annodashboard' 
-
-- task: PublishTestResults@2
-  displayName: 'Publish Test Results'
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '**/test-reports/*.xml'
-    testRunTitle: 'Django Unit Test Results'
-    failTaskOnFailedTests: true 
-
-- script: python manage.py collectstatic --no-input
-  displayName: 'Collect static files'
-  workingDirectory: 'annodashboard'  
-
-- script: python manage.py check --deploy
-  displayName: 'Check for deployment issues'
-  workingDirectory: 'annodashboard'  
-
-# Add additional steps here for any database migrations as needed
-# - script: python manage.py makemigrations
-#   displayName: 'Make database migrations'
-#   workingDirectory: 'annodashboard'  
-
-# - script: python manage.py migrate
-#   displayName: 'Apply database migrations'
-#   workingDirectory: 'annodashboard'  
-
-# Add steps here to package your app if needed, for instance using Docker
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifacts'
-  condition: succeeded()
-  inputs:
-    pathtoPublish: 'annodashboard'  
-    artifactName: 'drop'
-
+          - script: |
+              docker run $(imageName):$(tag) python manage.py test
+            displayName: Run Django Unit Tests
