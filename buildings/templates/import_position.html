@@ -1,5 +1,19 @@
-{% load static %} {% include 'navbar.html' %} {% block content %}
-<section class="px-10 mt-24">
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ANNO Amsterdam</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+        {% tailwind_css %}
+    </head>
+
+    {% block content %}
+        {% include 'navbar.html' %}
+        <section class="px-10 mt-24">
   <div class="container mx-auto px-4 py-8">
     {# Status Bar #} {% include 'import_status_bar.html'%}
 
@@ -45,4 +59,6 @@
     </div>
   </div>
 </section>
-{% endblock %}
+    {% endblock %}
+
+</html>

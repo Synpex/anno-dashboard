@@ -1,15 +1,4 @@
-{% load static tailwind_tags %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>ANNO Amsterdam</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    {% tailwind_css %}
-  </head>
-
-  <body class="leading-normal tracking-normal">
+ <section class="leading-normal tracking-normal">
     <section>
       <nav
         class="bg-white fixed w-full z-20 top-0 start-0 border-b border-sky-700 dark:border-sky-700 dark:border-opacity-10"
@@ -90,7 +79,7 @@
               <li>
                 <a
                   href="/buildings"
-                  class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
+                  class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800 {% if request.path == "localhost:8001/buildings/" %} text-red-800 {% endif %}"
                   aria-current="page"
                   >Buildings</a
                 >
@@ -126,5 +115,5 @@
       </nav>
     </section>
     {% block content %} {% endblock %}
-  </body>
+  </section>
 </html>

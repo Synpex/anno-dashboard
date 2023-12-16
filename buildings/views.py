@@ -1,14 +1,16 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 # Create your views here.
 
 # This decorator ensures that only authenticated users can access the dashboard
 @login_required
 def buildings_view(request):
     # You can add your logic here to pass context to your dashboard template
-    # mapbox_access_token = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxMHlnZWNuMDM1cjJpbzExcTlqaGJ6NCJ9._P7uUlMRTrZCiFyzQCGTjw'
+    mapbox_access_token = settings.MAPBOX_ACCESS_TOKEN
     context = {
         'section': 'buildings',
+        'mapbox_access_token': mapbox_access_token,
         # Add more context variables here
     }
     return render(request, 'buildings.html', context)
@@ -42,8 +44,10 @@ def import_timeline_view(request):
 
 def import_position_view(request):
     # You can add your logic here to pass context to your dashboard template
+    mapbox_access_token = settings.MAPBOX_ACCESS_TOKEN
     context = {
         'section': 'import',
+        'mapbox_access_token': mapbox_access_token,
         # Add more context variables here
     }
     return render(request, 'import_position.html', context)
