@@ -1,14 +1,14 @@
 trigger:
-  - main 
+- main 
 
 resources:
-  - repo: self
+- repo: self
 
 variables:
-  dockerRegistryServiceConnection: 'AzureContainerRegistryConnection'  
-  imageName: 'annodashboard'  
+  dockerRegistryServiceConnection: 'DockerHubConnection'  
+  imageName: 'sebastianpreis/annodashboard'  
   tag: '$(Build.BuildId)'
-  
+
 stages:
   - stage: Build
     displayName: Build and Test
@@ -16,7 +16,7 @@ stages:
       - job: Build
         displayName: Build Image
         pool:
-          name: upcode-dev.at  
+          name: upcode-dev.at  # Specify your custom pool here
         steps:
           - checkout: self
             submodules: true
@@ -31,7 +31,7 @@ stages:
                 $(tag)
 
           - task: Docker@2
-            displayName: Push Image to ACR
+            displayName: Push Image to DockerHub
             inputs:
               command: push
               repository: $(imageName)
