@@ -9,8 +9,6 @@ variables:
   imageName: 'annodashboard'  
   tag: '$(Build.BuildId)'
   
-pool: upcode-dev.at
-
 stages:
   - stage: Build
     displayName: Build and Test
@@ -18,7 +16,7 @@ stages:
       - job: Build
         displayName: Build Image
         pool:
-          vmImage: 'ubuntu-latest'
+          name: upcode-dev.at  
         steps:
           - checkout: self
             submodules: true
@@ -47,7 +45,7 @@ stages:
       - job: DjangoTests
         displayName: Django Unit Tests
         pool:
-          vmImage: 'ubuntu-latest'
+          name: upcode-dev.at  # Specify your custom pool here
         steps:
           - checkout: self
             submodules: true
