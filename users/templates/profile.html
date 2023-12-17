@@ -12,10 +12,10 @@
               class="w-36 h-36 rounded-full overflow-hidden border-4 border-sky-100 mb-4"
             >
               <img
-                alt=""
+                alt="Profile Picture"
                 class="w-full h-full object-cover"
                 height="192"
-                src="../static/media/images/profile.png"
+                src="{{ user_profile.picture.url|default_if_none:'../static/media/images/default-profile.png' }}"
                 width="192"
               />
             </div>
@@ -82,7 +82,7 @@
             <input
               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="tel"
-              value="+31 - 123 - 45 67 654"
+              value="{{ user_profile.telephone}}"
             />
           </div>
           <button

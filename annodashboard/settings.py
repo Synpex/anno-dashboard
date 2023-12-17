@@ -48,14 +48,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Core',
-    'buildings',
-    'rest_framework',
-    'stats',
-    'users',
-    'drf_yasg',
-    'tailwind',
-    'django_browser_reload',
+    'storages', # Django Storages
+    'Core', # Django Tailwind - Dashboard Navigation
+    'buildings', # Django App - Buildings
+    'rest_framework', # Django REST Framework
+    'stats', # Django App - Stats
+    'users', # Django App - Users
+    'drf_yasg', # Django REST Framework - Swagger
+    'tailwind', # Django Tailwind
+    'django_browser_reload', # Django Browser Reload
 ]
 
 MIDDLEWARE = [
@@ -124,12 +125,23 @@ DATABASES = {
     }
 }
 
+#region Azure Storage Variables
+
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
+AZURE_SSL = True
+
+
+
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+#MEDIA_URL = '/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-DATABASE_ROUTERS = ['annodashboard.router.BuildingsRouter']  # Replace with the actual path to your BuildingsRouter class
+DATABASE_ROUTERS = ['annodashboard.router.NoMigrateRouter']  # Replace with the actual path to your BuildingsRouter class
 
 
 # Password validation
@@ -205,5 +217,7 @@ REST_FRAMEWORK = {
 
 MY_API_KEY = os.environ.get('MY_DJANGO_API_KEY')
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxMHlnZWNuMDM1cjJpbzExcTlqaGJ6NCJ9._P7uUlMRTrZCiFyzQCGTjw'
+
+
 
 
