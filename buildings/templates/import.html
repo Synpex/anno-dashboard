@@ -1,2 +1,40 @@
-{% load static %} {% include 'navbar.html' %}  {%
-block content %} {% endblock %}
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ANNO Amsterdam</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+        {% tailwind_css %}
+    </head>
+    <style >
+        #map {
+            width: 100%;
+            height: 70vh;
+            margin-top: 2%;
+            position: center;
+        }
+    </style>
+    {% block content %}
+    {% include 'navbar.html' %}
+    <section class="px-10 mt-24">
+      {# Search Bar #}
+      <div>
+        <input
+          type="text"
+          value="Search...eg. Schoonzichtlaan 162"
+          class="w-full text-gray-300 rounded-lg border-2 border-gray-400 mb-10"
+        />
+      </div>
+      {# TODO: Implement Map #} {# Map #}
+        <div>
+            {% include 'map.html' %}
+        </div>
+
+    </section>
+    {% endblock %}
+
+</html>

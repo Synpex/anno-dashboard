@@ -1,66 +1,82 @@
-{% load static %} {% include "navbar.html" %} {% block content %}
-<section class="px-10 mt-24">
-  <div class="container mx-auto px-4 py-8">
-    {# Status Bar #} {% include 'import_status_bar.html'%} {# Input fields #}
-    <div class="bg-custom-blue shadow rounded-lg p-8 text-sky-900">
-      <div class="md: grid md: grid-cols-2 gap-8">
-        <div>
-          <label class="block text-sm font-semibold mb-2"
-            >Address [Preview]</label
-          >
-          <input
-            type="text"
-            placeholder="Address ..."
-            class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:border-sky-900"
-          />
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ANNO Amsterdam</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+        {% tailwind_css %}
+    </head>
 
-          <label class="block text-sm font-semibold mb-2"
-            >Type of use [Preview]</label
-          >
-          <select class="w-full p-2 border border-gray-300 rounded-lg mb-4">
-            <option>Choose ...</option>
-          </select>
+    {% block content %}
+    {% include 'navbar.html' %}
+        <section class="px-10 mt-24">
+          <div class="container mx-auto px-4 py-8">
+            {# Status Bar #} {% include 'import_status_bar.html'%} {# Input fields #}
+            <div class="bg-custom-blue shadow rounded-lg p-8 text-sky-900">
+              <div class="md: grid md: grid-cols-2 gap-8">
+                <div>
+                  <label class="block text-sm font-semibold mb-2"
+                    >Address [Preview]</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="Address ..."
+                    class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:border-sky-900"
+                  />
 
-          <label class="block text-sm font-semibold mb-2"
-            >Description (250+ characters)</label
-          >
-          <textarea
-            placeholder="Address ..."
-            class="w-full p-2 border border-gray-300 rounded-lg mb-4"
-            rows="5"
-          ></textarea>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2"
-            >Name (to show an alternative name instead of the address)</label
-          >
-          <input
-            type="text"
-            placeholder="Address ..."
-            class="w-full p-2 border border-gray-300 rounded-lg mb-4"
-          />
+                  <label class="block text-sm font-semibold mb-2"
+                    >Type of use [Preview]</label
+                  >
+                  <select class="w-full p-2 border border-gray-300 rounded-lg mb-4">
+                    <option>Choose ...</option>
+                  </select>
 
-          <label class="block text-sm font-semibold mb-2"
-            >Tags / architectural features</label
-          >
-          <select class="w-full p-2 border border-gray-300 rounded-lg mb-4">
-            <option>Tags ...</option>
-          </select>
+                  <label class="block text-sm font-semibold mb-2"
+                    >Description (250+ characters)</label
+                  >
+                  <textarea
+                    placeholder="Address ..."
+                    class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                    rows="5"
+                  ></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-2"
+                    >Name (to show an alternative name instead of the address)</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="Address ..."
+                    class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                  />
 
-          <label class="block text-sm font-semibold mb-2"
-            >construction year [Preview]</label
-          >
-          <input
-            type="text"
-            placeholder="1903"
-            class="w-full p-2 border border-gray-300 rounded-lg mb-4"
-          />
-        </div>
-      </div>
-    </div>
-    <div class="flex justify-between mt-8">
-      {% include "cancel-button.html" %} {% include "next-button.html" %}
-    </div>
-  </div>
-</section>
+                  <label class="block text-sm font-semibold mb-2"
+                    >Tags / architectural features</label
+                  >
+                  <select class="w-full p-2 border border-gray-300 rounded-lg mb-4">
+                    <option>Tags ...</option>
+                  </select>
+
+                  <label class="block text-sm font-semibold mb-2"
+                    >construction year [Preview]</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="1903"
+                    class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-between mt-8">
+              {% include "cancel-button.html" %} {% include "next-button.html" %}
+            </div>
+          </div>
+        </section>
 {% endblock %}
+
+</html>

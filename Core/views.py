@@ -12,7 +12,7 @@ def dashboard_view(request):
         'section': 'dashboard',
         # Add more context variables here
     }
-    return render(request, 'navbar.html', context)
+    return render(request, 'buildings.html', context)
 
 @login_required
 
