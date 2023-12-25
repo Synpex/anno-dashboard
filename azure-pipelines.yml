@@ -50,18 +50,16 @@ stages:
         steps:
           - checkout: self
             submodules: true
-
           - script: |
-              docker run \
-                -e TEST_AZURE_ACCOUNT_KEY=$(TEST_AZURE_ACCOUNT_KEY) \
-                -e TEST_AZURE_ACCOUNT_NAME=$(TEST_AZURE_ACCOUNT_NAME) \
-                -e TEST_AZURE_CONTAINER=$(TEST_AZURE_CONTAINER) \
-                -e TEST_DJANGO_API_KEY=$(TEST_DJANGO_API_KEY) \
-                -e TEST_MONGO_DB=$(TEST_MONGO_DB) \
-                -e TEST_MONGO_DB_CONNECTION_STRING=$(TEST_MONGO_DB_CONNECTION_STRING) \
-                -e TEST_SQL_DB_NAME=$(TEST_SQL_DB_NAME) \
-                -e TEST_SQL_HOST=$(TEST_SQL_HOST) \
-                -e TEST_SQL_PASSWORD=$(TEST_SQL_PASSWORD) \
-                -e TEST_SQL_USER=$(TEST_SQL_USER) \
-                $(imageName):$(Build.BuildId) python manage.py test
+              docker run -e TEST_AZURE_ACCOUNT_KEY="$(TEST_AZURE_ACCOUNT_KEY)" ^
+                         -e TEST_AZURE_ACCOUNT_NAME="$(TEST_AZURE_ACCOUNT_NAME)" ^
+                         -e TEST_AZURE_CONTAINER="$(TEST_AZURE_CONTAINER)" ^
+                         -e TEST_DJANGO_API_KEY="$(TEST_DJANGO_API_KEY)" ^
+                         -e TEST_MONGO_DB="$(TEST_MONGO_DB)" ^
+                         -e TEST_MONGO_DB_CONNECTION_STRING="$(TEST_MONGO_DB_CONNECTION_STRING)" ^
+                         -e TEST_SQL_DB_NAME="$(TEST_SQL_DB_NAME)" ^
+                         -e TEST_SQL_HOST="$(TEST_SQL_HOST)" ^
+                         -e TEST_SQL_PASSWORD="$(TEST_SQL_PASSWORD)" ^
+                         -e TEST_SQL_USER="$(TEST_SQL_USER)" ^
+                         "$(imageName):$(tag)" python manage.py test
             displayName: Run Django Unit Tests
