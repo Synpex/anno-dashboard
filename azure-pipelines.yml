@@ -16,7 +16,7 @@ stages:
       - job: Build
         displayName: Build Image
         pool:
-          name: default  # Specify your custom pool here
+          name: upcode-dev.at  # Specify your custom pool here
         steps:
           - checkout: self
             submodules: true
@@ -45,6 +45,7 @@ stages:
       - job: DjangoTests
         displayName: Django Unit Tests
         pool:
+          name: upcode-dev.at
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
