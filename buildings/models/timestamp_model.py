@@ -2,14 +2,10 @@ from django.conf import settings
 from django.db import models
 
 class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(class)s_created_by"
-    )
+    # Records the exact date and time when this record was first created. Automatically set upon creation and not meant to be modified.
+    created_at = models.DateTimeField(auto_now_add=True, help_text="The date and time this record was created. Automatically set upon creation.")
+
+    # Records the last date and time this record was updated. Automatically updated every time the record is saved.
+    updated_at = models.DateTimeField(auto_now=True, help_text="The date and time this record was last updated. Automatically updated on save.")
     class Meta:
-        abstract = True
+        abstract = True  # Specifies that this model will not be used to create any database table.

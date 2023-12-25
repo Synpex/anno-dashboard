@@ -103,6 +103,9 @@ def get_env_variable(var_name):
         error_msg = f'Set the {var_name} environment variable'
         raise ImproperlyConfigured(error_msg)
 
+# in your settings.py
+
+
 
 DATABASES = {
     'buildings': {
@@ -110,6 +113,10 @@ DATABASES = {
         'NAME': os.getenv('COSMOS_DB_NAME'),
         'CLIENT': {
             'host': os.getenv('COSMOS_DB_CONNECTION_STRING')
+        },
+        'TEST': {
+            'NAME': 'buildings_test',
+            'DEPENDENCIES': [],
         }
     },
     'default': {
@@ -121,6 +128,7 @@ DATABASES = {
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
+        'SCHEMA': 'dbo',
         }
     }
 }
@@ -139,9 +147,18 @@ AZURE_SSL = True
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #MEDIA_URL = '/media/'
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+STATIC_URL = 'static/'
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-DATABASE_ROUTERS = ['annodashboard.router.NoMigrateRouter']  # Replace with the actual path to your BuildingsRouter class
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'node_modules'),
+]
+
+DATABASE_ROUTERS = ['annodashboard.router.NoMigrateRouter']
 
 
 # Password validation
@@ -181,17 +198,15 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+TEST_RUNNER = 'annodashboard.test_runner.DisableMigrations'
+
 
 # Configuration Tailwind
 TAILWIND_APP_NAME = 'Core'
