@@ -1,330 +1,320 @@
 {% load static tailwind_tags %}
+{% load custom_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>ANNO Amsterdam</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        {% tailwind_css %}
-    </head>
+<head>
+    <title>ANNO Amsterdam</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    {% tailwind_css %}
+</head>
 <body>
-    {% block content %}
-        {% include 'navbar.html' %}
-        <section>
-  <div class="px-3 pt-24 md:pt-20 flex flex-wrap justify-between items-center">
-    <!-- Left section -->
-    <div class="px-3 flex flex-col sm:flex-row items-center justify-between">
-      <div class="flex items-center space-x-2 mb-1 sm:mb-0">
-        {# TODO: Implement the number selected to be dynamically calculated #}
-        <span class="text-gray-400 text-xs">3 selected</span>
-        <select
-          id="dropdownHoverButton"
-          data-dropdown-toggle="dropdownHover"
-          data-dropdown-trigger="hover"
-          class="bg-white border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
-          type="button"
-        >
-          <option>Actions</option>
-          <option>Action 2</option>
-          <option>Action 3</option>
-        </select>
+{% block content %}
+    {% include 'navbar.html' %}
+    <section>
+        <div class="px-3 pt-24 md:pt-20 flex flex-wrap justify-between items-center">
+            <!-- Left section -->
+            <div class="px-3 flex flex-col sm:flex-row items-center justify-between">
+                <div class="flex items-center space-x-2 mb-1 sm:mb-0">
+                    {# TODO: Implement the number selected to be dynamically calculated #}
+                    <span class="text-gray-400 text-xs">3 selected</span>
+                    <select
+                            id="dropdownHoverButton"
+                            data-dropdown-toggle="dropdownHover"
+                            data-dropdown-trigger="hover"
+                            class="bg-white border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
+                            type="button"
+                    >
+                        <option>Actions</option>
+                        <option>Action 2</option>
+                        <option>Action 3</option>
+                    </select>
 
-        <!-- Close button -->
-        <button>
-          <svg
-            class="w-[8px] h-[8px] text-gray-800 dark:text-white stroke-red-800"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 14 14"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1"
-              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-            />
-          </svg>
-        </button>
+                    <!-- Close button -->
+                    <button>
+                        <svg
+                                class="w-[8px] h-[8px] text-gray-800 dark:text-white stroke-red-800"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 14 14"
+                        >
+                            <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1"
+                                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                            />
+                        </svg>
+                    </button>
 
-        <!-- All dropdown menu button -->
-        <select
-          id="dropdownHoverButton"
-          data-dropdown-toggle="dropdownHover"
-          data-dropdown-trigger="hover"
-          class="bg-white border border-gray-300 text-gray-500 rounded-l px-3 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
-          type="button"
-        >
-          <svg
-            class="w-[10px] h-[10px] mr-2 my-1 text-gray-800 dark:text-white fill-gray-600"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 18"
-          >
-            <path
-              d="M18.85 1.1A1.99 1.99 0 0 0 17.063 0H2.937a2 2 0 0 0-1.566 3.242L6.99 9.868 7 14a1 1 0 0 0 .4.8l4 3A1 1 0 0 0 13 17l.01-7.134 5.66-6.676a1.99 1.99 0 0 0 .18-2.09Z"
-            />
-          </svg>
-          <option>Active</option>
-          <option>Inactive</option>
-          <option>Admin</option>
-          <option>Moderator</option>
-        </select>
+                    <!-- All dropdown menu button -->
+                    <select
+                            id="dropdownHoverButton"
+                            data-dropdown-toggle="dropdownHover"
+                            data-dropdown-trigger="hover"
+                            class="bg-white border border-gray-300 text-gray-500 rounded-l px-3 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
+                            type="button"
+                    >
+                        <svg
+                                class="w-[10px] h-[10px] mr-2 my-1 text-gray-800 dark:text-white fill-gray-600"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 18"
+                        >
+                            <path
+                                    d="M18.85 1.1A1.99 1.99 0 0 0 17.063 0H2.937a2 2 0 0 0-1.566 3.242L6.99 9.868 7 14a1 1 0 0 0 .4.8l4 3A1 1 0 0 0 13 17l.01-7.134 5.66-6.676a1.99 1.99 0 0 0 .18-2.09Z"
+                            />
+                        </svg>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                        <option>Admin</option>
+                        <option>Moderator</option>
+                    </select>
 
-        <div
-          class="flex items-center border border-gray-300 rounded-r px-2 py-1 bg-white shadow-sm"
-        >
-          <i class="fas fa-search text-gray-400"></i>
-          <input type="text" placeholder="Search" class="ml-2 text-xs p-0" />
-        </div>
-      </div>
-    </div>
-    <button
-      class="bg-blue-950 text-white text-sm px-1 md:px-4 py-1 rounded-md hover:bg-sky-900 focus:outline-none"
-    >
-      + New user
-    </button>
-  </div>
-  <div class="flex space-x-4 py-3 px-6 items-center">
-    <div class="flex items-center space-x-2 text-xs">
-      <span class="text-gray-400 font-semibold">All</span>
-      <div class="bg-gray-200 rounded-full px-2 py-1">
-        <span class="text-gray-400 font-medium">5</span>
-      </div>
-    </div>
-    <div class="flex items-center space-x-2 text-xs">
-      <span class="text-gray-400 font-semibold">On hold</span>
-      <div class="bg-gray-200 rounded-full px-2 py-1">
-        <span class="text-gray-400 font-medium">4</span>
-      </div>
-    </div>
-    <div class="flex items-center space-x-2 text-xs">
-      <span class="text-gray-400 font-semibold">Archived</span>
-      <div class="bg-gray-200 rounded-full px-2 py-1">
-        <span class="text-gray-400 font-medium">9</span>
-      </div>
-    </div>
-  </div>
-
-  {# Users table #}
-  <div class="min-h-screen bg-gray-100 p-2">
-    <div class="overflow-x-auto table-responsive">
-      <table class="w-full bg-white">
-        <thead>
-          {# TODO: Do something like this for each user #}
-          {# {#each contributors as user} #}
-          {# <img class="inline-block h-12 w-12 rounded-full ring-2 ring-white" src="{user.avatarUrl}" alt="{user.handle}" />#}
-          {# {/each} #}
-
-          <tr>
-            <th
-              class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                    <div
+                            class="flex items-center border border-gray-300 rounded-r px-2 py-1 bg-white shadow-sm"
+                    >
+                        <i class="fas fa-search text-gray-400"></i>
+                        <input type="text" placeholder="Search" class="ml-2 text-xs p-0"/>
+                    </div>
+                </div>
+            </div>
+            <button
+                    class="bg-blue-950 text-white text-sm px-1 md:px-4 py-1 rounded-md hover:bg-sky-900 focus:outline-none"
             >
+                + New user
+            </button>
+        </div>
+        <div class="flex space-x-4 py-3 px-6 items-center">
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="text-gray-400 font-semibold">All</span>
+                <div class="bg-gray-200 rounded-full px-2 py-1">
+                    <span class="text-gray-400 font-medium">5</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="text-gray-400 font-semibold">On hold</span>
+                <div class="bg-gray-200 rounded-full px-2 py-1">
+                    <span class="text-gray-400 font-medium">4</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="text-gray-400 font-semibold">Archived</span>
+                <div class="bg-gray-200 rounded-full px-2 py-1">
+                    <span class="text-gray-400 font-medium">9</span>
+                </div>
+            </div>
+        </div>
+
+        {# Users table #}
+        <div class="min-h-screen bg-gray-100 p-2">
+            <div class="overflow-x-auto table-responsive">
+            <form method="post" action="{% url 'update_user_permissions' %}">
+            {% csrf_token %}
+                <table class="w-full bg-white">
+                    <thead>
+
+                    <tr>
+                        <th
+                                class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                        >
               <span>
                 Username
                 <svg
-                  class="w-4 h-4 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-24 -mr-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                        class="w-4 h-4 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-24 -mr-5"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
                 >
                   <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    d="M9 5 5 1 1 5m0 6 4 4 4-4"
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.5"
+                          d="M9 5 5 1 1 5m0 6 4 4 4-4"
                   />
                 </svg>
               </span>
-            </th>
-            <th
-              class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
-            >
-              PM
-            </th>
-            <th
-              class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
-            >
+                        </th>
+                        <th
+                                class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                        >
+                            PM
+                        </th>
+                        <th
+                                class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                        >
               <span>
                 Status
                 <svg
-                  class="w-3 h-3 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-16 -mr-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                        class="w-3 h-3 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-16 -mr-5"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
                 >
                   <path
-                    d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+                          d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
                   />
                 </svg>
               </span>
-            </th>
-            <th
-              class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
-            >
+                        </th>
+                        <th
+                                class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                        >
               <span>
-                Last Update
+                Last Login
                 <svg
-                  class="w-4 h-4 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-28 -mr-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                        class="w-4 h-4 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-28 -mr-5"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
                 >
                   <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    d="M9 5 5 1 1 5m0 6 4 4 4-4"
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.5"
+                          d="M9 5 5 1 1 5m0 6 4 4 4-4"
                   />
                 </svg>
               </span>
-            </th>
-            <th
-              class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
-            >
+                        </th>
+                        <th
+                                class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                        >
               <span>
                 Role
                 <svg
-                  class="w-3 h-3 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-12 -mr-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                        class="w-3 h-3 text-gray-800 dark:text-white fill-gray-500 -mt-4 ml-12 -mr-5"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
                 >
                   <path
-                    d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+                          d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
                   />
                 </svg>
               </span>
-            </th>
-            <th
-              class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
-            >
-              Allow Import
-            </th>
-            <th
-              class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
-            >
-              Allow Edit
-            </th>
-          </tr>
-        </thead>
-        <tbody class="text-gray-700">
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap flex items-center text-sm">
-              <span class=""> Pieter Both </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">
-                <img
-                  alt="Profile picture of Pieter Both"
-                  class="h-9 w-9 rounded-e rounded-l -ml-2"
-                  src="../static/media/images/profile.png"
-                />
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-              >
-                Active
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
-              15 Mar 2021, 12:47 PM
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
-              >
-                Admin
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-              <input checked="" type="checkbox" />
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-              <input checked="" type="checkbox" />
-            </td>
-          </tr>
-          <!-- Repeat for each user -->
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap flex items-center">
-              <span class="text-sm"> Fabian Greimel </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">
-                <img
-                  alt="Profile picture of Pieter Both"
-                  class="h-9 w-9 rounded-e rounded-l -ml-2"
-                  src="../static/media/images/profile.png"
-                />
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-              >
-                Active
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
-              15 Mar 2021, 12:47 PM
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
-              >
-                Moderator
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-              <input checked="" type="checkbox" />
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-              <input checked="" type="checkbox" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="flex justify-between items-center py-4">
-      <div class="flex items-center">
-        <span class="text-xs text-gray-500">Rows per page:</span>
-        <select
-          class="ml-2 border border-gray-300 rounded-md text-gray-500 h-8 pl-3 pr-8 bg-white hover:border-gray-400 focus:outline-none appearance-none text-xs"
-        >
-          <option>5</option>
-          <option>10</option>
-          <option>20</option>
-        </select>
-      </div>
-      <div class="flex items-center">
-        <span class="text-xs text-gray-700">1-5 of 8</span>
-        <button class="text-gray-600 ml-4">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="text-gray-600 ml-2">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
+                        </th>
+                        <th
+                                class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                        >
+                            Allow Import
+                        </th>
+                        <th
+                                class="text-left font-medium text-gray-600 uppercase tracking-wider py-3 px-6 text-sm"
+                        >
+                            Allow Edit
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                    {% for user in users %}
+                        <!-- Repeat for each user -->
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap flex items-center">
+                                <span class="text-sm">{{ user.username }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <img
+                                            alt="Profile picture of {{ user.username }}"
+                                            class="h-9 w-9 rounded-e rounded-l -ml-2"
+                                            src="
 
-  <script>
-    // JavaScript to handle checkbox state changes
-    document
-      .querySelectorAll('input[type="checkbox"]')
-      .forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-          console.log("Checkbox " + this.id + " changed to " + this.checked);
-        });
-      });
-  </script>
-</section>
+                                                    {% if user.profile.picture %}{{ user.profile.picture.url }}{% else %}{% static 'media/images/profile.png' %}{% endif %}"
+                                    />
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    {% if user.is_active %}
+                                        bg-green-100 text-green-800
+                                    {% else %}
+                                        bg-red-100 text-red-800
+                                    {% endif %}">
+                                    {% if user.is_active %}
+                                        Active
+                                    {% else %}
+                                        Inactive
+                                    {% endif %}
+                                </span>
+                            </td>
 
-    {% endblock %}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                {{ user.last_login }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if user|has_group:"Administrators" %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Administrator
+                                    </span>
+                                {% elif user|has_group:"Moderators" %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        Moderator
+                                    </span>
+                                {% else %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        User
+                                    </span>
+                                {% endif %}
+                             </td>
+                                <!-- ... other user information ... -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <input type="checkbox" name="add_building_{{ user.id }}"
+                                            {% if user|has_permission:'buildings.add_building' %} checked {% endif %}
+                                           {% if not request.user|has_group:"Administrator" %} disabled {% endif %}/>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <input type="checkbox" name="change_building_{{ user.id }}"
+                                           {% if user|has_permission:'buildings.change_building' %} checked {% endif %}
+                                           {% if not request.user|has_group:"Administrator" %} disabled {% endif %}/>
+                                </td>
+                            </tr>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+             <button type="submit" class="btn btn-primary">Update Permissions</button>
+            </div>
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <span class="text-xs text-gray-500">Rows per page:</span>
+                    <select
+                            class="ml-2 border border-gray-300 rounded-md text-gray-500 h-8 pl-3 pr-8 bg-white hover:border-gray-400 focus:outline-none appearance-none text-xs"
+                    >
+                        <option>5</option>
+                        <option>10</option>
+                        <option>20</option>
+                    </select>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-xs text-gray-700">1-5 of 8</span>
+                    <button class="text-gray-600 ml-4">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="text-gray-600 ml-2">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // JavaScript to handle checkbox state changes
+            document
+                .querySelectorAll('input[type="checkbox"]')
+                .forEach(function (checkbox) {
+                    checkbox.addEventListener("change", function () {
+                        console.log("Checkbox " + this.id + " changed to " + this.checked);
+                    });
+                });
+        </script>
+    </section>
+
+{% endblock %}
 </body>
 </html>

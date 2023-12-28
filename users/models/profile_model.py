@@ -8,10 +8,12 @@ class UserProfile(models.Model):
         upload_to='profile_pics',
         storage=ProfilePictureStorage(),
         blank=True,
-        null=True
+        null=True,
+        default=None,
     )
     telephone = models.CharField(max_length=20, blank=True, null=True)
 
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
