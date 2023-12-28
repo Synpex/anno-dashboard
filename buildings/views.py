@@ -14,6 +14,18 @@ def buildings_view(request):
         # Add more context variables here
     }
     return render(request, 'buildings.html', context)
+
+@login_required
+def import_view(request):
+    # You can add your logic here to pass context to your dashboard template
+    mapbox_access_token = settings.MAPBOX_ACCESS_TOKEN
+    context = {
+        'section': 'import',
+        'mapbox_access_token': mapbox_access_token,
+        # Add more context variables here
+    }
+    return render(request, 'import.html', context)
+
 @login_required
 def import_detail_view(request):
     # You can add your logic here to pass context to your dashboard template
@@ -22,6 +34,7 @@ def import_detail_view(request):
         # Add more context variables here
     }
     return render(request, 'import_detail.html', context)
+
 @login_required
 def import_images_view(request):
     # You can add your logic here to pass context to your dashboard template

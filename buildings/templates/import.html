@@ -1,4 +1,5 @@
 {% load static tailwind_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,27 +10,28 @@
         <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
         {% tailwind_css %}
-    </head>
-    <style >
+
+        <style >
         #map {
             width: 100%;
             height: 70vh;
-            margin-top: 2%;
+            margin-bottom: 5%;
             position: center;
         }
     </style>
+    </head>
+
     {% block content %}
     {% include 'navbar.html' %}
     <section class="px-10 mt-24">
       {# Search Bar #}
-      <div>
+       <div>
         <input
           type="text"
           value="Search...eg. Schoonzichtlaan 162"
           class="w-full text-gray-300 rounded-lg border-2 border-gray-400 mb-10"
         />
       </div>
-      {# TODO: Implement Map #} {# Map #}
         <div>
             {% include 'map.html' %}
         </div>
