@@ -2,7 +2,6 @@
 from django.db import models
 from djongo.models import ObjectIdField
 
-from Core.fields import MongoObjectIdField
 from buildings.models.timestamp_model import TimeStampedModel  # Importing the base model with timestamps
 from Core.validators import validate_azure_blob_url  # Importing the custom Azure URL validator
 

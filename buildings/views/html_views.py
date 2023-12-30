@@ -1,22 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-# Create your views here.
-
-from rest_framework import generics
-from buildings.models.building_model import Building
-from buildings.api.api import BuildingSerializer
-
-class BuildingByYearList(generics.ListAPIView):
-    serializer_class = BuildingSerializer
-
-    def get_queryset(self):
-        """
-        This view should return a list of all buildings for
-        the construction year as determined by the year portion of the URL.
-        """
-        year = self.kwargs['year']
-        return Building.objects.filter(construction_year=year)
 
 
 # This decorator ensures that only authenticated users can access the dashboard
@@ -41,6 +25,7 @@ def import_view(request):
         # Add more context variables here
     }
     return render(request, 'import.html', context)
+
 
 @login_required
 def import_detail_view(request):

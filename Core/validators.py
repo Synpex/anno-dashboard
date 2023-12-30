@@ -4,8 +4,6 @@ import re
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
-
-
 def validate_azure_blob_url(value):
     # Fetch Azure storage details from settings
     account_name = settings.AZURE_ACCOUNT_NAME
