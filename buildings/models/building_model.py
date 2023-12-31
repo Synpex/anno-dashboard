@@ -73,11 +73,22 @@ class Building(TimeStampedModel):
         default = list  # Ensures the default is an empty list
     )
 
+    # active: A boolean field indicating whether the building is active or not.
+    active = models.BooleanField(
+        default=True,  # Set the default value to True (active)
+        help_text="Indicates whether the building is active or not."
+    )
+
     # audioguides: A JSON field storing a list of embedded audioguide details. Each entry contains the ID of the audioguide
     audioguides = models.JSONField(
         help_text="JSON-formatted list of audioguides.",
         default=list  # Default to an empty list
     )
+
+    # Used to access the id of the building in Django Templates
+    @property
+    def public_id(self):
+        return self._id
 
     def save(self, *args, **kwargs):
         """
@@ -150,6 +161,12 @@ class Building(TimeStampedModel):
             self.save()
         except ValueError:
             pass  # Handle the case where the audioguide_id is not in the list
+
+    def total_images_count(self):
+        count = len(self.image_urls)
+        if self.preview_image_url:
+            count += 1
+        return count
 
     def __str__(self):
         """

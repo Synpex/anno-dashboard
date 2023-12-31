@@ -15,6 +15,7 @@ from pathlib import Path
 import djongo
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import timezone
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -179,7 +180,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = 'login'
 
 # Set redirection to dashboard after login
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = 'buildings'
 
 
 # Internationalization
@@ -187,7 +188,9 @@ LOGIN_REDIRECT_URL = 'dashboard'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Berlin'
+DEFAULT_TIME_ZONE = timezone.get_fixed_timezone(60)  # 60 minutes ahead of UTC for GMT+1
+
 
 USE_I18N = True
 

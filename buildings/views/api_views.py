@@ -32,6 +32,16 @@ class BuildingSearchView(APIView):
     """
     API endpoint that allows users to search for buildings by address.
     """
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name='address', in_=openapi.IN_QUERY,
+                description="Partial or full address to search for",
+                type=openapi.TYPE_STRING
+            )
+        ]
+    )
     def get(self, request, *args, **kwargs):
         # Retrieve the address query from the request's query parameters
         query = request.GET.get('address', '')
@@ -131,6 +141,12 @@ class SortedBuildingsView(APIView):
                 'construction_year': 1,
                 'type_of_use': 1,
                 # Add any other fields you want to include in the response
+            }
+        })
+        # Filter only active buildings in the aggregation pipeline
+        pipeline.append({
+            '$match': {
+                'active': True
             }
         })
 

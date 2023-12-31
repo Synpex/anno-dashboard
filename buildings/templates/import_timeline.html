@@ -1,72 +1,130 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>ANNO Amsterdam</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
-        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
-        {% tailwind_css %}
-    </head>
+<head>
+    <title>ANNO Amsterdam</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% tailwind_css %}
+</head>
 
-    {% block content %}
-        {% include 'navbar.html' %}
-        <section class="px-10 mt-24">
-  <div class="container mx-auto px-4 py-8">
-    {# Status Bar #} {% include 'import_status_bar.html'%}
-    <div
-      class="bg-white shadow rounded-lg p-4 flex items-center justify-between"
-    >
-      <div class="flex items-center">
-        <label for="year" class="block text-sm font-medium text-gray-700 mr-4"
-          >Year</label
-        >
-        <input
-          type="text"
-          id="year"
-          name="year"
-          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
-          placeholder="1903"
-        />
-      </div>
-      <div class="flex-1 ml-4">
-        <input
-          type="text"
-          id="event"
-          name="event"
-          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
-          placeholder="Half of the building burned"
-        />
-      </div>
-      <button
-        class="ml-4 bg-sky-900 p-2 rounded-full text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      >
-        <svg
-          class="w-[12px] h-[12px] text-gray-800 dark:text-white"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 18 18"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 1v16M1 9h16"
-          />
-        </svg>
-      </button>
-    </div>
+<body>
+    {% load static tailwind_tags %}
+    {% include 'navbar.html' %}
 
-    <div class="flex justify-center mt-8">
+    <section class="px-10 mt-24">
+        <div class="container mx-auto px-4 py-8">
+            {# Status Bar #} {% include 'import_status_bar.html'%}
+
+
+
+            <!-- Disclaimer -->
+            <div class="mb-4 text-gray-600">
+                <p><strong>Disclaimer:</strong> The timeline you create will be stored and presented in the order you add the events. Please ensure the accuracy and order of events before submitting.</p>
+            </div>
+             <!-- Initial Timeline Element with Add Button -->
+            <div id="initialTimeline" class="bg-white shadow rounded-lg p-4 flex items-center justify-between">
+                <!-- Year Input -->
+                <div class="flex items-center">
+                    <label for="year_1" class="block text-sm font-medium text-gray-700 mr-4">Year</label>
+                    <input
+                        type="text"
+                        id="year_1"
+                        name="year"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
+                        placeholder="1903"
+                    />
+                </div>
+                <!-- Event Input -->
+                <div class="flex-1 ml-4">
+                    <input
+                        type="text"
+                        id="event_1"
+                        name="event"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
+                        placeholder="Enter the first event description"
+                    />
+                </div>
+                <!-- Add Button -->
+                <button
+                    id="addTimeline"
+                    class="ml-4 bg-sky-900 p-2 rounded-full text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                    <!-- SVG for Plus Icon -->
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+             <!-- Timeline Template (Hidden) -->
+            <div id="timelineTemplate" class="bg-white shadow rounded-lg p-4 flex items-center justify-between" style="display:none;">
+                <!-- Inputs are the same as the initial element -->
+                <div class="flex items-center">
+                    <label class="block text-sm font-medium text-gray-700 mr-4">Year</label>
+                    <input
+                        type="text"
+                        class="yearInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
+                        placeholder="1903"
+                    />
+                </div>
+                <div class="flex-1 ml-4">
+                    <input
+                        type="text"
+                        class="eventInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
+                        placeholder="Event description"
+                    />
+                </div>
+                <!-- Remove Button (For Cloned Elements) -->
+                <button
+                    class="deleteButton ml-4 bg-red-900 p-2 rounded-full text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                    <!-- SVG for Minus Icon -->
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+            </div>
+
+
+
+               <!-- Timeline Container -->
+            <div id="timelineContainer"></div>
+
+
+            <!-- Continue and Previous Buttons -->
+            <<div class="flex justify-center mt-8">
       {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
       {% include 'next-button.html' %}
     </div>
-  </div>
-</section>
-    {% endblock %}
+        </div>
+    </section>
+    <script>
+        $(document).ready(function() {
+            let idCounter = 2; // Start from 2 since we already have one timeline entry
 
-</html>
+            // Function to add a new timeline entry
+            function addTimelineEntry() {
+                // Clone the template and make it visible
+                const clonedElement = $("#timelineTemplate").clone().removeAttr('id').show();
+
+                // Update attributes for the new inputs
+                clonedElement.find('.yearInput').attr('id', 'year_' + idCounter);
+                clonedElement.find('.eventInput').attr('id', 'event_' + idCounter);
+
+                // Append the cloned element to the container
+                $("#timelineContainer").append(clonedElement);
+                idCounter++; // Increment the ID counter
+            }
+
+            // Event listener for adding new timeline entries
+            $("#addTimeline").click(function() {
+                addTimelineEntry();
+            });
+
+            // Event delegation for removing a timeline entry
+            $("#timelineContainer").on('click', '.deleteButton', function() {
+                $(this).closest(".bg-white").remove();
+            });
+        });
+    </script>
