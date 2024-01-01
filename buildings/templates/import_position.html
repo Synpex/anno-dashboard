@@ -9,15 +9,30 @@
         <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
         {% tailwind_css %}
+
+        <style >
+            #map {
+                width: 100%;
+                height: 50vh;
+                margin-bottom: 5%;
+                margin-right: 2%;
+                position: center;
+            }
+        </style>
     </head>
 
     {% block content %}
         {% include 'navbar.html' %}
         <section class="px-10 mt-24">
   <div class="container mx-auto px-4 py-8">
-    {# Status Bar #} {% include 'import_status_bar.html'%}
+      {# Status Bar #}
+      {% include 'import_status_bar.html'%}
+
+      {# Map #}
+      {% include 'map.html' %}
 
     <div class="bg-gray-100">
+
       <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="flex flex-wrap -mx-2">
           <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
@@ -53,10 +68,9 @@
     </div>
     {# TODO: Implement Map #}
 
-    <div class="flex justify-center mt-8">
-      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
-      {% include 'next-button.html' %}
-    </div>
+      <div class="flex justify-between mt-8">
+          {% include "cancel-button.html" %} {% include "next-button.html" %}
+        </div>
   </div>
 </section>
     {% endblock %}
