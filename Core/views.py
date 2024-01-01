@@ -7,12 +7,8 @@ from django.shortcuts import render, redirect
 # This decorator ensures that only authenticated users can access the dashboard
 @login_required
 def dashboard_view(request):
-    # You can add your logic here to pass context to your dashboard template
-    context = {
-        'section': 'dashboard',
-        # Add more context variables here
-    }
-    return render(request, 'buildings.html', context)
+    # Redirect to the /buildings URL
+    return redirect('/buildings')
 
 @login_required
 

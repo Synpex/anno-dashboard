@@ -8,19 +8,21 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.6/datatables.min.css"/>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.6/datatables.min.js"></script>
-
         {% tailwind_css %}
 
-        <style>
-        #map {
-            width: 100%;
-            height: 50vh;
-            margin-bottom: 5%;
-            margin-right: 2%;
-            position: center;
-        }
+        <style >
+.map-container {
+    width: 100%; /* Full width */
+    height: 50vh; /* Adjust height as needed */
+    margin-bottom: 5%;
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        height: 40vh; /* Smaller height on smaller screens */
+    }
+}
     </style>
     </head>
 <body>
@@ -34,16 +36,16 @@
         {# TODO: Implement the number selected to be dynamically calculated #}
         <span class="text-gray-400 text-xs">3 selected</span>
         <select
-          id="dropdownHoverButton1"
-          data-dropdown-toggle="dropdownHover"
-          data-dropdown-trigger="hover"
-          class="bg-white border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
-          type="button"
-        >
-          <option>Actions</option>
-          <option>Action 2</option>
-          <option>Action 3</option>
-        </select>
+      id="building-filter"
+      class="bg-white border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
+      type="button"
+    >
+      <option value="all">All</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+
+
 
         <!-- Close button -->
         <button>
@@ -103,26 +105,19 @@
     <div class="flex items-center space-x-2 text-xs">
       <span class="text-gray-500 font-semibold">All</span>
       <div class="bg-gray-200 rounded-full px-2 py-1">
-        <span class="text-gray-400 font-medium">5</span>
+        <span class="text-gray-400 font-medium">{{ buildings_count}}</span>
       </div>
     </div>
     <div class="flex items-center space-x-2 text-xs">
       <span class="text-gray-500 font-semibold">Missing Images</span>
       <div class="bg-gray-200 rounded-full px-2 py-1">
-        <span class="text-gray-400 font-medium">4</span>
+        <span class="text-gray-400 font-medium">{{buildings_without_images_count}}</span>
       </div>
     </div>
-    <div class="flex items-center space-x-2 text-xs">
-      <span class="text-gray-500 font-semibold">Incomplete description</span>
-      <div class="bg-gray-200 rounded-full px-2 py-1">
-        <span class="text-gray-400 font-medium">9</span>
-      </div>
-    </div>
-
       <div class="flex items-center space-x-2 text-xs">
       <span class="text-gray-500 font-semibold">Incomplete timeline</span>
       <div class="bg-gray-200 rounded-full px-2 py-1">
-        <span class="text-gray-400 font-medium">9</span>
+        <span class="text-gray-400 font-medium">{{ buildings_with_incomplete_timeline_count }}</span>
       </div>
     </div>
   </div>
@@ -135,7 +130,6 @@
                 <tr class="">
                     <th class="px-4 sm:px-8"><input type="checkbox"/></th>
                     <th class="font-medium text-gray-600 text-sm -ml-"></th>
-                    <th class="font-medium text-gray-600 text-sm px-8">ZIP</th>
                     <th class="font-medium text-gray-600 text-sm px-8">ADDRESS</th>
                     <th class="font-medium text-gray-600 text-sm px-8">ANNO</th>
                     <th class="font-medium text-gray-600 text-sm px-8">STATUS</th>
@@ -146,71 +140,70 @@
                 </tr>
             </thead>
             <tbody class="bg-white mt-5">
-            <tr>
+            {% for building in buildings %}
+            <tr class="building-row" data-status="{% if building.active %}active{% else %}inactive{% endif %}">
                 <td class="px-4 sm:px-8"><input type="checkbox"/></td>
                 <td>
-                    <button onclick="toggle(this)" class=" py-2 px-3 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
+                    <button onclick="toggleDetails('{{ building.public_id}}')" class=" py-2 px-3 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
                         <svg class="w-[10px] h-[10px] ms-3 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                         </svg>
                     </button>
                 </td>
-                <td class="font-medium text-sky-950 text-sm px-8"><button>1011 AD</button></td>
                 <td class="font-medium text-sky-950 text-sm px-8">
-                    <a class="flex" href="/buildings/import/position">
+                    <button class="flex">
                         <svg class="w-[12px] h-[12px] fill-sky-950 stroke-sky-950 my-1 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                             <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"/>
                             <path d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"/>
                             <path d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"/>
                         </svg>
-                        Single 144
-                    </a>
+                        {{ building.address }}
+                    </button>
                 </td>
-                <td class="font-medium text-gray-500 text-sm px-10"> <p class="bg-gray-100 px-2 rounded-md">1800</p></td>
-                <td class="font-medium text-sm px-8"> <p class="text-gray-500 bg-green-100 px-2 py-0.5 rounded-md">Active</p></td>
-                <td class="font-medium text-sky-950 text-sm px-8"> <p class="px-2">28.12.2023</p></td>
+                <td class="font-medium text-gray-500 text-sm px-10"> <p class="bg-gray-100 px-2 rounded-md">{{ building.construction_year }}</p></td>
+                <td class="font-medium text-sm px-8">
+                {% if building.active %}
+                    <p class="text-green-500 bg-green-100 px-2 py-0.5 rounded-md">Active</p>
+                {% else %}
+                    <p class="text-red-500 bg-red-100 px-2 py-0.5 rounded-md">Inactive</p>
+                {% endif %}
+                </td>
+                <td class="font-medium text-sky-950 text-sm px-8"> <p class="px-2">{{ building.updated_at }}</p></td>
                 <td class="px-12">
-                    <span class="bg-gray-100 text-gray-400 rounded-md font-medium text-sm px-2"><button>4</button></span>
+                    <span class="bg-gray-100 text-gray-400 rounded-md font-medium text-sm px-2"><button>{{building.total_images_count}}</button></span>
                 </td>
                 <td class="font-medium text-gray-500 text-xs px-8">
-                    <ul class="space-x-1 flex">
-                        <li class="text-gray-500 bg-gray-100 px-3 rounded-xl py-1"><button>Frame facade</button></li>
-                        <li class="text-gray-500 bg-gray-100 px-3 rounded-xl py-1"><button>Stepped gable</button></li>
-                    </ul>
-                </td>
-                <td class="font-medium text-sky-950 text-sm px-8"> <p class="px-2">Residential Building</p></td>
+                <ul class="space-x-1 flex">
+                    {% for tag in building.tags %}
+                        <li class="text-gray-500 bg-gray-100 px-3 rounded-xl py-1">
+                            <button>{{ tag }}</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </td>
+                <td class="font-medium text-sky-950 text-sm px-8"> <p class="px-2">{{ building.type_of_use }}</p></td>
             </tr>
 
             {# Dropdown building details #}
-            <tr id="building-data" class="shadow-lg" hidden="hidden">
+            <tr id="building-detail-{{ building.public_id }}" class="shadow-lg" hidden="hidden">
                 <td colspan="3" class="h-5">
                     <div class="bg-white px-6 shadow-md flex flex-col">
-                    <h1 class="text-md font-bold mb-2 mt-6 text-sky-900">Anno 1600</h1>
-                    <h2 class="text-md font-bold mb-2 text-sky-900">SINGEL 144</h2>
+                    <h1 class="text-md font-bold mb-2 mt-6 text-sky-900">Anno {{ building.construction_year }}</h1>
+                    <h2 class="text-md font-bold mb-2 text-sky-900">{{ building.address }}</h2>
                     <div class="flex flex-wrap items-center">
-                      <span class="text-xs bg-gray-200 px-2 py-1 mr-2 mb-2">
-                        Distance to ??? meters
-                      </span>
                       <span class="text-xs bg-gray-200 px-2 py-1 mb-2">
-                        Residential building
+                        {{ building.type_of_use }}
                       </span>
                     </div>
                     <div class="flex flex-wrap items-center mb-6">
-                      <span class="text-xs bg-gray-200 px-2 py-1 mr-2 mb-2">
-                        Hendrick de Keyser
-                      </span>
-                      <span class="text-xs bg-gray-200 px-2 py-1 mb-2">
-                        Stepped gable
-                      </span>
-
+                     {% for tag in building.tags %}
+                        <span class="text-xs bg-gray-200 px-2 py-1 mr-2 mb-2">
+                          {{ tag }}
+                        </span>
+                      {% endfor %}
                     </div>
                     <p class="mb-6 text-xs">
-                      This house is called De Dolphijn. It is one of three examples in
-                      Amsterdam of an early 17th century house with side house (the
-                      predecessor of the double house). The second resident, Frans
-                      Banninck Cocq, was a lieutenant of the militia in 1635 and in that
-                      capacity he was immortalized by Rembrandt in 1642 in the 'Night
-                      Watch'.
+                      {{ building.description }}
                     </p>
                   </div>
                 </td>
@@ -218,96 +211,49 @@
                 {# Timeline #}
                 <td colspan="3">
                     <div class="bg-white px-6 shadow-l flex flex-col">
-                        <div class="flex justify-between items-center mb-6">
-                          <h2 class="text-md font-bold text-sky-900">TIMELINE</h2>
-                        </div>
-                        <div class="relative text-xs">
-                          <div class="absolute left-2 w-0.5 bg-custom-blue rounded-b-3xl rounded-t-3xl"></div>
-                          <div class="space-y-4 ml-8">
-                            <div class="flex items-center">
-                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                              <div class="text-sky-900">1600</div>
-                              <div class="font-semibold ml-3">Build</div>
-                            </div>
-                            <div class="flex items-center">
-                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                              <div class="text-sky-900">1609</div>
-                              <div class="font-semibold ml-3">
-                                Resident: Volckert Overlander
-                              </div>
-                            </div>
-                            <div class="flex items-center">
-                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                              <div class="text-sky-900">1630</div>
-                              <div class="font-semibold ml-3">
-                                Resident: Frans Banninck Cocq
-                              </div>
-                            </div>
-                            <div class="flex items-center">
-                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                              <div class="text-sky-900">1679</div>
-                              <div class="font-semibold ml-3">
-                                Division of 2 houses: De Vergulde Dolphijn &amp; De Kleynne
-                                Dolphijn
-                              </div>
-                            </div>
-                            <div class="flex items-center">
-                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                              <div class="text-sky-900">1863</div>
-                              <div class="font-semibold ml-3">
-                                Gable top of right house replaced by frame gable
-                              </div>
-                            </div>
-                            <div class="flex items-center">
-                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                              <div class="text-sky-900">1967</div>
-                              <div class="font-semibold ml-3">
-                                Restoration + reconstruction stepped gable
-                              </div>
-                            </div>
-                            <div class="flex items-center">
-                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                              <div class="text-sky-900">Now</div>
-                              <div class="font-semibold ml-3">
-                                Residential building
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-md font-bold text-sky-900">TIMELINE</h2>
+          </div>
+          <div class="relative text-xs">
+            <div class="absolute left-2 w-0.5 bg-custom-blue rounded-b-3xl rounded-t-3xl"></div>
+            <div class="space-y-4 ml-8">
+              {% for event in building.timeline %}
+                <div class="flex items-center">
+                  <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
+                  <div class="text-sky-900">{{ event.year }}</div>
+                  <div class="font-semibold ml-3">{{ event.description }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
                 </td>
 
                 {# Map #}
                 <td colspan="3" class="">
-                    {% include 'map.html' %}
-                </td>
+                {% include 'map_with_marker.html' with building=building %}
+            </td>
                 <td colspan="1" class="items-center">
                     <h2 class="text-md font-bold text-sky-900">INFORMATION</h2>
                     <div class="space-y-4 text-xs items-center">
                       <div class="flex items-center">
-                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">4</span> pictures uploaded</div>
+                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.total_images_count }}</span> pictures uploaded</div>
                       </div>
                       <div class="flex items-center">
-                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">7</span> timeline entries</div>
+                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.timeline|length }}</span> timeline entries</div>
                       </div>
                       <div class="flex items-center">
-                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">2</span> tags added</div>
+                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.tags|length }}</span> tags added</div>
                       </div>
-                        <div class="flex items-center">
-                            <div class="font-medium text-white text-sm">
-                                <button class="bg-sky-900 px-3 py-2 rounded-md">
-                                    <svg class="w-[15px] h-[15px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
-                                        <path d="M17 0h-5.768a1 1 0 1 0 0 2h3.354L8.4 8.182A1.003 1.003 0 1 0 9.818 9.6L16 3.414v3.354a1 1 0 0 0 2 0V1a1 1 0 0 0-1-1Z"/>
-                                        <path d="m14.258 7.985-3.025 3.025A3 3 0 1 1 6.99 6.768l3.026-3.026A3.01 3.01 0 0 1 8.411 2H2.167A2.169 2.169 0 0 0 0 4.167v11.666A2.169 2.169 0 0 0 2.167 18h11.666A2.169 2.169 0 0 0 16 15.833V9.589a3.011 3.011 0 0 1-1.742-1.604Z"/>
-                                      </svg>
-                                    Audio guides
-                                </button>
-                            </div>
-                        </div>
+                    <div class="flex items-center">
+                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.audio_guides|length }}</span> audio-guides added</div>
+                      </div>
                     </div>
+
                 </td>
 
             </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
@@ -318,22 +264,45 @@
 </body>
 
 <script>
-  let toggle = button => {
-    let element = document.getElementById("building-data");
-    let hidden = element.getAttribute("hidden");
-
-    if (hidden) {
-       element.removeAttribute("hidden");
-    } else {
-       element.setAttribute("hidden", "hidden");
+  function toggleDetails(buildingId) {
+    let element = document.getElementById('building-detail-' + buildingId);
+    if (element) {
+      if (element.hasAttribute('hidden')) {
+        element.removeAttribute('hidden');
+      } else {
+        element.setAttribute('hidden', 'hidden');
+      }
     }
   }
-</script>
 
-<script>
-    $(document).ready(function() {
-        $('buildings-data').DataTable();
+
+  $(document).ready(function() {
+    $('#buildings-data').DataTable({
+        responsive: true
     });
 
+    function filterBuildingsByStatus(status) {
+      const buildingRows = document.querySelectorAll('.building-row');
+
+      buildingRows.forEach((row) => {
+        const isActive = row.dataset.status === status || status === 'all';
+        row.style.display = isActive ? '' : 'none';
+      });
+
+      // Redraw the DataTable to adjust to the filtered rows
+      $('#buildings-data').DataTable().draw();
+    }
+
+    // Event listener for the filter dropdown
+    const buildingFilter = document.getElementById('building-filter');
+    buildingFilter.addEventListener('change', (event) => {
+      const selectedStatus = event.target.value;
+      filterBuildingsByStatus(selectedStatus);
+    });
+
+    // Initial filtering (optional)
+    filterBuildingsByStatus('all');
+  });
 </script>
+
 </html>

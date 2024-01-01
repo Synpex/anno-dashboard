@@ -5,11 +5,19 @@ LABEL authors="spreis"
 # Set the working directory in the container to /app
 WORKDIR /app
 
-# Install system dependencies required for PyODBC and Node.js
+# Install system dependencies required for PyODBC, Node.js, and GDAL
 RUN apt-get update \
-  && apt-get install -y build-essential curl unixodbc-dev gnupg \
+  && apt-get install -y build-essential curl unixodbc-dev gnupg g++ \
+  # Add the repositories for GDAL
+  && echo "deb http://deb.debian.org/debian buster main contrib non-free" >> /etc/apt/sources.list \
+  && echo "deb-src http://deb.debian.org/debian buster main contrib non-free" >> /etc/apt/sources.list \
+  # Node.js and other dependencies
   && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
+  && apt-get update \
   && apt-get install -y nodejs --no-install-recommends \
+  # Install GDAL dependencies
+  && apt-get install -y libgdal-dev gdal-bin \
+  # Clean up
   && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
   && apt-get clean
 
@@ -33,8 +41,9 @@ COPY --chown=python:python requirements*.txt ./
 RUN pip install --upgrade pip \
   && pip install -r requirements.txt
 
-# Set environment variables
-ENV DEBUG="${DEBUG}" \
+# Set environment variables for GDAL
+ENV GDAL_LIBRARY_PATH=/usr/lib/libgdal.so \
+    DEBUG="${DEBUG}" \
     PYTHONUNBUFFERED="true" \
     PATH="${PATH}:/home/python/.local/bin" \
     USER="python"

@@ -1,0 +1,17 @@
+<div id="map-{{ building.public_id }}"  class="map-container"></div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ';
+    var map = new mapboxgl.Map({
+        container: 'map-{{ building.public_id }}',  // Unique ID for each map
+        style: 'mapbox://styles/mapbox/streets-v10',
+        center: [{{ building.location.coordinates.0 }}, {{ building.location.coordinates.1 }}],  // Dynamic center from building's location
+        zoom: 15,
+        attributionControl: false
+    });
+
+    // Create a new marker and set its position to the building's location
+    new mapboxgl.Marker()
+        .setLngLat([{{ building.location.coordinates.0 }}, {{ building.location.coordinates.1 }}])
+        .addTo(map);
+</script>

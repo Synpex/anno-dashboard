@@ -3,7 +3,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .api import BuildingViewSet, AudioguideViewSet
-from ..views import BuildingByYearList
+from buildings.views.api_views import BuildingByYearList, SortedBuildingsView, BuildingSearchView
 
 router = DefaultRouter()
 router.register(r'buildings', BuildingViewSet, basename='building')
@@ -11,7 +11,8 @@ router.register(r'audioguides', AudioguideViewSet, basename='audioguide')  # Reg
 
 
 urlpatterns = [
+    path('buildings/search/', BuildingSearchView.as_view(), name='building-search'),
+    path('buildings/sorted/', SortedBuildingsView.as_view(), name='building-sorted'),
     path('', include(router.urls)),
     path('buildings/year/<int:year>/', BuildingByYearList.as_view(), name='building-by-year'),
-    path('buildings/<str:id>/', BuildingViewSet.as_view({'get': 'retrieve'}), name='building-detail'),
 ]

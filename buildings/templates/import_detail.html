@@ -13,9 +13,11 @@
 
     {% block content %}
     {% include 'navbar.html' %}
+
         <section class="px-10 mt-24">
           <div class="container mx-auto px-4 py-8">
             {# Status Bar #} {% include 'import_status_bar.html'%} {# Input fields #}
+                  {% include 'map.html' %}
             <div class="bg-custom-blue shadow rounded-lg p-8 text-sky-900">
               <div class="md: grid md: grid-cols-2 gap-8">
                 <div>

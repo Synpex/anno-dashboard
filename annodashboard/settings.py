@@ -15,6 +15,7 @@ from pathlib import Path
 import djongo
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import timezone
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -110,9 +111,9 @@ def get_env_variable(var_name):
 DATABASES = {
     'buildings': {
         'ENGINE': 'djongo',
-        'NAME': os.getenv('COSMOS_DB_NAME'),
+        'NAME': os.getenv('MONGO_DB_NAME'),
         'CLIENT': {
-            'host': os.getenv('COSMOS_DB_CONNECTION_STRING')
+            'host': os.getenv('MONGO_DB_CONNECTION_STRING')
         },
         'TEST': {
             'NAME': 'buildings_test',
@@ -120,18 +121,14 @@ DATABASES = {
         }
     },
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': os.getenv('AZURE_SQL_DB_NAME'),
-        'USER': os.getenv('AZURE_SQL_USER'),
-        'PASSWORD': os.getenv('AZURE_SQL_PASSWORD'),
-        'HOST': os.getenv('AZURE_SQL_HOST'),
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        'SCHEMA': 'dbo',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('SQL_DB_NAME'),
+        'USER': os.getenv('SQL_USER'),
+        'PASSWORD': os.getenv('SQL_PASSWORD'),
+        'HOST': os.getenv('SQL_HOST'),
+        'PORT': os.getenv('SQL_PORT')
         }
     }
-}
 
 #region Azure Storage Variables
 
@@ -183,7 +180,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = 'login'
 
 # Set redirection to dashboard after login
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = 'buildings'
 
 
 # Internationalization
@@ -191,7 +188,9 @@ LOGIN_REDIRECT_URL = 'dashboard'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Berlin'
+DEFAULT_TIME_ZONE = timezone.get_fixed_timezone(60)  # 60 minutes ahead of UTC for GMT+1
+
 
 USE_I18N = True
 
@@ -224,15 +223,15 @@ INTERNAL_IPS = ['127.0.0.1',]
 TAILWIND_CSS_PATH = 'css/dist/styles.css'
 
 REST_FRAMEWORK = {
-    #'DEFAULT_AUTHENTICATION_CLASSES': [
-    #    'annodashboard.authenticate.APIKeyAuthentication',
-    #],
+   # 'DEFAULT_AUTHENTICATION_CLASSES': [
+   #     'annodashboard.authenticate.APIKeyAuthentication',
+   # ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
 MY_API_KEY = os.environ.get('MY_DJANGO_API_KEY')
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ'
 
-
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
 
 

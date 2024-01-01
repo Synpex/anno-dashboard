@@ -3,7 +3,8 @@ from bson import ObjectId as BsonObjectId
 from django.db import models
 from django.core.validators import URLValidator
 from djongo.models.fields import ObjectIdField
-from Core.fields import MongoObjectIdField
+
+from buildings.fields import CustomJSONField
 from buildings.models.timestamp_model import TimeStampedModel  # Base model with timestamps
 from Core.validators import validate_azure_blob_url, validate_timeline  # Custom validators
 
@@ -23,9 +24,9 @@ class Building(TimeStampedModel):
         help_text="URL to a preview image of the building."
     )
 
-    # location: A JSON field storing the geographic location of the building as a GeoJSON point. This allows for
+    # location: A Custom JSON field storing the geographic location of the building as a GeoJSON point. This allows for
     # efficient geospatial queries within Cosmos DB.
-    location = models.JSONField(
+    location = CustomJSONField(
         help_text="GeoJSON formatted point data representing the building's location."
     )
 
@@ -72,19 +73,44 @@ class Building(TimeStampedModel):
         default = list  # Ensures the default is an empty list
     )
 
+    # active: A boolean field indicating whether the building is active or not.
+    active = models.BooleanField(
+        default=True,  # Set the default value to True (active)
+        help_text="Indicates whether the building is active or not."
+    )
+
     # audioguides: A JSON field storing a list of embedded audioguide details. Each entry contains the ID of the audioguide
     audioguides = models.JSONField(
         help_text="JSON-formatted list of audioguides.",
         default=list  # Default to an empty list
     )
 
+    # Used to access the id of the building in Django Templates
+    @property
+    def public_id(self):
+        return self._id
+
     def save(self, *args, **kwargs):
         """
-        The save method overrides the default save method to perform custom validation on the location field.
+        Overrides the default save method to ensure that the location field
+        is stored as a proper GeoJSON object in the database.
         """
+        # Convert location from string to dictionary if necessary
+        global json
+        if isinstance(self.location, str):
+            try:
+                # Attempt to convert the string to a dictionary
+                import json
+                self.location = json.loads(self.location)
+            except json.JSONDecodeError:
+                # If conversion fails, raise an error
+                raise ValueError("Location must be a valid GeoJSON point")
 
+        # Validate the location field
         if self.location is None or 'type' not in self.location or self.location['type'] != 'Point':
             raise ValueError("Location must be a GeoJSON point")
+
+        # Call the parent class's save method with all arguments
         super().save(*args, **kwargs)
 
     def add_image(self, image_url, source):
@@ -94,6 +120,17 @@ class Building(TimeStampedModel):
         """
         self.image_urls.append({'url': image_url, 'source': source})
         self.save()
+
+
+    def century(self):
+        """
+        Determines the century in which the building was constructed.
+        Returns:
+            int: The century of the construction year.
+        """
+        if self.construction_year:
+            return (self.construction_year - 1) // 100 + 1
+        return None
 
 
     def add_audioguide(self, audioguide_id):
@@ -124,6 +161,12 @@ class Building(TimeStampedModel):
             self.save()
         except ValueError:
             pass  # Handle the case where the audioguide_id is not in the list
+
+    def total_images_count(self):
+        count = len(self.image_urls)
+        if self.preview_image_url:
+            count += 1
+        return count
 
     def __str__(self):
         """

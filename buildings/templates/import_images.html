@@ -1,45 +1,250 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>ANNO Amsterdam</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
-        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
-        {% tailwind_css %}
-    </head>
+<head>
+    <title>ANNO Amsterdam</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include your Tailwind CSS here -->
+      {% tailwind_css %}
+    <style>
+        /* Style for image preview boxes */
+        .image-box {
+            width: 200px; /* Increased Width of the box */
+            height: 200px; /* Increased Height of the box */
+            margin: 30px 10px 20px; /* Space between boxes */
+            border: 1px solid #ccc; /* Border around the box */
+            border-radius: 5%;
 
-    {% block content %}
-        {% include 'navbar.html' %}
-        <section class="px-10 mt-24">
-  <div class="container mx-auto px-4 py-8">
-    {# Status Bar #} {% include 'import_status_bar.html'%}
-    <div class="flex justify-center items-center bg-gray-100">
-      <form
-        class="p-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 font-\[\'Oswald\'\]]"
-      >
-        {# <input type="file" id="upload" alt="" />#}
-        <label
-          for="upload"
-          class="btn-same-height bg-sky-900 px-12 justify-center items-center rounded-3xl text-white flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          Upload Pictures to the Building
-        </label>
-        <button
-          class="btn-same-height border-2 rounded-3xl border-sky-900 px-12 text-sky-900 font-\[\'Oswald\'\]] flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          Browse Google Maps for Images
-        </button>
-      </form>
-    </div>
-    <div class="flex justify-center mt-8">
-      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
-      {% include 'next-button.html' %}
-    </div>
-  </div>
-</section>
-    {% endblock %}
+            position: relative; /* Positioning context for the close button */
+            display: inline-block; /* Align boxes in a grid */
+        }
+        .image-box img {
+            width: 100%; /* Make image fill the box */
+            height: 100%; /* Make image fill the box */
+            object-fit: cover; /* Ensure aspect ratio is maintained */
+            border-radius: 5%;
+        }
+         .image-box .close-btn {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: red;
+        color: white;
+        border-radius: 50%; /* Adjusted for a more squared appearance */
+        padding: 5px 10px; /* Adjust padding as needed */
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold; /* Make the '×' symbol more prominent */
 
+        }
+        .image-box .add-btn {
+            position: absolute;
+            bottom: -10px; /* Position at the bottom */
+            right: -10px; /* Adjust position */
+            background: green; /* Green background for add button */
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .selected-preview {
+            box-shadow: 0px 0px 10px 2px #0c4a6e; /* Blue glow for selected preview */
+        }
+        .input-box {
+            margin-top: 5px; /* Spacing between the image and the input field */
+        }
+         #imagePreview {
+            margin-bottom: 50px; /* Adjust as needed for ample space */
+        }
+    </style>
+</head>
+<body>
+{% include 'navbar.html' %}
+    <!-- Include your navbar.html here -->
+    <section class="px-10 mt-24">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Include your import_status_bar.html here -->
+            {% include 'import_status_bar.html' %}
+
+
+            <div id="disclaimer" class="mb-4 text-gray-600" style="display: none;">
+    <p><strong>Disclaimer:</strong> One image will serve as the preview image of the building. In order to select the preview image, just click on the uploaded image.</p>
+</div>
+
+
+            <!-- Image preview area above the buttons -->
+            <div id="imagePreview" class="flex justify-center flex-wrap mt-4">
+                <!-- Image thumbnails will be added here in little boxes -->
+            </div>
+
+            <!-- Form for Image Upload and Google Maps Search -->
+            <div class="flex justify-center items-center bg-gray-100">
+                <form method="post" enctype="multipart/form-data" class="p-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 font-[\'Oswald\']">
+                    <!-- Hidden input for file upload -->
+                    <input type="file" id="upload" name="images" multiple class="hidden" onchange="previewImages()" />
+
+                    <!-- Label acting as button for file upload -->
+                    <label for="upload" class="btn-same-height bg-sky-900 px-12 justify-center items-center rounded-3xl text-white flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        Upload Pictures to the Building
+                    </label>
+
+                    <!-- Button for Google Maps Search (functionality to be implemented) -->
+                    <button type="button" class="btn-same-height border-2 rounded-3xl border-sky-900 px-12 text-sky-900 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        Browse Google Maps for Images
+                    </button>
+
+                    <!-- Image preview area -->
+                    <div id="imagePreview" class="flex flex-wrap mt-4">
+                        <!-- Image thumbnails will be added here -->
+                    </div>
+                </form>
+            </div>
+
+            <!-- Continue and Previous Buttons -->
+            <div class="flex justify-center mt-8">
+                {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
+                {% include 'next-button.html' %}
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript to Preview Images Before Upload -->
+   <script>
+    var imageBoxCount = 0; // Global variable to keep track of the number of image boxes
+    var processedFiles = new Set(); // Set to keep track of processed files
+    var selectedPreviewId = null; // Keep track of the selected preview image box ID
+
+
+    if (files.length > 0) {
+    // Show the disclaimer when images are uploaded
+    document.getElementById('disclaimer').style.display = 'block';
+}
+
+
+    function previewImages() {
+        var files = document.querySelector('input[type=file]').files;
+
+         if (files.length > 0) {
+            // Show the disclaimer when images are uploaded
+            document.getElementById('disclaimer').style.display = 'block';
+        }
+
+
+        // Remove the existing green 'Add' button from the last box if present
+        removeAddButton();
+
+        function readAndPreview(file, index) {
+            var fileIdentifier = file.name + '-' + file.lastModified;
+            if (processedFiles.has(fileIdentifier)) {  // Skip if the file has already been processed
+                return;
+            }
+            processedFiles.add(fileIdentifier);  // Add the file to the set of processed files
+
+            // Ensure `file.name` matches the extensions criteria
+            if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
+                var reader = new FileReader();
+
+                reader.addEventListener("load", function () {
+                    var box = document.createElement('div');
+                    box.className = 'image-box';
+                    box.id = 'imageBox-' + imageBoxCount++; // Incremental ID
+
+                    // Clicking the box selects it as the preview image
+                    box.onclick = function() {
+                        // Remove highlight from the previously selected preview
+                        if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
+                            document.getElementById(selectedPreviewId).classList.remove('selected-preview');
+                        }
+                        // Highlight the new selected preview
+                        box.classList.add('selected-preview');
+                        selectedPreviewId = box.id; // Update the selected preview ID
+                    };
+
+                    var image = new Image();
+                    image.src = this.result;
+                    box.appendChild(image);
+
+                    // Add text input for image source or description
+                    var sourceInput = document.createElement('input');
+                    sourceInput.type = 'text';
+                    sourceInput.placeholder = 'Enter image source';
+                    sourceInput.className = 'w-full p-2 border border-gray-300 rounded-lg mb-4';
+                    box.appendChild(sourceInput);
+
+                     // Create a preview label but hide it initially
+                    var previewLabel = document.createElement('div');
+                    previewLabel.className = 'preview-label hidden';
+                    previewLabel.innerText = 'PREVIEW';
+                    box.appendChild(previewLabel);
+
+                    // Add close button to all image boxes
+                    var closeBtn = document.createElement('span');
+                    closeBtn.innerHTML = '&times;';
+                    closeBtn.className = 'close-btn';
+                    closeBtn.onclick = function(event) {
+                        event.stopPropagation();  // Prevent the box click event from firing
+                        this.parentElement.remove();
+                        imageBoxCount--; // Decrement the count when an image box is removed
+                        processedFiles.delete(fileIdentifier); // Remove from processed files
+                        // If the removed image was the selected preview, clear the selectedPreviewId
+                        if (box.id === selectedPreviewId) {
+                            selectedPreviewId = null;
+                        }
+                        // Update add button after removal
+                        updateAddButton();
+                    };
+                    box.appendChild(closeBtn);
+
+                    document.querySelector('#imagePreview').appendChild(box);
+                }, false);
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        if (files) {
+            [].forEach.call(files, readAndPreview);
+        }
+
+        // Add the green 'Add' button to the new last image box after all images are processed
+        setTimeout(updateAddButton, 100); // Adjust timeout as needed
+    }
+
+    function removeAddButton() {
+        var existingAddBtn = document.querySelector('.add-btn');
+        if (existingAddBtn) {
+            existingAddBtn.parentElement.removeChild(existingAddBtn);
+        }
+    }
+
+    function updateAddButton() {
+        var allImageBoxes = document.querySelectorAll('.image-box');
+        if (allImageBoxes.length > 0) {
+            var lastImageBox = allImageBoxes[allImageBoxes.length - 1];
+            var addBtn = document.createElement('span');
+            addBtn.innerHTML = '+'; // Text for the add button
+            addBtn.className = 'add-btn'; // Assign add button styling class
+            addBtn.onclick = function() {
+                document.getElementById('upload').click(); // Trigger file input
+            };
+            // Remove existing add button if present and add new one
+            var existingAddBtn = lastImageBox.querySelector('.add-btn');
+            if (existingAddBtn) {
+                existingAddBtn.remove();
+            }
+            lastImageBox.appendChild(addBtn);
+        }
+    }
+
+    document.getElementById('upload').addEventListener('change', previewImages);
+</script>
+
+</body>
 </html>
