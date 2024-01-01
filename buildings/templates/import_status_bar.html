@@ -1,11 +1,20 @@
   {# TODO: Background of each field in the status bar should be custom-blue #}
   {# after each step is completed #}
 
-<div class="flex space-x-16 mb-8 border border-2 border-sky-900 rounded-lg">
+<div class="flex mb-8 border border-2 border-sky-900 rounded-lg">
+ <div class="w-1/6">
+    <a href="/buildings/import/position"
+      ><button
+        class="w-full py-2 px-4 text-sky-900 rounded-l-md {% if request.path == '/buildings/import/position' %} bg-sky-900 text-white {% endif %}"
+      >
+        Position
+      </button></a
+    >
+  </div>
   <div class="w-1/6">
     <a href="/buildings/import/detail"
       ><button
-        class="w-full py-2 px-4 text-sky-900 rounded-l-md {% if request.path == '/buildings/import/detail' %} bg-sky-900 text-white {% endif %}"
+        class="w-full py-2 px-4 text-sky-900 {% if request.path == '/buildings/import/detail' %} bg-sky-900 text-white {% endif %}"
       >
         Details
       </button></a
@@ -29,19 +38,20 @@
       </button></a
     >
   </div>
-  <div class="w-1/6">
-    <a href="/buildings/import/position"
+
+    <div class="w-1/6">
+    <a href="/buildings/import/audioguides"
       ><button
-        class="w-full py-2 px-4 text-sky-900 {% if request.path == '/buildings/import/position' %} bg-sky-900 text-white {% endif %}"
+        class="w-full py-2 px-4 text-sky-900 {% if request.path == '/buildings/import/audioguides' %} bg-sky-900 text-white {% endif %}"
       >
-        Position
+        Audio Guides
       </button></a
     >
   </div>
   <div class="w-1/6">
     <a href="/buildings/import/review"
       ><button
-        class="w-full py-2 text-gray-600 mr-1 rounded-r-md {% if request.path == '/buildings/import/review' %} bg-sky-900 text-white {% endif %}"
+        class="w-full py-2 text-sky-900 rounded-r-md {% if request.path == '/buildings/import/review' %} bg-sky-900 text-white {% endif %}"
       >
         Review
       </button></a

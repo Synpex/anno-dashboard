@@ -1,0 +1,38 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ANNO Amsterdam</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+        {% tailwind_css %}
+    </head>
+
+    {% block content %}
+        {% include 'navbar.html' %}
+        <section class="px-10 mt-24">
+  <div class="container mx-auto px-4 py-8">
+    {# Status Bar #} {% include 'import_status_bar.html'%}
+    <div class="flex justify-center items-center bg-gray-100">
+      <form
+        class="p-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 font-\[\'Oswald\'\]]"
+      >
+        <button
+          class="btn-same-height border-2 rounded-3xl border-sky-900 px-12 text-sky-900 font-\[\'Oswald\'\]] flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          Add Audio Guides
+        </button>
+      </form>
+    </div>
+    <div class="flex justify-center mt-8">
+      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
+      {% include 'next-button.html' %}
+    </div>
+  </div>
+</section>
+    {% endblock %}
+
+</html>

@@ -95,6 +95,15 @@ def import_timeline_view(request):
         # Add more context variables here
     }
     return render(request, 'import_timeline.html', context)
+
+def import_audioguides_view(request):
+    # You can add your logic here to pass context to your dashboard template
+    context = {
+        'section': 'import',
+        # Add more context variables here
+    }
+    return render(request, 'import_audioguides.html', context)
+
 @login_required
 
 def import_position_view(request):
