@@ -1,4 +1,8 @@
-from django.shortcuts import render
+import os
+import uuid
+
+from django.core.files.storage import FileSystemStorage
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
@@ -52,11 +56,34 @@ def import_detail_view(request):
 
 @login_required
 def import_images_view(request):
-    # You can add your logic here to pass context to your dashboard template
+    if request.method == 'POST':
+        # Process the uploaded images
+        images = request.FILES.getlist('images')  # Get the uploaded images
+
+        # Initialize the session variable to store image paths if it doesn't exist
+        if 'temp_image_paths' not in request.session:
+            request.session['temp_image_paths'] = []
+
+        fs = FileSystemStorage(location=settings.TEMP_IMAGE_STORAGE)  # Use a temporary storage location
+
+        for image in images:
+            # Generate a new filename to avoid conflicts
+            temp_filename = str(uuid.uuid4()) + os.path.splitext(image.name)[1]
+            filename = fs.save(temp_filename, image)  # Save the file to temporary storage
+            request.session['temp_image_paths'].append(fs.path(filename))  # Track the file path in the session
+
+        # Save the session (required if using a file-based session backend)
+        request.session.save()
+
+        # Redirect to the next step or back to the form for additional uploads
+        return redirect('next_view_name')  # Replace with the name of your next view or URL
+
+    # Existing context for rendering the form
     context = {
         'section': 'import',
         # Add more context variables here
     }
+
     return render(request, 'import_images.html', context)
 
 @login_required

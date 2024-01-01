@@ -55,8 +55,8 @@
             font-size: 14px;
         }
         .selected-preview {
-            box-shadow: 0px 0px 10px 2px #0c4a6e; /* Blue glow for selected preview */
-        }
+        box-shadow: 0px 0px 20px 4px #4CAF50; /* Larger green glow */
+    }
         .input-box {
             margin-top: 5px; /* Spacing between the image and the input field */
         }
@@ -116,111 +116,118 @@
     </section>
 
     <!-- JavaScript to Preview Images Before Upload -->
-   <script>
+
+<script>
     var imageBoxCount = 0; // Global variable to keep track of the number of image boxes
     var processedFiles = new Set(); // Set to keep track of processed files
     var selectedPreviewId = null; // Keep track of the selected preview image box ID
-
-
-    if (files.length > 0) {
-    // Show the disclaimer when images are uploaded
-    document.getElementById('disclaimer').style.display = 'block';
-}
-
+    var inputValues = {}; // Object to keep track of input values for each image box
 
     function previewImages() {
         var files = document.querySelector('input[type=file]').files;
 
-         if (files.length > 0) {
-            // Show the disclaimer when images are uploaded
+        // Show the disclaimer when images are uploaded
+        if (files.length > 0) {
             document.getElementById('disclaimer').style.display = 'block';
         }
 
-
-        // Remove the existing green 'Add' button from the last box if present
+        // Remove the existing 'Add' button from the last box if present
         removeAddButton();
 
-        function readAndPreview(file, index) {
+        // Process each file
+        files.forEach(function(file, index) {
             var fileIdentifier = file.name + '-' + file.lastModified;
-            if (processedFiles.has(fileIdentifier)) {  // Skip if the file has already been processed
-                return;
-            }
-            processedFiles.add(fileIdentifier);  // Add the file to the set of processed files
+            if (!processedFiles.has(fileIdentifier)) { // If file hasn't been processed
+                processedFiles.add(fileIdentifier); // Mark file as processed
 
-            // Ensure `file.name` matches the extensions criteria
-            if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
                 var reader = new FileReader();
-
-                reader.addEventListener("load", function () {
+                reader.onload = function(event) {
                     var box = document.createElement('div');
                     box.className = 'image-box';
                     box.id = 'imageBox-' + imageBoxCount++; // Incremental ID
 
-                    // Clicking the box selects it as the preview image
-                    box.onclick = function() {
-                        // Remove highlight from the previously selected preview
-                        if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
-                            document.getElementById(selectedPreviewId).classList.remove('selected-preview');
-                        }
-                        // Highlight the new selected preview
-                        box.classList.add('selected-preview');
-                        selectedPreviewId = box.id; // Update the selected preview ID
-                    };
-
                     var image = new Image();
-                    image.src = this.result;
-                    box.appendChild(image);
+                    image.src = event.target.result;
+
+                    // Clicking the image selects it as the preview image
+                    image.onclick = function() {
+                        updatePreview(box); // Update preview to the clicked image
+                    };
 
                     // Add text input for image source or description
                     var sourceInput = document.createElement('input');
                     sourceInput.type = 'text';
                     sourceInput.placeholder = 'Enter image source';
                     sourceInput.className = 'w-full p-2 border border-gray-300 rounded-lg mb-4';
-                    box.appendChild(sourceInput);
-
-                     // Create a preview label but hide it initially
-                    var previewLabel = document.createElement('div');
-                    previewLabel.className = 'preview-label hidden';
-                    previewLabel.innerText = 'PREVIEW';
-                    box.appendChild(previewLabel);
-
-                    // Add close button to all image boxes
-                    var closeBtn = document.createElement('span');
-                    closeBtn.innerHTML = '&times;';
-                    closeBtn.className = 'close-btn';
-                    closeBtn.onclick = function(event) {
-                        event.stopPropagation();  // Prevent the box click event from firing
-                        this.parentElement.remove();
-                        imageBoxCount--; // Decrement the count when an image box is removed
-                        processedFiles.delete(fileIdentifier); // Remove from processed files
-                        // If the removed image was the selected preview, clear the selectedPreviewId
-                        if (box.id === selectedPreviewId) {
-                            selectedPreviewId = null;
-                        }
-                        // Update add button after removal
-                        updateAddButton();
+                    sourceInput.oninput = function() { // Store the current value when it changes
+                        inputValues[box.id] = this.value;
                     };
-                    box.appendChild(closeBtn);
+                    sourceInput.value = inputValues[box.id] || ''; // Set the stored value if available
 
+                    // Append elements to the box
+                    box.appendChild(image);
+                    box.appendChild(sourceInput);
+                    createPreviewLabel(box); // Create and append the preview label
+                    createCloseButton(box, fileIdentifier); // Create and append the close button
+
+                    // Append the box to the preview area
                     document.querySelector('#imagePreview').appendChild(box);
-                }, false);
-
+                };
                 reader.readAsDataURL(file);
             }
-        }
+        });
 
-        if (files) {
-            [].forEach.call(files, readAndPreview);
-        }
+        // Add the 'Add' button to the last image box after all images are processed
+        setTimeout(updateAddButton, 100);
+    }
 
-        // Add the green 'Add' button to the new last image box after all images are processed
-        setTimeout(updateAddButton, 100); // Adjust timeout as needed
+    function createPreviewLabel(box) {
+        var previewLabel = document.createElement('div');
+        previewLabel.className = 'preview-label hidden';
+        previewLabel.innerText = 'PREVIEW';
+        box.appendChild(previewLabel);
+    }
+
+    function createCloseButton(box, fileIdentifier) {
+        var closeBtn = document.createElement('span');
+        closeBtn.innerHTML = '&times;';
+        closeBtn.className = 'close-btn';
+        closeBtn.onclick = function(event) {
+            event.stopPropagation();  // Prevent triggering the image's onclick
+            box.remove();
+            imageBoxCount--; // Decrement the count when an image box is removed
+            processedFiles.delete(fileIdentifier); // Remove from processed files
+            if (box.id === selectedPreviewId) {
+                selectedPreviewId = null; // Clear the selected preview ID
+            }
+            updateAddButton(); // Update the 'Add' button placement
+        };
+        box.appendChild(closeBtn);
+    }
+
+    function updatePreview(box) {
+        // Remove highlight and reset input from the previously selected preview
+        if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
+            var prevSelectedBox = document.getElementById(selectedPreviewId);
+            prevSelectedBox.classList.remove('selected-preview');
+            var prevLabel = prevSelectedBox.querySelector('.preview-label');
+            if (prevLabel) {
+                prevLabel.classList.add('hidden'); // Hide the label
+            }
+        }
+        // Highlight the new selected preview and show label
+        box.classList.add('selected-preview');
+        var previewLabel = box.querySelector('.preview-label');
+        if (previewLabel) {
+            previewLabel.classList.remove('hidden'); // Show the label
+        }
+        selectedPreviewId = box.id; // Update the selected preview ID
     }
 
     function removeAddButton() {
         var existingAddBtn = document.querySelector('.add-btn');
         if (existingAddBtn) {
-            existingAddBtn.parentElement.removeChild(existingAddBtn);
+            existingAddBtn.remove();
         }
     }
 
@@ -234,11 +241,6 @@
             addBtn.onclick = function() {
                 document.getElementById('upload').click(); // Trigger file input
             };
-            // Remove existing add button if present and add new one
-            var existingAddBtn = lastImageBox.querySelector('.add-btn');
-            if (existingAddBtn) {
-                existingAddBtn.remove();
-            }
             lastImageBox.appendChild(addBtn);
         }
     }
