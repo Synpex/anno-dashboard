@@ -32,9 +32,10 @@ class BuildingSerializer(serializers.ModelSerializer):
 class SlimBuildingSerializer(serializers.ModelSerializer):# Custom field for handling MongoDB's ObjectId
     distance = serializers.FloatField(source='distanceRounded', read_only=True)  # FloatField for distance
     _id = ObjectIdField(read_only=True)  # Custom field for handling MongoDB's ObjectId
+    location = GeoPointField(read_only=True)
     class Meta:
         model = Building
-        fields = ('_id', 'distance', 'preview_image_url', 'address', 'construction_year', 'type_of_use')
+        fields = ('_id', 'location', 'distance', 'preview_image_url', 'address', 'construction_year', 'type_of_use', 'active')
 
 
 

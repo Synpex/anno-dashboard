@@ -8,6 +8,23 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+<style>
+    .tagify__tag {
+    @apply bg-gray-200 rounded-full text-xs py-1 px-2;
+}
+
+.tagify__tag .tagify__tag__removeBtn {
+    @apply bg-transparent border-none;
+}
+
+/* Optionally, style the focus state */
+.tagify--focus .tagify {
+    @apply shadow-outline;
+}
+
+</style>
         {% tailwind_css %}
     </head>
 
@@ -28,8 +45,8 @@
                     type="text"
                     placeholder="Address ..."
                     class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:border-sky-900"
+                    value="{{ selected_building.building.address }}"
                   />
-
                   <label class="block text-sm font-semibold mb-2"
                     >Type of use [Preview]</label
                   >
@@ -56,12 +73,9 @@
                     class="w-full p-2 border border-gray-300 rounded-lg mb-4"
                   />
 
-                  <label class="block text-sm font-semibold mb-2"
-                    >Tags / architectural features</label
-                  >
-                  <select class="w-full p-2 border border-gray-300 rounded-lg mb-4">
-                    <option>Tags ...</option>
-                  </select>
+                    <label class="block text-sm font-semibold mb-2"
+                        >Tags</label>
+                  <input id="tagInput" name="tags" placeholder="Add tags" class="w-full p-1/2 border border-gray-300 rounded-lg mb-4">
 
                   <label class="block text-sm font-semibold mb-2"
                     >construction year [Preview]</label
@@ -70,6 +84,7 @@
                     type="text"
                     placeholder="1903"
                     class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                    value="{{ selected_building.building.constructionYear }}"
                   />
                 </div>
               </div>
@@ -81,5 +96,20 @@
           </div>
         </section>
 {% endblock %}
+<script>
+  // Initialize Tagify on the input element
+  var input = document.getElementById('tagInput');
+  var tagify = new Tagify(input);
+
+  tagify.DOM.scope.classList.add('border', 'border-gray-300', 'rounded-lg', 'p-1', 'bg-white', 'focus:border-blue-500');
+
+  // Listen to the 'add' event, which is triggered when a new tag is added
+  tagify.on('add', onAddTag);
+
+  // Function to handle a new tag added
+  function onAddTag(e) {
+    console.log("Added a tag:", e.detail.data.value);
+  }
+</script>
 
 </html>

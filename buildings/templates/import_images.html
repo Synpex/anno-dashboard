@@ -55,8 +55,8 @@
             font-size: 14px;
         }
         .selected-preview {
-            box-shadow: 0px 0px 10px 2px #0c4a6e; /* Blue glow for selected preview */
-        }
+        box-shadow: 0px 0px 20px 4px #4CAF50; /* Larger green glow */
+    }
         .input-box {
             margin-top: 5px; /* Spacing between the image and the input field */
         }
@@ -120,6 +120,7 @@
     var imageBoxCount = 0; // Global variable to keep track of the number of image boxes
     var processedFiles = new Set(); // Set to keep track of processed files
     var selectedPreviewId = null; // Keep track of the selected preview image box ID
+     var inputValues = {}; // Object to keep track of input values
 
 
     if (files.length > 0) {
@@ -156,20 +157,30 @@
                     box.className = 'image-box';
                     box.id = 'imageBox-' + imageBoxCount++; // Incremental ID
 
-                    // Clicking the box selects it as the preview image
-                    box.onclick = function() {
-                        // Remove highlight from the previously selected preview
-                        if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
-                            document.getElementById(selectedPreviewId).classList.remove('selected-preview');
-                        }
-                        // Highlight the new selected preview
-                        box.classList.add('selected-preview');
-                        selectedPreviewId = box.id; // Update the selected preview ID
-                    };
-
                     var image = new Image();
                     image.src = this.result;
-                    box.appendChild(image);
+                    // Clicking the box selects it as the preview image
+                     image.onclick = function() {
+                // Remove highlight from the previously selected preview
+                if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
+                    var prevSelectedBox = document.getElementById(selectedPreviewId);
+                    prevSelectedBox.classList.remove('selected-preview');
+                    var prevInput = prevSelectedBox.querySelector('input');
+                    if (prevInput) {
+                        prevInput.disabled = false; // Enable the input field
+                        prevInput.classList.remove('bg-gray-300'); // Remove greyed out background
+                        prevInput.value = inputValues[prevSelectedBox.id] || ''; // Restore the previous value
+                    }
+                }
+                // Highlight the new selected preview and disable its input
+                box.classList.add('selected-preview');
+                sourceInput.disabled = true; // Disable the input field
+                sourceInput.classList.add('bg-gray-300'); // Add greyed out background
+                selectedPreviewId = box.id; // Update the selected preview ID
+
+            };
+            box.appendChild(image);
+
 
                     // Add text input for image source or description
                     var sourceInput = document.createElement('input');
@@ -245,6 +256,5 @@
 
     document.getElementById('upload').addEventListener('change', previewImages);
 </script>
-
 </body>
 </html>
