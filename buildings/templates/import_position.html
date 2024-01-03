@@ -1,81 +1,375 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>ANNO Amsterdam</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
-        <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
-        {% tailwind_css %}
+<head>
+    <title>ANNO Amsterdam</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+    {% tailwind_css %}
+    <style>
+        #map {
+            width: 100%;
+            height: 50vh;
+            margin-top: 5%;
+            margin-bottom: 1%;
+            margin-right: 2%;
+            position: relative;
+        }
+        .search-button {
+            display: block; /* Ensure it's a block element */
+            width: 100%; /* Take full width */
+            text-align: center; /* Center the text */
+        }
 
-        <style >
-            #map {
-                width: 100%;
-                height: 50vh;
-                margin-bottom: 5%;
-                margin-right: 2%;
-                position: center;
-            }
-        </style>
-    </head>
-
+    </style>
+</head>
+<body>
     {% block content %}
-        {% include 'navbar.html' %}
-        <section class="px-10 mt-24">
-  <div class="container mx-auto px-4 py-8">
-      {# Status Bar #}
-      {% include 'import_status_bar.html'%}
+    {% include 'navbar.html' %}
+    <section class="px-10 mt-24">
+        <div class="container mx-auto px-4 py-8">
+            {% include 'import_status_bar.html' %}
+            <div class="bg-gray-100">
+                <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="w-full px-2 mb-4 md:mb-0">
+                            <label for="zipCode" class="block text-sm font-medium text-gray-700">ZIP Code</label>
+                            <input type="text" id="zipCode" name="zipCode" class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                        </div>
+                        <div class="w-full px-2">
+                            <label for="houseNumber" class="block text-sm font-medium text-gray-700">House Number</label>
+                            <input type="text" id="houseNumber" name="houseNumber" class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                        </div>
+                        <div class="w-full px-2 text-center my-4">
+                            <span class="text-xl font-medium text-gray-700">OR</span>
+                        </div>
+                        <div class="w-full px-2 mb-4 md:mb-0">
+                            <label for="textualSearch" class="block text-sm font-medium text-gray-700">Textual Search</label>
+                            <input type="text" id="textualSearch" name="textualSearch" class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                        </div>
+                        <div class="w-full px-2 mt-4 md:mt-6">
+                        <button id="searchButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-stone-400 disabled:cursor-not-allowed">Search</button>
+                    </div>
+                    </div>
+                </div>
+                <div id="buildingInfo" style="display: none; max-width: 90%; margin: auto;">
+                    <table class="min-w-full divide-y divide-gray-200 mt-8">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Street</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">House Number</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">House Letter</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ZIP Code</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Function</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Area (m²)</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Original Year</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Geo Position</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Select</th>
+                            </tr>
+                        </thead>
+                        <tbody id="addressResults" class="bg-white divide-y divide-gray-200">
+                            <!-- Address rows will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
 
-      {# Map #}
-      {% include 'map.html' %}
+            <div id="map"></div>
 
-    {# Map #}
-    {% include 'map.html' %}
-
-    <div class="bg-gray-100">
-
-      <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-wrap -mx-2">
-          <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
-            <label
-              for="longitude"
-              class="block text-sm font-medium text-gray-700"
-              >Longitude</label
-            >
-            <input
-              type="text"
-              id="longitude"
-              name="longitude"
-              value="52.377956"
-              class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div class="w-full md:w-1/2 px-2">
-            <label
-              for="latitude"
-              class="block text-sm font-medium text-gray-700"
-              >Latitude</label
-            >
-            <input
-              type="text"
-              id="latitude"
-              name="latitude"
-              value="4.897070"
-              class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
         </div>
-      </div>
-    </div>
-    {# TODO: Implement Map #}
-
-      <div class="flex justify-between mt-8">
-          {% include "cancel-button.html" %} {% include "next-button.html" %}
-        </div>
-  </div>
-</section>
+            </div>
+    <div class="flex justify-between mt-8">
+                {% include "cancel-button.html" %}
+                {% include "next-button.html" %}
+            </div>
+    </section>
     {% endblock %}
 
+    <script>
+        // Initialize the map
+mapboxgl.accessToken = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v10',
+    center: [4.897070, 52.377956], // Default center
+    zoom: 12
+});
+
+// Add navigation controls to the map
+map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+// Object to track existing markers by their coordinates to avoid duplicates
+var existingMarkers = {};
+
+var globalApiResponseData;  // This will store the API response data
+
+
+// Utility functions
+function clearMarkers() {
+    Object.values(existingMarkers).forEach(marker => marker.remove());
+    existingMarkers = {}; // Reset the existingMarkers object
+}
+
+// Function to focus on the map
+function scrollToMap() {
+    var mapElement = document.getElementById('map');
+    if (mapElement) {
+        // Get the position of the map relative to the top of the document
+        const mapTop = mapElement.getBoundingClientRect().top + window.pageYOffset;
+
+        // Smoothly scroll to the map position
+        window.scrollTo({ top: mapTop, behavior: 'smooth' });
+    }
+}
+
+function focusMapOn(coords) {
+    map.flyTo({
+        center: coords,
+        essential: true,
+        zoom: 18
+    });
+}
+
+function formatCoordinates(coords) {
+    return coords.map(coord => coord.toFixed(4)); // Round to 4 decimal places
+}
+
+function updateSearchButtonState() {
+    const zipCode = document.getElementById('zipCode').value.trim();
+    const houseNumber = document.getElementById('houseNumber').value.trim();
+    const textualSearch = document.getElementById('textualSearch').value.trim();
+    const searchButton = document.getElementById('searchButton');
+
+    searchButton.disabled = !(zipCode && houseNumber && !textualSearch) && !(!zipCode && !houseNumber && textualSearch);
+}
+
+// Event listeners
+document.getElementById('zipCode').addEventListener('input', updateSearchButtonState);
+document.getElementById('houseNumber').addEventListener('input', updateSearchButtonState);
+document.getElementById('textualSearch').addEventListener('input', updateSearchButtonState);
+document.getElementById('searchButton').addEventListener('click', searchBuildings);
+
+// Initial state check on page load
+updateSearchButtonState();
+
+// Main function to handle search and display results
+function searchBuildings() {
+    clearMarkers(); // Clear existing markers from the map
+
+    var zipCode = document.getElementById('zipCode').value;
+    var houseNumber = document.getElementById('houseNumber').value;
+    var textualSearch = document.getElementById('textualSearch').value;
+
+    var queryParams = new URLSearchParams();
+    if (textualSearch) {
+        queryParams.set('q', textualSearch);
+    } else {
+        if (zipCode) queryParams.set('postcode', zipCode);
+        if (houseNumber) queryParams.set('huisnummer', houseNumber);
+    }
+
+    var requestUrl = `/api/buildings/proxy/bag?${queryParams.toString()}`;
+
+    fetch(requestUrl)
+        .then(handleResponse)
+        .then(updateUI)
+        .catch(handleError);
+}
+
+// Helper functions for fetching and displaying data
+function handleResponse(response) {
+    if (response.ok) {
+        return response.json();
+    } else {
+        console.error(`Server responded with a status of ${response.status}`);
+        return response.text().then(text => {
+            throw new Error(`Server response: ${text}`);
+        });
+    }
+}
+
+function updateUI(data) {
+    globalApiResponseData = data;
+    const buildingInfo = document.getElementById('buildingInfo');
+    const tbody = document.getElementById('addressResults');
+    tbody.innerHTML = ''; // Clear previous results
+
+    if (data && data._embedded && data._embedded.adressen) {
+        data._embedded.adressen.forEach((address, index) => {
+            addTableRow(address, index);
+            addMapMarker(address, index);
+        });
+
+        setupBuildingSelection(data);
+        buildingInfo.style.display = 'block'; // Show the building information section
+    } else {
+        console.error('Unexpected API response structure:', data);
+        alert('Received unexpected data structure from API.');
+    }
+}
+
+function addTableRow(address, index) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = generateTableRowHTML(address, index);
+    document.getElementById('addressResults').appendChild(tr);
+}
+
+// Modify your existing addMapMarker function to pass the index to generatePopupContent
+function addMapMarker(address, index) {
+    const coords = address.adresseerbaarObjectGeometrie.punt.coordinates;
+    const coordsKey = coords.join(',');
+
+    if (!existingMarkers[coordsKey]) {
+        const marker = new mapboxgl.Marker()
+            .setLngLat(coords)
+            .addTo(map);
+
+        // Create a popup and set its content, now passing the index as well
+        const popup = new mapboxgl.Popup({ offset: 25 })
+            .setHTML(generatePopupContent(address, index));
+
+        // Attach the popup to the marker
+        marker.setPopup(popup);
+
+        existingMarkers[coordsKey] = marker;
+    }
+}
+
+function generatePopupContent(address, index, data) {
+    // Customize this content to include whatever details are relevant
+    const buildingDetails = `
+        <h3>${address.openbareRuimteNaam} ${address.huisnummer}${address.huisletter || ''}</h3>
+        <p><strong>Postcode:</strong> ${address.postcode}</p>
+        <p><strong>City:</strong> ${address.woonplaatsNaam}</p>
+        <p><strong>Usage:</strong> ${address.gebruiksdoelen?.join(', ') || 'n/a'}</p>
+        <p><strong>Area:</strong> ${address.oppervlakte || 'n/a'} m²</p>
+        <p><strong>Construction Year:</strong> ${address.oorspronkelijkBouwjaar?.[0] || 'n/a'}</p>
+        <button onclick="selectBuildingFromPopup(${index}, ${JSON.stringify(data)})" class="mt-2 p-2 bg-blue-500 text-white rounded">Select Building</button>
+    `;
+    return buildingDetails;
+}
+
+function selectBuildingFromPopup(index) {
+    // Find the corresponding radio button in the table and check it
+    const radioButton = document.querySelector(`input[name="selectedBuilding"][value="${index}"]`);
+    if (radioButton) {
+        radioButton.checked = true;  // Check the corresponding radio button in the table
+
+        // Extract the necessary data from the selected row or directly from the API response data
+        const selectedBuilding = globalApiResponseData._embedded.adressen[index];
+
+        // Prepare the data to be sent to the Django backend
+        const buildingData = {
+            address: `${selectedBuilding.openbareRuimteNaam} ${selectedBuilding.huisnummer}${selectedBuilding.huisletter || ''}`,
+            constructionYear: selectedBuilding.oorspronkelijkBouwjaar?.[0] || 'n/a',
+            usage: selectedBuilding.gebruiksdoelen?.join(', ') || 'n/a',
+            coordinates: selectedBuilding.adresseerbaarObjectGeometrie.punt.coordinates  // Assuming it's an array [lon, lat]
+            // Add any other necessary details here
+        };
+
+        // Call the saveSelectedBuilding function to send the data to the backend
+        saveSelectedBuilding(buildingData);
+    }
+
+    function saveSelectedBuilding(buildingData) {
+        // Define the URL to which you want to send the POST request
+        const postUrl = '/api/buildings/save_selected/';
+
+        fetch(postUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),  // Assuming you're using Django's standard CSRF cookie
+            },
+            body: JSON.stringify({building: buildingData})
+        })
+            .then(response => {
+                if (response.ok) {
+                    // If the backend confirms the data is saved, redirect to the next page
+                    window.location.href = "/buildings/import/detail";
+                } else {
+                    console.error('Failed to save building selection.');
+                    // Handle failure (maybe show a message to the user)
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+}
+
+var currentOpenPopup = null;  // Variable to keep track of the currently opened popup
+
+function setupBuildingSelection(data) {
+    document.querySelectorAll('input[name="selectedBuilding"]').forEach(radioButton => {
+        radioButton.addEventListener('click', function() {
+            // Close the currently opened popup, if any
+            if (currentOpenPopup) {
+                currentOpenPopup.remove();
+            }
+
+            const selectedBuilding = data._embedded.adressen[this.value];
+            if (selectedBuilding && selectedBuilding.adresseerbaarObjectGeometrie.punt) {
+                const coords = selectedBuilding.adresseerbaarObjectGeometrie.punt.coordinates;
+                const coordsKey = coords.join(',');
+
+                // Check if a marker exists at these coordinates
+                if (existingMarkers[coordsKey]) {
+                    const marker = existingMarkers[coordsKey];
+
+                    // Open the marker's popup
+                    marker.togglePopup();
+
+                    // Update currentOpenPopup to the new popup
+                    currentOpenPopup = marker.getPopup();
+
+                    // Focus on the map and scroll to the map position
+                    focusMapOn(coords);
+                    scrollToMap();
+                }
+            }
+        });
+    });
+}
+
+function generateTableRowHTML(address, index) {
+    return `
+        <td class="px-6 py-4 whitespace-nowrap">${address.openbareRuimteNaam}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${address.huisnummer}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${address.huisletter || '-'}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${address.postcode}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${address.woonplaatsNaam}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${address.gebruiksdoelen?.join(', ') || 'n/a'}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${address.oppervlakte || 'n/a'}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${address.oorspronkelijkBouwjaar?.[0] || 'n/a'}</td>
+        <td class="px-6 py-4 whitespace-nowrap">[${formatCoordinates(address.adresseerbaarObjectGeometrie.punt?.coordinates)}]</td>
+        <td class="px-6 py-4 whitespace-nowrap"><input type="radio" name="selectedBuilding" value="${index}"></td>`;
+}
+
+function handleError(error) {
+    console.error('Error fetching data:', error);
+    alert('Failed to fetch data. Check the console for more details.');
+}
+
+// Helper function to get the CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    </script>
+</body>
 </html>

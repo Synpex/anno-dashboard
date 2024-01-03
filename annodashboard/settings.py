@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'drf_yasg', # Django REST Framework - Swagger
     'tailwind', # Django Tailwind
     'django_browser_reload', # Django Browser Reload
+    'corsheaders', # Django CORS Headers
 ]
 
 MIDDLEWARE = [
@@ -69,7 +70,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'annodashboard.urls'
 
@@ -157,6 +162,8 @@ STATICFILES_DIRS = [
 
 DATABASE_ROUTERS = ['annodashboard.router.NoMigrateRouter']
 
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Or another valid session engine
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -230,6 +237,9 @@ REST_FRAMEWORK = {
 }
 
 MY_API_KEY = os.environ.get('MY_DJANGO_API_KEY')
+BAG_API_BASE_URL = os.getenv('BAG_API_BASE_URL')
+BAG_API_KEY = os.getenv('BAG_API_KEY')
+
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ'
 
 GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')

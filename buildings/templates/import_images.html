@@ -116,118 +116,122 @@
     </section>
 
     <!-- JavaScript to Preview Images Before Upload -->
-
-<script>
+   <script>
     var imageBoxCount = 0; // Global variable to keep track of the number of image boxes
     var processedFiles = new Set(); // Set to keep track of processed files
     var selectedPreviewId = null; // Keep track of the selected preview image box ID
-    var inputValues = {}; // Object to keep track of input values for each image box
+     var inputValues = {}; // Object to keep track of input values
+
+
+    if (files.length > 0) {
+    // Show the disclaimer when images are uploaded
+    document.getElementById('disclaimer').style.display = 'block';
+}
+
 
     function previewImages() {
         var files = document.querySelector('input[type=file]').files;
 
-        // Show the disclaimer when images are uploaded
-        if (files.length > 0) {
+         if (files.length > 0) {
+            // Show the disclaimer when images are uploaded
             document.getElementById('disclaimer').style.display = 'block';
         }
 
-        // Remove the existing 'Add' button from the last box if present
+
+        // Remove the existing green 'Add' button from the last box if present
         removeAddButton();
 
-        // Process each file
-        files.forEach(function(file, index) {
+        function readAndPreview(file, index) {
             var fileIdentifier = file.name + '-' + file.lastModified;
-            if (!processedFiles.has(fileIdentifier)) { // If file hasn't been processed
-                processedFiles.add(fileIdentifier); // Mark file as processed
+            if (processedFiles.has(fileIdentifier)) {  // Skip if the file has already been processed
+                return;
+            }
+            processedFiles.add(fileIdentifier);  // Add the file to the set of processed files
 
+            // Ensure `file.name` matches the extensions criteria
+            if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
                 var reader = new FileReader();
-                reader.onload = function(event) {
+
+                reader.addEventListener("load", function () {
                     var box = document.createElement('div');
                     box.className = 'image-box';
                     box.id = 'imageBox-' + imageBoxCount++; // Incremental ID
 
                     var image = new Image();
-                    image.src = event.target.result;
+                    image.src = this.result;
+                    // Clicking the box selects it as the preview image
+                     image.onclick = function() {
+                // Remove highlight from the previously selected preview
+                if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
+                    var prevSelectedBox = document.getElementById(selectedPreviewId);
+                    prevSelectedBox.classList.remove('selected-preview');
+                    var prevInput = prevSelectedBox.querySelector('input');
+                    if (prevInput) {
+                        prevInput.disabled = false; // Enable the input field
+                        prevInput.classList.remove('bg-gray-300'); // Remove greyed out background
+                        prevInput.value = inputValues[prevSelectedBox.id] || ''; // Restore the previous value
+                    }
+                }
+                // Highlight the new selected preview and disable its input
+                box.classList.add('selected-preview');
+                sourceInput.disabled = true; // Disable the input field
+                sourceInput.classList.add('bg-gray-300'); // Add greyed out background
+                selectedPreviewId = box.id; // Update the selected preview ID
 
-                    // Clicking the image selects it as the preview image
-                    image.onclick = function() {
-                        updatePreview(box); // Update preview to the clicked image
-                    };
+            };
+            box.appendChild(image);
+
 
                     // Add text input for image source or description
                     var sourceInput = document.createElement('input');
                     sourceInput.type = 'text';
                     sourceInput.placeholder = 'Enter image source';
                     sourceInput.className = 'w-full p-2 border border-gray-300 rounded-lg mb-4';
-                    sourceInput.oninput = function() { // Store the current value when it changes
-                        inputValues[box.id] = this.value;
-                    };
-                    sourceInput.value = inputValues[box.id] || ''; // Set the stored value if available
-
-                    // Append elements to the box
-                    box.appendChild(image);
                     box.appendChild(sourceInput);
-                    createPreviewLabel(box); // Create and append the preview label
-                    createCloseButton(box, fileIdentifier); // Create and append the close button
 
-                    // Append the box to the preview area
+                     // Create a preview label but hide it initially
+                    var previewLabel = document.createElement('div');
+                    previewLabel.className = 'preview-label hidden';
+                    previewLabel.innerText = 'PREVIEW';
+                    box.appendChild(previewLabel);
+
+                    // Add close button to all image boxes
+                    var closeBtn = document.createElement('span');
+                    closeBtn.innerHTML = '&times;';
+                    closeBtn.className = 'close-btn';
+                    closeBtn.onclick = function(event) {
+                        event.stopPropagation();  // Prevent the box click event from firing
+                        this.parentElement.remove();
+                        imageBoxCount--; // Decrement the count when an image box is removed
+                        processedFiles.delete(fileIdentifier); // Remove from processed files
+                        // If the removed image was the selected preview, clear the selectedPreviewId
+                        if (box.id === selectedPreviewId) {
+                            selectedPreviewId = null;
+                        }
+                        // Update add button after removal
+                        updateAddButton();
+                    };
+                    box.appendChild(closeBtn);
+
                     document.querySelector('#imagePreview').appendChild(box);
-                };
+                }, false);
+
                 reader.readAsDataURL(file);
             }
-        });
-
-        // Add the 'Add' button to the last image box after all images are processed
-        setTimeout(updateAddButton, 100);
-    }
-
-    function createPreviewLabel(box) {
-        var previewLabel = document.createElement('div');
-        previewLabel.className = 'preview-label hidden';
-        previewLabel.innerText = 'PREVIEW';
-        box.appendChild(previewLabel);
-    }
-
-    function createCloseButton(box, fileIdentifier) {
-        var closeBtn = document.createElement('span');
-        closeBtn.innerHTML = '&times;';
-        closeBtn.className = 'close-btn';
-        closeBtn.onclick = function(event) {
-            event.stopPropagation();  // Prevent triggering the image's onclick
-            box.remove();
-            imageBoxCount--; // Decrement the count when an image box is removed
-            processedFiles.delete(fileIdentifier); // Remove from processed files
-            if (box.id === selectedPreviewId) {
-                selectedPreviewId = null; // Clear the selected preview ID
-            }
-            updateAddButton(); // Update the 'Add' button placement
-        };
-        box.appendChild(closeBtn);
-    }
-
-    function updatePreview(box) {
-        // Remove highlight and reset input from the previously selected preview
-        if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
-            var prevSelectedBox = document.getElementById(selectedPreviewId);
-            prevSelectedBox.classList.remove('selected-preview');
-            var prevLabel = prevSelectedBox.querySelector('.preview-label');
-            if (prevLabel) {
-                prevLabel.classList.add('hidden'); // Hide the label
-            }
         }
-        // Highlight the new selected preview and show label
-        box.classList.add('selected-preview');
-        var previewLabel = box.querySelector('.preview-label');
-        if (previewLabel) {
-            previewLabel.classList.remove('hidden'); // Show the label
+
+        if (files) {
+            [].forEach.call(files, readAndPreview);
         }
-        selectedPreviewId = box.id; // Update the selected preview ID
+
+        // Add the green 'Add' button to the new last image box after all images are processed
+        setTimeout(updateAddButton, 100); // Adjust timeout as needed
     }
 
     function removeAddButton() {
         var existingAddBtn = document.querySelector('.add-btn');
         if (existingAddBtn) {
-            existingAddBtn.remove();
+            existingAddBtn.parentElement.removeChild(existingAddBtn);
         }
     }
 
@@ -241,12 +245,16 @@
             addBtn.onclick = function() {
                 document.getElementById('upload').click(); // Trigger file input
             };
+            // Remove existing add button if present and add new one
+            var existingAddBtn = lastImageBox.querySelector('.add-btn');
+            if (existingAddBtn) {
+                existingAddBtn.remove();
+            }
             lastImageBox.appendChild(addBtn);
         }
     }
 
     document.getElementById('upload').addEventListener('change', previewImages);
 </script>
-
 </body>
 </html>
