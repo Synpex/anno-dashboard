@@ -9,20 +9,24 @@
         <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
         <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.6/datatables.min.css"/>
-        <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.6/datatables.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+        <script type="module" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
         {% tailwind_css %}
 
         <style >
-.map-container {
-    width: 100%; /* Full width */
-    height: 50vh; /* Adjust height as needed */
-    margin-bottom: 5%;
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        height: 40vh; /* Smaller height on smaller screens */
-    }
-}
+            .map-container {
+                width: 100%; /* Full width */
+                height: 50vh; /* Adjust height as needed */
+                margin-bottom: 5%;
+                /* Responsive adjustments */
+                @media (max-width: 768px) {
+                    height: 40vh; /* Smaller height on smaller screens */
+                }
+            }
+
+      .selected-row {
+        background-color: #c5d9e0;
+      }
     </style>
     </head>
 <body>
@@ -36,7 +40,7 @@
         {# TODO: Implement the number selected to be dynamically calculated #}
         <span class="text-gray-400 text-xs">3 selected</span>
         <select
-      id="building-filter"
+      id="filterSelect"
       class="bg-white border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
       type="button"
     >
@@ -123,12 +127,12 @@
   </div>
 
   {# Buildings table #}
-  <div id="buildings-table" class="min-h-screen bg-gray-100">
-    <div class="overflow-x-auto table-responsive">
-        <table id="buildings-data" class="">
+  <div class="min-h-screen bg-gray-100">
+    <div data-te-datatable-init class="overflow-x-auto table-responsive">
+        <table id="buildings-data" data-te-fixed-header="true" class="">
             <thead class="">
                 <tr class="">
-                    <th class="px-4 sm:px-8"><input type="checkbox"/></th>
+                    <th class="px-4 sm:px-8"><input type="checkbox" id="top-checkbox"/></th>
                     <th class="font-medium text-gray-600 text-sm -ml-"></th>
                     <th class="font-medium text-gray-600 text-sm px-8">ADDRESS</th>
                     <th class="font-medium text-gray-600 text-sm px-8">ANNO</th>
@@ -141,8 +145,8 @@
             </thead>
             <tbody class="bg-white mt-5">
             {% for building in buildings %}
-            <tr class="building-row" data-status="{% if building.active %}active{% else %}inactive{% endif %}">
-                <td class="px-4 sm:px-8"><input type="checkbox"/></td>
+            <tr class="building-row" data-status="{% if building.active %}active{% else %}inactive{% endif %}" data-te-selectable="true">
+                <td class="px-4 sm:px-8"><input type="checkbox" class="row-checkbox"/></td>
                 <td>
                     <button onclick="toggleDetails('{{ building.public_id}}')" class=" py-2 px-3 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
                         <svg class="w-[10px] h-[10px] ms-3 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
@@ -152,7 +156,7 @@
                 </td>
                 <td class="font-medium text-sky-950 text-sm px-8">
                     <button class="flex">
-                        <svg class="w-[12px] h-[12px] fill-sky-950 stroke-sky-950 my-1 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <svg class="w-20 h-20 fill-sky-950 stroke-sky-950 my-1 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                             <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"/>
                             <path d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"/>
                             <path d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"/>
@@ -186,7 +190,7 @@
 
             {# Dropdown building details #}
             <tr id="building-detail-{{ building.public_id }}" class="shadow-lg" hidden="hidden">
-                <td colspan="3" class="h-5">
+                <td class="h-5">
                     <div class="bg-white px-6 shadow-md flex flex-col">
                     <h1 class="text-md font-bold mb-2 mt-6 text-sky-900">Anno {{ building.construction_year }}</h1>
                     <h2 class="text-md font-bold mb-2 text-sky-900">{{ building.address }}</h2>
@@ -209,7 +213,7 @@
                 </td>
 
                 {# Timeline #}
-                <td colspan="3">
+                <td>
                     <div class="bg-white px-6 shadow-l flex flex-col">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-md font-bold text-sky-900">TIMELINE</h2>
@@ -229,10 +233,19 @@
         </div>
                 </td>
 
+            {#    Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed        #}
+            <td class="hidden"></td>
+            <td class="hidden"></td>
+
                 {# Map #}
-                <td colspan="3" class="">
+                <td>
                 {% include 'map_with_marker.html' with building=building %}
             </td>
+
+            {#    Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed        #}
+            <td class="hidden"></td>
+            <td class="hidden"></td>
+
                 <td colspan="1" class="items-center">
                     <h2 class="text-md font-bold text-sky-900">INFORMATION</h2>
                     <div class="space-y-4 text-xs items-center">
@@ -251,6 +264,10 @@
                     </div>
 
                 </td>
+
+            {#    Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed        #}
+            <td class="hidden"></td>
+            <td class="hidden"></td>
 
             </tr>
             {% endfor %}
@@ -275,9 +292,10 @@
     }
   }
 
+  function filterActive(buildingId){}
 
-  $(document).ready(function() {
-    $('#buildings-data').DataTable({
+  $(document).ready( function () {
+    var table = $('#buildings-data').DataTable({
         responsive: true
     });
 
@@ -303,6 +321,56 @@
     // Initial filtering (optional)
     filterBuildingsByStatus('all');
   });
+
+  // Get all checkboxes with the 'row-checkbox' class
+  {#const checkboxes = document.querySelectorAll('.row-checkbox');#}
+  {##}
+  {#checkboxes.forEach((checkbox) => {#}
+  {#    checkbox.addEventListener('change', function () {#}
+  {#        // Get the parent row of the clicked checkbox#}
+  {#        const row = this.closest('tr');#}
+  {#        console.log(row);#}
+  {#        // Toggle the 'bg-selected-row' class on the parent row#}
+  {#        if (this.checked) {#}
+  {#            // console.log("Checkbox is checked..");#}
+  {#          row.classList.add('selected-row');#}
+  {#      } else {#}
+  {#            // console.log("Checkbox is not checked..");#}
+  {#          row.classList.remove('selected-row');#}
+  {#      }#}
+  {#    });#}
+  //);
+
+  // Get top-most checkbox
+  //const topCheckbox = document.getElementById('top-checkbox')
+  //topCheckbox.addEventListener('change', function () {
+      //checkboxes.forEach((checkbox) => {
+          //console.log("Checkbox...");
+          //checkbox.checked = this.checked;
+      //});
+
+      {#if (this.checked) {#}
+      {#    console.log("Checkbox is checked..");#}
+      {#    // Get all table rows#}
+      {#    const tableRows = document.querySelectorAll('table tr');#}
+      {#    tableRows.forEach((row) => {#}
+      {##}
+      {#    });#}
+      //}
+  //});
+
+  // Get all table rows
+  {#const tableRows = document.querySelectorAll('table tr');#}
+  {#console.log(tableRows)#}
+  // Loop through each row and add a click event listener
+  // tableRows.forEach((row) => {
+  //   row.addEventListener('click', function() {
+        // Toggle the 'selected-row' class on the clicked row
+        // this.classList.toggle('selected-row');
+    // });
+// });
+
+
 </script>
 
 </html>
