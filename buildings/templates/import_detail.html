@@ -39,38 +39,43 @@
               <div class="md: grid md: grid-cols-2 gap-8">
                 <div>
                   <label class="block text-sm font-semibold mb-2"
-                    >Address [Preview]</label
+                    >Address</label
                   >
                   <input
                     type="text"
+                    name="address"
                     placeholder="Address ..."
                     class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:border-sky-900"
-                    value="{{ selected_building.building.address }}"
+                    value="{{ selected_building.address }}"
+                    required
                   />
-                  <label class="block text-sm font-semibold mb-2"
-                    >Type of use [Preview]</label
-                  >
-                  <select class="w-full p-2 border border-gray-300 rounded-lg mb-4">
-                    <option>Choose ...</option>
-                  </select>
+                   <div>
+                    <label for="typeOfUseSelect" class="block text-sm font-semibold mb-2">Type of Use</label>
+                    <input id="typeOfUseSelect" name="typeOfUse" placeholder="Select type of use" class="w-full p-1/2 border border-gray-300 rounded-lg mb-4" required>
+                </div>
+
 
                   <label class="block text-sm font-semibold mb-2"
                     >Description (250+ characters)</label
                   >
                   <textarea
-                    placeholder="Address ..."
+                    name="description"
+                    placeholder="Describe the building ..."
                     class="w-full p-2 border border-gray-300 rounded-lg mb-4"
                     rows="5"
-                  ></textarea>
+                    required
+                  >{{ selected_building.description }}</textarea>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold mb-2"
-                    >Name (to show an alternative name instead of the address)</label
+                    >Name of the building (to show an alternative name instead of the address)</label
                   >
                   <input
                     type="text"
-                    placeholder="Address ..."
+                    name="buildingName"
+                    placeholder="Alternative Name ..."
                     class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                    value="{{ selected_building.alternative_name }}"
                   />
 
                     <label class="block text-sm font-semibold mb-2"
@@ -78,15 +83,23 @@
                   <input id="tagInput" name="tags" placeholder="Add tags" class="w-full p-1/2 border border-gray-300 rounded-lg mb-4">
 
                   <label class="block text-sm font-semibold mb-2"
-                    >construction year [Preview]</label
+                    >Construction year</label
                   >
                   <input
                     type="text"
-                    placeholder="1903"
+                    placeholder="1999"
+                    name="constructionYear"
                     class="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                    value="{{ selected_building.building.constructionYear }}"
+                    value="{{ selected_building.constructionYear }}"
+                    required
                   />
                 </div>
+
+                </div>
+                <div class="flex justify-end mt-8">
+                    <button id="saveButton" class="bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" disabled>
+                      Save Details
+                    </button>
               </div>
             </div>
             <div class="flex justify-center mt-8">
@@ -97,12 +110,180 @@
         </section>
 {% endblock %}
 <script>
-  // Initialize Tagify on the input element
+  // Define custom suggestions
+  var customSuggestions = [
+    // Architectural Styles
+    "Gothic Revival",
+    "Baroque",
+    "Neoclassical",
+    "Bauhaus",
+    "Art Nouveau",
+    "Beaux-Arts",
+    "Art Deco",
+    "Victorian",
+    "Edwardian",
+    "Colonial Revival",
+    "Renaissance Revival",
+    "Craftsman",
+    "International Style",
+    "Brutalist",
+    "Postmodern",
+    "Deconstructivism",
+    "Streamline Moderne",
+    "Prairie Style",
+    "Futurist",
+    "Parametricism",
+    "High Tech",
+    "Neo-Futurism",
+
+    // Sustainable and Modern Features
+    "Sustainable",
+    "Eco-friendly",
+    "Green Building",
+    "Smart Building",
+    "Energy Efficient",
+    "Solar Powered",
+    "Adaptive Reuse",
+    "Heritage Conservation",
+
+    // Usage Subcategories - Residential
+    "Apartment Complex",
+    "Single-Family Home",
+    "Duplex",
+    "Townhouse",
+    "Condominium",
+    "Cooperative",
+    "Senior Living",
+    "Student Housing",
+
+    // Usage Subcategories - Commercial
+    "Retail Store",
+    "Shopping Mall",
+    "Office Building",
+    "Business Park",
+    "Restaurant",
+    "Hotel",
+    "Convention Center",
+    "Entertainment Venue",
+
+    // Usage Subcategories - Industrial
+    "Factory",
+    "Warehouse",
+    "Distribution Center",
+    "Data Center",
+    "Research Facility",
+    "Light Manufacturing",
+    "Heavy Manufacturing",
+
+    // Usage Subcategories - Institutional
+    "School",
+    "University",
+    "Hospital",
+    "Clinic",
+    "Library",
+    "Museum",
+    "Government Building",
+    "Religious Building",
+
+    // Usage Subcategories - Recreational
+    "Park",
+    "Stadium",
+    "Arena",
+    "Gymnasium",
+    "Swimming Pool",
+    "Community Center",
+    "Golf Course",
+    "Amusement Park",
+
+    // Usage Subcategories - Mixed-Use
+    "Live/Work",
+    "Retail/Residential",
+    "Office/Residential",
+    "Commercial/Cultural",
+    "Transport Hub",
+
+    // Usage Subcategories - Transport
+    "Airport",
+    "Train Station",
+    "Subway Station",
+    "Bus Terminal",
+    "Port",
+    "Parking Garage",
+
+    // Usage Subcategories - Agricultural
+    "Farmhouse",
+    "Barn",
+    "Greenhouse",
+    "Stable",
+    "Vineyard",
+
+    // Usage Subcategories - Specialized
+    "Theater",
+    "Cinema",
+    "Broadcasting Studio",
+    "Laboratory",
+    "Observatory",
+    "Fire Station",
+    "Police Station",
+
+    // Additional Features and Characteristics
+    "Landmark",
+    "Iconic",
+    "Waterfront",
+    "Skyline Defining",
+    "Pedestrian-Friendly",
+    "Transit-Oriented",
+    "Historical",
+    "Contemporary",
+    "Renovated",
+    "Low-rise",
+    "High-rise",
+    "Skyscraper",
+    "Underground",
+    "Floating",
+    "Modular",
+    "Prefabricated"
+    // Add more tags as needed
+];
+
+  // Initialize Tagify on the input element with custom settings
   var input = document.getElementById('tagInput');
-  var tagify = new Tagify(input);
+  var tagify = new Tagify(input, {
+    whitelist: customSuggestions, // Use the custom suggestions
+    dropdown: {
+      enabled: 1, // always show suggestions dropdown when the input gets focus
+      maxItems: 20,
+      position: "text", // place the dropdown near the typed text
+      closeOnSelect: false, // keep the dropdown open after selecting a suggestion
+      highlightFirst: true
+    }
+  });
+
+  // Initialize Tagify on the 'typeOfUseSelect' input element
+  var typeOfUseInput = document.getElementById('typeOfUseSelect');
+  var typeOfUseTagify = new Tagify(typeOfUseInput, {
+    enforceWhitelist: true,
+    whitelist: [
+      "Residential Building",
+      "Commercial Building",
+      "Industrial Building",
+      "Institutional Building",
+      "Recreational Building",
+      "Historical Building",
+      "Mixed-Use Building",
+      "Transport Building",
+      "Agricultural Building",
+      "Specialized Building"
+    ],
+      mode : "select",
+    dropdown: {
+      enabled: 0
+    },
+    maxTags: 1
+  });
 
   tagify.DOM.scope.classList.add('border', 'border-gray-300', 'rounded-lg', 'p-1', 'bg-white', 'focus:border-blue-500');
-
+  typeOfUseTagify.DOM.scope.classList.add('border', 'border-gray-300', 'rounded-lg', 'p-1', 'bg-white', 'focus:border-blue-500');
   // Listen to the 'add' event, which is triggered when a new tag is added
   tagify.on('add', onAddTag);
 
@@ -110,6 +291,114 @@
   function onAddTag(e) {
     console.log("Added a tag:", e.detail.data.value);
   }
+
+  // Function to collect data and send it to Django
+    function saveBuildingData() {
+        var address = document.querySelector('input[name="address"]').value;
+        var typeOfUse = typeOfUseTagify.value[0].value; // Getting the first tag's value
+        var description = document.querySelector('textarea[name="description"]').value;
+        var alternativeName = document.querySelector('input[name="buildingName"]').value;
+        var tags = tagify.value.map(tag => tag.value); // Get array of tag values
+        var constructionYear = document.querySelector('input[name="constructionYear"]').value;
+
+        var new_selected_building = {
+          address: address,
+          typeOfUse: typeOfUse,
+          alternative_name: alternativeName,
+          constructionYear: constructionYear,
+          tags: tags,
+          description: description
+        };
+
+         var payload = {
+          new_selected_building: new_selected_building,
+        };
+
+        fetch('/api/buildings/session/details', {  // Use the correct path to your Django view
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')  // Ensure you're getting the CSRF token
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            saveClicked = true;
+            document.getElementById('nextButton').classList.remove('hidden');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Listen for a submit event or button click to trigger saveBuildingData
+    document.getElementById('saveButton').addEventListener('click', saveBuildingData);
+
+    // Helper function to get the CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function checkMandatoryFields() {
+    var address = document.querySelector('input[name="address"]').value.trim();
+    var typeOfUse = typeOfUseTagify.value.length > 0 ? typeOfUseTagify.value[0].value.trim() : '';
+    var description = document.querySelector('textarea[name="description"]').value.trim();
+    var constructionYear = document.querySelector('input[name="constructionYear"]').value.trim();
+
+    if (address && typeOfUse && description && constructionYear) {
+      document.getElementById('saveButton').classList.remove('bg-gray-500', 'cursor-not-allowed');
+      document.getElementById('saveButton').classList.add('bg-blue-500', 'hover:bg-blue-700');
+      document.getElementById('saveButton').disabled = false;
+    } else {
+      document.getElementById('saveButton').classList.add('bg-gray-500', 'cursor-not-allowed');
+      document.getElementById('saveButton').classList.remove('bg-blue-500', 'hover:bg-blue-700');
+      document.getElementById('saveButton').disabled = true;
+    }
+  }
+
+  // Event listeners for input changes
+  document.querySelector('input[name="address"]').addEventListener('input', checkMandatoryFields);
+  typeOfUseTagify.on('change', checkMandatoryFields);
+  document.querySelector('textarea[name="description"]').addEventListener('input', checkMandatoryFields);
+  document.querySelector('input[name="constructionYear"]').addEventListener('input', checkMandatoryFields);
+
+  // Initial check on page load
+  checkMandatoryFields();
+
+document.addEventListener('DOMContentLoaded', function() {
+        var savedTypeOfUse = "{{ selected_building.typeOfUse|escapejs }}";
+        if(savedTypeOfUse) {
+            typeOfUseTagify.addTags([savedTypeOfUse]);
+        }
+    });
+
+  // After initializing Tagify for tagInput
+  // Set the value if it exists in the session
+  document.addEventListener('DOMContentLoaded', function() {
+        var savedTagsJson = '{{ selected_building.tags|safe|default_if_none:"[]"|escapejs }}';
+        try {
+            var savedTags = JSON.parse(savedTagsJson.replace(/'/g, '"'));
+            if(savedTags && savedTags.length > 0) {
+                tagify.addTags(savedTags);
+            }
+        } catch(e) {
+            console.error("Error parsing saved tags: ", e);
+        }
+    });
+
 </script>
 
 </html>

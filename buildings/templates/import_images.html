@@ -15,9 +15,9 @@
     <style>
         /* Style for image preview boxes */
         .image-box {
-            width: 200px; /* Increased Width of the box */
-            height: 200px; /* Increased Height of the box */
-            margin: 30px 10px 20px; /* Space between boxes */
+            width: 300px; /* Increased Width of the box */
+            height: 300px; /* Increased Height of the box */
+            margin: 30px 10px 40px; /* Space between boxes */
             border: 1px solid #ccc; /* Border around the box */
             border-radius: 5%;
 
@@ -54,12 +54,15 @@
             cursor: pointer;
             font-size: 14px;
         }
+        .image-info{
+            display: flex; /* Use flexbox for horizontal layout */
+            justify-content: space-between; /* Distribute space between children */
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
         .selected-preview {
         box-shadow: 0px 0px 20px 4px #4CAF50; /* Larger green glow */
     }
-        .input-box {
-            margin-top: 5px; /* Spacing between the image and the input field */
-        }
          #imagePreview {
             margin-bottom: 50px; /* Adjust as needed for ample space */
         }
@@ -114,147 +117,196 @@
             </div>
         </div>
     </section>
-
+<script>
     <!-- JavaScript to Preview Images Before Upload -->
-   <script>
-    var imageBoxCount = 0; // Global variable to keep track of the number of image boxes
-    var processedFiles = new Set(); // Set to keep track of processed files
-    var selectedPreviewId = null; // Keep track of the selected preview image box ID
-     var inputValues = {}; // Object to keep track of input values
+var imageBoxCount = 0;
+var processedFiles = new Map(); // To keep track of processed files
+var selectedPreviewId = null;
 
+// Creates an image box for each file
+function createImageBox(imageData, index) {
+    var box = document.createElement('div');
+    box.className = 'image-box';
+    box.id = 'imageBox-' + index;
 
-    if (files.length > 0) {
-    // Show the disclaimer when images are uploaded
-    document.getElementById('disclaimer').style.display = 'block';
+    var img = new Image();
+     if (imageData.blob) {
+        // If a blob URL is provided (for new images), use it
+        img.src = imageData.blob;
+    } else if (imageData.file_path) {
+        // If a file path is provided (for already uploaded images), use it
+        img.src = `/buildings/temp${imageData.file_path}`;
+    } else {
+        // Otherwise, set to a placeholder or empty string
+        img.src = '';
+    }
+    img.onclick = function() {
+        if (selectedPreviewId) document.getElementById(selectedPreviewId).classList.remove('selected-preview');
+        box.classList.add('selected-preview');
+        selectedPreviewId = box.id;
+    };
+    box.appendChild(img);
+
+    var imageInfo = document.createElement('div');
+    imageInfo.className = 'image-info';
+
+    var sourceInput = document.createElement('input');
+    sourceInput.type = 'text';
+    sourceInput.placeholder = 'Enter image source';
+    sourceInput.className = 'flex-1 p-2 border border-gray-300 rounded-lg';
+    // If imageData has a source, use it
+    sourceInput.value = imageData.source || '';
+    imageInfo.appendChild(sourceInput);
+
+    var yearInput = document.createElement('input');
+    yearInput.type = 'number';
+    yearInput.placeholder = 'Year';
+    yearInput.className = 'flex-[0.67] ml-2 p-2 border border-gray-300 rounded-lg';
+    yearInput.setAttribute('min', '1000');
+    yearInput.setAttribute('max', new Date().getFullYear());
+    // If imageData has a year, use it
+    yearInput.value = imageData.year || '';
+    imageInfo.appendChild(yearInput);
+
+    var closeBtn = document.createElement('span');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'close-btn';
+    closeBtn.onclick = function(event) {
+        event.stopPropagation();
+        box.remove();
+        imageBoxCount--;
+        if (box.id === selectedPreviewId) selectedPreviewId = null;
+        updateAddButton();
+    };
+    box.appendChild(closeBtn);
+
+    box.appendChild(imageInfo);
+    document.getElementById('imagePreview').appendChild(box);
 }
 
 
-    function previewImages() {
-        var files = document.querySelector('input[type=file]').files;
+// Reads and previews each file
+function readAndPreview(file) {
+    var fileIdentifier = file.name + '-' + file.lastModified;
+    if (processedFiles.has(fileIdentifier)) return;
+    processedFiles.set(fileIdentifier, file);
 
-         if (files.length > 0) {
-            // Show the disclaimer when images are uploaded
-            document.getElementById('disclaimer').style.display = 'block';
-        }
-
-
-        // Remove the existing green 'Add' button from the last box if present
-        removeAddButton();
-
-        function readAndPreview(file, index) {
-            var fileIdentifier = file.name + '-' + file.lastModified;
-            if (processedFiles.has(fileIdentifier)) {  // Skip if the file has already been processed
-                return;
-            }
-            processedFiles.add(fileIdentifier);  // Add the file to the set of processed files
-
-            // Ensure `file.name` matches the extensions criteria
-            if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
-                var reader = new FileReader();
-
-                reader.addEventListener("load", function () {
-                    var box = document.createElement('div');
-                    box.className = 'image-box';
-                    box.id = 'imageBox-' + imageBoxCount++; // Incremental ID
-
-                    var image = new Image();
-                    image.src = this.result;
-                    // Clicking the box selects it as the preview image
-                     image.onclick = function() {
-                // Remove highlight from the previously selected preview
-                if (selectedPreviewId && document.getElementById(selectedPreviewId)) {
-                    var prevSelectedBox = document.getElementById(selectedPreviewId);
-                    prevSelectedBox.classList.remove('selected-preview');
-                    var prevInput = prevSelectedBox.querySelector('input');
-                    if (prevInput) {
-                        prevInput.disabled = false; // Enable the input field
-                        prevInput.classList.remove('bg-gray-300'); // Remove greyed out background
-                        prevInput.value = inputValues[prevSelectedBox.id] || ''; // Restore the previous value
-                    }
-                }
-                // Highlight the new selected preview and disable its input
-                box.classList.add('selected-preview');
-                sourceInput.disabled = true; // Disable the input field
-                sourceInput.classList.add('bg-gray-300'); // Add greyed out background
-                selectedPreviewId = box.id; // Update the selected preview ID
-
-            };
-            box.appendChild(image);
-
-
-                    // Add text input for image source or description
-                    var sourceInput = document.createElement('input');
-                    sourceInput.type = 'text';
-                    sourceInput.placeholder = 'Enter image source';
-                    sourceInput.className = 'w-full p-2 border border-gray-300 rounded-lg mb-4';
-                    box.appendChild(sourceInput);
-
-                     // Create a preview label but hide it initially
-                    var previewLabel = document.createElement('div');
-                    previewLabel.className = 'preview-label hidden';
-                    previewLabel.innerText = 'PREVIEW';
-                    box.appendChild(previewLabel);
-
-                    // Add close button to all image boxes
-                    var closeBtn = document.createElement('span');
-                    closeBtn.innerHTML = '&times;';
-                    closeBtn.className = 'close-btn';
-                    closeBtn.onclick = function(event) {
-                        event.stopPropagation();  // Prevent the box click event from firing
-                        this.parentElement.remove();
-                        imageBoxCount--; // Decrement the count when an image box is removed
-                        processedFiles.delete(fileIdentifier); // Remove from processed files
-                        // If the removed image was the selected preview, clear the selectedPreviewId
-                        if (box.id === selectedPreviewId) {
-                            selectedPreviewId = null;
-                        }
-                        // Update add button after removal
-                        updateAddButton();
-                    };
-                    box.appendChild(closeBtn);
-
-                    document.querySelector('#imagePreview').appendChild(box);
-                }, false);
-
-                reader.readAsDataURL(file);
-            }
-        }
-
-        if (files) {
-            [].forEach.call(files, readAndPreview);
-        }
-
-        // Add the green 'Add' button to the new last image box after all images are processed
-        setTimeout(updateAddButton, 100); // Adjust timeout as needed
+    if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            createImageBox({blob: reader.result, source: '', year: '', is_preview: false}, imageBoxCount++);
+        };
+        reader.readAsDataURL(file);
     }
+}
 
-    function removeAddButton() {
-        var existingAddBtn = document.querySelector('.add-btn');
-        if (existingAddBtn) {
-            existingAddBtn.parentElement.removeChild(existingAddBtn);
+// Triggered when user selects files, calls readAndPreview for each file
+function previewImages() {
+    var files = document.getElementById('upload').files;
+    [].forEach.call(files, readAndPreview);
+    setTimeout(updateAddButton, 100);
+}
+
+// Prepares and sends the FormData with images and metadata to the server
+function submitImagesMetadata() {
+    var formData = new FormData();
+    var index = 0; // Initialize a shared index
+
+    // Append image files with the index
+    processedFiles.forEach((file) => {
+        formData.append('image_' + index, file);
+        index++; // Increment the index for each file
+    });
+
+    index = 0; // Reset the index for metadata
+
+    // Append metadata with the index
+    document.querySelectorAll('.image-box').forEach(function(box) {
+        var sourceInput = box.querySelector('input[type="text"]');
+        var yearInput = box.querySelector('input[type="number"]');
+        var metadata = {
+            source: sourceInput.value,
+            year: yearInput.value,
+            is_preview: box.id === selectedPreviewId
+        };
+        formData.append(`metadata_${index}`, JSON.stringify(metadata));
+        index++; // Increment the index for each set of metadata
+    });
+
+    // Proceed with the fetch request
+    fetch("/api/buildings/session/images", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Success:", data);
+        // Optional: Redirect or perform some action upon success
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+// Utility functions
+function updateAddButton() {
+    var allImageBoxes = document.querySelectorAll('.image-box');
+    if (allImageBoxes.length > 0) {
+        var lastImageBox = allImageBoxes[allImageBoxes.length - 1];
+        var addBtn = document.createElement('span');
+        addBtn.innerHTML = '+';
+        addBtn.className = 'add-btn';
+        addBtn.onclick = function() { document.getElementById('upload').click(); };
+        lastImageBox.appendChild(addBtn);
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
     }
+    return cookieValue;
+}
 
-    function updateAddButton() {
-        var allImageBoxes = document.querySelectorAll('.image-box');
-        if (allImageBoxes.length > 0) {
-            var lastImageBox = allImageBoxes[allImageBoxes.length - 1];
-            var addBtn = document.createElement('span');
-            addBtn.innerHTML = '+'; // Text for the add button
-            addBtn.className = 'add-btn'; // Assign add button styling class
-            addBtn.onclick = function() {
-                document.getElementById('upload').click(); // Trigger file input
-            };
-            // Remove existing add button if present and add new one
-            var existingAddBtn = lastImageBox.querySelector('.add-btn');
-            if (existingAddBtn) {
-                existingAddBtn.remove();
-            }
-            lastImageBox.appendChild(addBtn);
-        }
+var imagesMetadata = {{ images_metadata_json|safe }};
+
+    // Function to create image boxes from session data
+    function createImageBoxesFromSession() {
+        imagesMetadata.forEach(function(image, index) {
+            image.src = `/buildings/temp/${image.file_path}`
+            createImageBox(image, index);
+        });
     }
 
-    document.getElementById('upload').addEventListener('change', previewImages);
+    // Call the function when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+    createImageBoxesFromSession();
+    // Other initialization code...
+});
+
+document.getElementById('nextButton').addEventListener('click', function(event) {
+    event.preventDefault();
+    submitImagesMetadata();
+});
+
+document.getElementById('upload').addEventListener('change', previewImages);
+
+
 </script>
 </body>
 </html>
