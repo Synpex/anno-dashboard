@@ -18,30 +18,47 @@
                 width: 100%; /* Full width */
                 height: 50vh; /* Adjust height as needed */
                 margin-bottom: 5%;
+
                 /* Responsive adjustments */
                 @media (max-width: 768px) {
                     height: 40vh; /* Smaller height on smaller screens */
                 }
             }
 
-      .selected-row {
-        background-color: #c5d9e0;
-      }
-    </style>
-    </head>
+          .dataTables_filter {
+              margin-top: 1%;
+              margin-bottom: 0.2%;
+              margin-right: 1%;
+            font-size: 90%;
+          }
+
+          .dataTables_length {
+              margin-left: 0.6%;
+              margin-top: 1%;
+              font-size: 90%;
+              position: absolute;
+          }
+
+          .dataTables_length select{
+              background-position-x: 1.6rem;
+              background-position-y: center;
+              width: 50px;
+          }
+}
+        </style>
+</head>
 <body>
     {% block content %}
         {% include 'navbar.html' %}
         <section>
-  <div class="px-3 pt-24 md:pt-20 flex flex-wrap justify-between items-center">
+  <div class="px-4 pt-24 md:pt-20 flex flex-wrap justify-between items-center">
     <!-- Left section -->
     <div class="px-3 flex flex-col sm:flex-row items-center justify-between">
       <div class="flex items-center space-x-2 mb-1 sm:mb-0">
-        {# TODO: Implement the number selected to be dynamically calculated #}
-        <span class="text-gray-400 text-xs">3 selected</span>
+        <span class="text-gray-400 text-sm" id="selected-rows">0 selected</span>
         <select
-      id="filterSelect"
-      class="bg-white border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
+      id="building-filter"
+      class="bg-white border border-gray-300 text-gray-500 rounded-md px-2 py-1 text-sm shadow-sm hover:shadow-lg flex items-center"
       type="button"
     >
       <option value="all">All</option>
@@ -52,7 +69,7 @@
 
 
         <!-- Close button -->
-        <button>
+        <button onclick="filterBuildingsByStatus('all')">
           <svg
             class="w-[8px] h-[8px] text-gray-800 dark:text-white stroke-red-800"
             aria-hidden="true"
@@ -70,99 +87,109 @@
         </button>
 
         <!-- All dropdown menu button -->
-        <select
-          id="dropdownHoverButton2"
-          data-dropdown-toggle="dropdownHover"
-          data-dropdown-trigger="hover"
-          class="bg-white border border-gray-300 text-gray-500 rounded-l px-3 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"
-          type="button"
-        >
-          <svg
-            class="w-[10px] h-[10px] mr-2 my-1 text-gray-800 dark:text-white fill-gray-600"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 18"
-          >
-            <path
-              d="M18.85 1.1A1.99 1.99 0 0 0 17.063 0H2.937a2 2 0 0 0-1.566 3.242L6.99 9.868 7 14a1 1 0 0 0 .4.8l4 3A1 1 0 0 0 13 17l.01-7.134 5.66-6.676a1.99 1.99 0 0 0 .18-2.09Z"
-            />
-          </svg>
-          <option>All</option>
-          <option>Recent</option>
-        </select>
+{#        <select#}
+{#          id="dropdownHoverButton2"#}
+{#          data-dropdown-toggle="dropdownHover"#}
+{#          data-dropdown-trigger="hover"#}
+{#          class="bg-white border border-gray-300 text-gray-500 rounded-l px-3 py-1 text-xs shadow-sm hover:shadow-lg flex items-center"#}
+{#          type="button"#}
+{#        >#}
+{#          <svg#}
+{#            class="w-[10px] h-[10px] mr-2 my-1 text-gray-800 dark:text-white fill-gray-600"#}
+{#            aria-hidden="true"#}
+{#            xmlns="http://www.w3.org/2000/svg"#}
+{#            viewBox="0 0 20 18"#}
+{#          >#}
+{#            <path#}
+{#              d="M18.85 1.1A1.99 1.99 0 0 0 17.063 0H2.937a2 2 0 0 0-1.566 3.242L6.99 9.868 7 14a1 1 0 0 0 .4.8l4 3A1 1 0 0 0 13 17l.01-7.134 5.66-6.676a1.99 1.99 0 0 0 .18-2.09Z"#}
+{#            />#}
+{#          </svg>#}
+{#          <option>All</option>#}
+{#          <option>Recent</option>#}
+{#        </select>#}
 
-        <div
-          class="flex items-center border border-gray-300 rounded-r px-2 py-1 bg-white shadow-sm"
-        >
-          <i class="fas fa-search text-gray-400"></i>
-          <input type="text" placeholder="Search" class="ml-2 text-xs p-0" />
-        </div>
-      </div>
-    </div>
-    <button
-      class="bg-blue-950 text-white text-sm px-1 md:px-4 py-1 rounded-md hover:bg-sky-900 focus:outline-none"
-    >
-      + New building
-    </button>
-  </div>
-  <div class="flex space-x-4 py-3 px-6 items-center">
-    <div class="flex items-center space-x-2 text-xs">
+{#        <div#}
+{#          class="flex items-center border border-gray-300 rounded-r px-2 py-1 bg-white shadow-sm"#}
+{#        >#}
+{#          <i class="fas fa-search text-gray-400"></i>#}
+{#          <input type="text" placeholder="Search" class="ml-2 text-xs p-0" />#}
+{#        </div>#}
+
+          <div class="flex space-x-4 py-3 px-6 items-center">
+    <button class="flex items-center space-x-2 text-xs" onclick="filterBuildingsByStatus('all')">
       <span class="text-gray-500 font-semibold">All</span>
       <div class="bg-gray-200 rounded-full px-2 py-1">
         <span class="text-gray-400 font-medium">{{ buildings_count}}</span>
       </div>
-    </div>
-    <div class="flex items-center space-x-2 text-xs">
+    </button>
+    <button class="flex items-center space-x-2 text-xs" id="buildings-without-images">
       <span class="text-gray-500 font-semibold">Missing Images</span>
       <div class="bg-gray-200 rounded-full px-2 py-1">
         <span class="text-gray-400 font-medium">{{buildings_without_images_count}}</span>
       </div>
-    </div>
-      <div class="flex items-center space-x-2 text-xs">
+    </button>
+      <button class="flex items-center space-x-2 text-xs" id="buildings-with-incomplete-timeline">
       <span class="text-gray-500 font-semibold">Incomplete timeline</span>
       <div class="bg-gray-200 rounded-full px-2 py-1">
         <span class="text-gray-400 font-medium">{{ buildings_with_incomplete_timeline_count }}</span>
       </div>
+    </button>
+  </div>
+      </div>
     </div>
+    <a
+      class="bg-blue-950 text-white text-md px-1 md:px-4 py-1 rounded-md hover:bg-sky-900 focus:outline-none"
+      href="/buildings/import/position"
+    >
+      + New building
+    </a>
   </div>
 
-  {# Buildings table #}
+  <!-- Buildings table -->
   <div class="min-h-screen bg-gray-100">
     <div data-te-datatable-init class="overflow-x-auto table-responsive">
         <table id="buildings-data" data-te-fixed-header="true" class="">
             <thead class="">
                 <tr class="">
-                    <th class="px-4 sm:px-8"><input type="checkbox" id="top-checkbox"/></th>
-                    <th class="font-medium text-gray-600 text-sm -ml-"></th>
-                    <th class="font-medium text-gray-600 text-sm px-8">ADDRESS</th>
-                    <th class="font-medium text-gray-600 text-sm px-8">ANNO</th>
-                    <th class="font-medium text-gray-600 text-sm px-8">STATUS</th>
-                    <th class="font-medium text-gray-600 text-sm px-8">LAST UPDATE</th>
-                    <th class="font-medium text-gray-600 text-sm px-8">PICTURES</th>
-                    <th class="font-medium text-gray-600 text-sm px-8">TAGS</th>
-                    <th class="font-medium text-gray-600 text-sm px-8">TYPE</th>
+                    <th class="font-medium text-gray-600 text-sm" data-sort="false">
+                        <span>
+                            <input onclick="checkAllBoxes()" type="checkbox" name="top-checkbox" class="mr-3"/>
+                            <button onclick="toggleActions()" class=" py-2 mr-10 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
+                            <svg class="w-[10px] h-[10px] stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                            </svg>
+                        </button>
+                        ADDRESS
+                        </span>
+                    </th>
+                    <th class="font-medium text-gray-600 text-sm">ANNO</th>
+                    <th class="font-medium text-gray-600 text-sm">STATUS</th>
+                    <th class="font-medium text-gray-600 text-sm">LAST UPDATE</th>
+                    <th class="font-medium text-gray-600 text-sm">PICTURES</th>
+                    <th class="font-medium text-gray-600 text-sm">TAGS</th>
+                    <th class="font-medium text-gray-600 text-sm">TYPE</th>
                 </tr>
             </thead>
             <tbody class="bg-white mt-5">
             {% for building in buildings %}
             <tr class="building-row" data-status="{% if building.active %}active{% else %}inactive{% endif %}" data-te-selectable="true">
-                <td class="px-4 sm:px-8"><input type="checkbox" class="row-checkbox"/></td>
-                <td>
-                    <button onclick="toggleDetails('{{ building.public_id}}')" class=" py-2 px-3 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
-                        <svg class="w-[10px] h-[10px] ms-3 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                        </svg>
-                    </button>
-                </td>
-                <td class="font-medium text-sky-950 text-sm px-8">
-                    <button class="flex">
-                        <svg class="w-20 h-20 fill-sky-950 stroke-sky-950 my-1 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"/>
-                            <path d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"/>
-                            <path d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"/>
-                        </svg>
+                <td class="px-4 sm:px-8">
+                    <span>
+                        <input id="checkbox-{{ building.public_id }}" onclick="checkABox('checkbox-{{ building.public_id }}'); toggleRowClass('checkbox-{{ building.public_id }}');" type="checkbox" name="row-checkbox"/>
+                        <button id="dropdown-{{ building.public_id }}" onclick="toggleDetails('{{building.public_id}}')" class=" py-2 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
+                            <svg class="w-[10px] h-[10px] ms-3 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                            </svg>
+                        </button>
+                        <button class="my-2 ml-10 mr-1.5">
+                            <svg class="w-4 h-4 fill-sky-950 stroke-sky-950" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"/>
+                                <path d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"/>
+                                <path d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"/>
+                            </svg>
+                        </button>
                         {{ building.address }}
-                    </button>
+                    </span>
                 </td>
                 <td class="font-medium text-gray-500 text-sm px-10"> <p class="bg-gray-100 px-2 rounded-md">{{ building.construction_year }}</p></td>
                 <td class="font-medium text-sm px-8">
@@ -187,8 +214,7 @@
             </td>
                 <td class="font-medium text-sky-950 text-sm px-8"> <p class="px-2">{{ building.type_of_use }}</p></td>
             </tr>
-
-            {# Dropdown building details #}
+                <!-- Dropdown building details-->
             <tr id="building-detail-{{ building.public_id }}" class="shadow-lg" hidden="hidden">
                 <td class="h-5">
                     <div class="bg-white px-6 shadow-md flex flex-col">
@@ -212,7 +238,7 @@
                   </div>
                 </td>
 
-                {# Timeline #}
+                <!-- Timeline  -->
                 <td>
                     <div class="bg-white px-6 shadow-l flex flex-col">
           <div class="flex justify-between items-center mb-6">
@@ -233,47 +259,76 @@
         </div>
                 </td>
 
-            {#    Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed        #}
-            <td class="hidden"></td>
-            <td class="hidden"></td>
+            <!-- Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed -->
+            <td class=""></td>
 
-                {# Map #}
-                <td>
-                {% include 'map_with_marker.html' with building=building %}
-            </td>
 
-            {#    Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed        #}
-            <td class="hidden"></td>
-            <td class="hidden"></td>
-
-                <td colspan="1" class="items-center">
+                <td class="items-center -mb-56">
                     <h2 class="text-md font-bold text-sky-900">INFORMATION</h2>
                     <div class="space-y-4 text-xs items-center">
                       <div class="flex items-center">
-                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.total_images_count }}</span> pictures uploaded</div>
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.total_images_count }}</span> pictures uploaded</button>
                       </div>
                       <div class="flex items-center">
-                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.timeline|length }}</span> timeline entries</div>
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.timeline|length }}</span> timeline entries</button>
                       </div>
                       <div class="flex items-center">
-                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.tags|length }}</span> tags added</div>
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.tags|length }}</span> tags added</button>
                       </div>
                     <div class="flex items-center">
-                        <div><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.audio_guides|length }}</span> audio-guides added</div>
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.audio_guides|length }}</span> audio-guides added</button>
                       </div>
                     </div>
 
                 </td>
 
-            {#    Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed        #}
-            <td class="hidden"></td>
-            <td class="hidden"></td>
+            <!-- Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed -->
+            <td class=""></td>
+
+            <!-- Map -->
+                <td>
+                {% include 'map_with_marker.html' with building=building %}
+            </td>
+
+            <!-- Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed -->
+            <td class=""></td>
 
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
+
+  <!-- Pop-ups -->
+    <div id="building-actions" class="flex items-center justify-center h-screen" hidden="hidden">
+    <div class="text-center">
+      <div id="popup-window" class="bg-white p-6 w-80 bg-white rounded-lg shadow-lg max-w-sm">
+      <div>
+          <p><button class="text-sky-950 my-2 hover:bg-gray-300">Set selected active</button></p>
+          <p><button class="text-yellow-700 mb-2 hover:bg-gray-300">Set selected inactive</button></p>
+          <p><button onclick="deleteBuildingPopUp()" class="text-rose-600 mb-2 hover:bg-red-300">Delete selected buildings</button></p>
+      </div>
+      <button id="close-button" class="text-red-800 hover:bg-text-red-800 hover:text-white">Close</button>
+    </div>
+  </div>
+</div>
+  <br>
+    <div id="delete-building" class="flex items-center justify-center h-screen" hidden="hidden">
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm">
+    <div class="text-center">
+      <h1 class="text-2xl font-semibold mb-4">Delete these buildings?</h1>
+      <p class="mb-6">Are you sure you want to delete Single 140-142 & Single 180? If you delete, it will be permanently lost.</p>
+      <div class="flex justify-center">
+        <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center mr-10">
+          Cancel
+        </button>
+        <button class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
   </div>
 </section>
 
@@ -283,6 +338,24 @@
 <script>
   function toggleDetails(buildingId) {
     let element = document.getElementById('building-detail-' + buildingId);
+    let tableRow = document.getElementById('dropdown-' + buildingId).closest('tr');
+
+    if (element) {
+      if (element.hasAttribute('hidden')) {
+          element.removeAttribute('hidden');
+
+          // Change the background color of the selected row
+          tableRow.style.backgroundColor = '#C5D9E0';
+      } else {
+        element.setAttribute('hidden', 'hidden');
+        // Change the background color back to white
+          tableRow.style.backgroundColor = 'white';
+      }
+    }
+  }
+
+  function toggleActions(){
+      let element = document.getElementById('building-actions');
     if (element) {
       if (element.hasAttribute('hidden')) {
         element.removeAttribute('hidden');
@@ -292,14 +365,18 @@
     }
   }
 
-  function filterActive(buildingId){}
+  function deleteBuildingPopUp() {
+    let element = document.getElementById('delete-building');
+    if (element) {
+      if (element.hasAttribute('hidden')) {
+        element.removeAttribute('hidden');
+      } else {
+        element.setAttribute('hidden', 'hidden');
+      }
+    }
+  }
 
-  $(document).ready( function () {
-    var table = $('#buildings-data').DataTable({
-        responsive: true
-    });
-
-    function filterBuildingsByStatus(status) {
+  function filterBuildingsByStatus(status) {
       const buildingRows = document.querySelectorAll('.building-row');
 
       buildingRows.forEach((row) => {
@@ -307,9 +384,91 @@
         row.style.display = isActive ? '' : 'none';
       });
 
+      const buildingFilter = document.getElementById('building-filter');
+      buildingFilter.value = status;
+
       // Redraw the DataTable to adjust to the filtered rows
       $('#buildings-data').DataTable().draw();
-    }
+  }
+
+  {#function changeRowBackground(checkboxID){#}
+  {#    const checkBox = document.getElementById(checkboxID);#}
+  {##}
+  {#    // Get table row#}
+  {#    const tableRow = checkBox.closest('tr');#}
+  {##}
+  {#   // Change the background color of the selected row#}
+  {#   tableRow.style.backgroundColor = '#C5D9E0';#}
+  //}
+
+  var boxesChecked = 0;
+  function checkAllBoxes(){
+      const topCheckBox = document.querySelector("input[type=checkbox][name=top-checkbox]");
+      const checkBoxes = document.querySelectorAll("input[type=checkbox][name=row-checkbox]");
+
+          if (topCheckBox.checked) {
+              checkBoxes.forEach((checkbox) => {
+                  checkbox.checked = true;
+
+                  // Get table row
+                  const tableRow = checkbox.closest('tr');
+
+                 // Change the background color of the selected row
+                 tableRow.style.backgroundColor = '#C5D9E0';
+
+                  boxesChecked = checkBoxes.length;
+
+                  // updates number of checked boxes
+                  document.getElementById("selected-rows").textContent = boxesChecked + " selected";
+
+              });
+          } else {
+              checkBoxes.forEach((checkBox) => {
+                  checkBox.checked = false;
+
+                  // Get table row
+                  const tableRow = checkBox.closest('tr');
+
+                 // Change the background color back to white
+                 tableRow.style.backgroundColor = 'white';
+
+                  boxesChecked = 0;
+
+                  // updates number of checked boxes
+                  document.getElementById("selected-rows").textContent = boxesChecked + " selected";
+              });
+          }
+  }
+
+  function checkABox(checkboxID) {
+      const checkBox = document.getElementById(checkboxID);
+
+      // Get table row
+      const tableRow = checkBox.closest('tr');
+
+      if (checkBox.checked){
+          boxesChecked += 1;
+
+          // Change the background color of the selected row
+          tableRow.style.backgroundColor = '#C5D9E0';
+      }
+      else {
+          boxesChecked -= 1;
+
+          // Change the background color back to white
+          tableRow.style.backgroundColor = 'white';
+      }
+
+      // updates number of checked boxes
+    document.getElementById("selected-rows").textContent = boxesChecked + " selected";
+
+  }
+
+
+  $(document).ready( function () {
+    var table = $('#buildings-data').DataTable({
+        responsive: true
+    });
 
     // Event listener for the filter dropdown
     const buildingFilter = document.getElementById('building-filter');
@@ -320,7 +479,13 @@
 
     // Initial filtering (optional)
     filterBuildingsByStatus('all');
+
   });
+
+
+
+  {#console.log(document.querySelectorAll("input[name=row-checkbox]:checked").length);#}
+
 
   // Get all checkboxes with the 'row-checkbox' class
   {#const checkboxes = document.querySelectorAll('.row-checkbox');#}
@@ -358,17 +523,6 @@
       {#    });#}
       //}
   //});
-
-  // Get all table rows
-  {#const tableRows = document.querySelectorAll('table tr');#}
-  {#console.log(tableRows)#}
-  // Loop through each row and add a click event listener
-  // tableRows.forEach((row) => {
-  //   row.addEventListener('click', function() {
-        // Toggle the 'selected-row' class on the clicked row
-        // this.classList.toggle('selected-row');
-    // });
-// });
 
 
 </script>
