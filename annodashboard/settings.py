@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'stats', # Django App - Stats
     'users', # Django App - Users
     'drf_yasg', # Django REST Framework - Swagger
-    'tailwind', # Django Tailwind
+    # 'tailwind', # Django Tailwind
     'django_browser_reload', # Django Browser Reload
     'corsheaders', # Django CORS Headers
 ]
