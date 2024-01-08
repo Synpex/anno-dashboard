@@ -1,3 +1,4 @@
+import json
 import logging
 
 from bson import ObjectId as BsonObjectId, ObjectId
@@ -33,10 +34,24 @@ class SlimBuildingSerializer(serializers.ModelSerializer):# Custom field for han
     distance = serializers.FloatField(source='distanceRounded', read_only=True)  # FloatField for distance
     _id = ObjectIdField(read_only=True)  # Custom field for handling MongoDB's ObjectId
     location = GeoPointField(read_only=True)
+    name = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    main_image_url = serializers.SerializerMethodField()
     class Meta:
         model = Building
-        fields = ('_id', 'location', 'distance', 'preview_image_url', 'address', 'construction_year', 'type_of_use', 'active')
+        fields = ('_id', 'name', 'location', 'distance', 'main_image_url', 'address', 'construction_year', 'type_of_use', 'active')
 
+    def get_main_image_url(self, obj):
+        image_urls_str = obj.get('image_urls', '[]')
+        try:
+            image_urls = json.loads(image_urls_str)
+        except json.JSONDecodeError:
+            logger.error(f"Failed to decode image_urls: {image_urls_str}")
+            return None
+
+        for img in image_urls:
+            if img.get('is_main', False):
+                return img.get('url')
+        return None
 
 
 class BuildingViewSet(viewsets.ModelViewSet):

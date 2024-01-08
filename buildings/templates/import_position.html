@@ -6,8 +6,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet' />
     {% tailwind_css %}
     <style>
         #map {
@@ -35,11 +35,11 @@
             <div class="bg-gray-100">
                 <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full px-2 mb-4 md:mb-0">
+                        <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
                             <label for="zipCode" class="block text-sm font-medium text-gray-700">ZIP Code</label>
                             <input type="text" id="zipCode" name="zipCode" class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                         </div>
-                        <div class="w-full px-2">
+                        <div class="w-full md:w-1/2 px-2">
                             <label for="houseNumber" class="block text-sm font-medium text-gray-700">House Number</label>
                             <input type="text" id="houseNumber" name="houseNumber" class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                         </div>
@@ -71,14 +71,27 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Select</th>
                             </tr>
                         </thead>
-                        <tbody id="addressResults" class="bg-white divide-y divide-gray-200">
-                            <!-- Address rows will be added here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-
+                       <tbody id="addressResults" class="bg-white divide-y divide-gray-200">
+    {% if request.session.table_results %}
+        {% for address in request.session.table_results %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.openbareRuimteNaam }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.huisnummer }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.huisletter|default:'-' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.postcode }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.woonplaatsNaam }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.gebruiksdoelen|join:', '|default:'n/a' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.oppervlakte|default:'n/a' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.oorspronkelijkBouwjaar.0|default:'n/a' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ address.adresseerbaarObjectGeometrie.punt.coordinates }}</td>
+                <td class="px-6 py-4 whitespace-nowrap"><input type="radio" name="selectedBuilding" value="{{ forloop.counter0 }}"></td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr><td colspan="10" class="px-6 py-4 text-center">No data available.</td></tr>
+    {% endif %}
+</tbody></table></div>
             <div id="map"></div>
-
         </div>
             </div>
     <div class="flex justify-between mt-8">
@@ -89,17 +102,31 @@
     {% endblock %}
 
     <script>
+
+let searchParams = {{ search_params|safe}};
+let selectedBuilding = {{ selected_building|safe}};
+
+let initialCenter = [4.897070, 52.377956];  // Default center coordinates
+let hasSelectedBuilding = selectedBuilding && selectedBuilding.coordinates;
+if (hasSelectedBuilding) {
+    // If there's a selected building, use its coordinates as the initial center
+    initialCenter = selectedBuilding.coordinates;
+}
+
         // Initialize the map
 mapboxgl.accessToken = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v10',
-    center: [4.897070, 52.377956], // Default center
-    zoom: 12
+    style: 'mapbox://styles/pnuam/clq5cvgqm00he01plhkuv8kj0',
+    center: initialCenter, // Set the initial center coordinates
+    zoom: 15
 });
 
 // Add navigation controls to the map
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+// If there's a selected building, add a marker to its location
+
 
 // Object to track existing markers by their coordinates to avoid duplicates
 var existingMarkers = {};
@@ -223,7 +250,7 @@ function addMapMarker(address, index) {
     const coordsKey = coords.join(',');
 
     if (!existingMarkers[coordsKey]) {
-        const marker = new mapboxgl.Marker()
+        const marker = new mapboxgl.Marker({dragable:true})
             .setLngLat(coords)
             .addTo(map);
 
@@ -251,55 +278,78 @@ function generatePopupContent(address, index, data) {
     `;
     return buildingDetails;
 }
-
+//
 function selectBuildingFromPopup(index) {
-    // Find the corresponding radio button in the table and check it
     const radioButton = document.querySelector(`input[name="selectedBuilding"][value="${index}"]`);
     if (radioButton) {
         radioButton.checked = true;  // Check the corresponding radio button in the table
 
-        // Extract the necessary data from the selected row or directly from the API response data
         const selectedBuilding = globalApiResponseData._embedded.adressen[index];
+        const zipCode = document.getElementById('zipCode').value;
+        const houseNumber = document.getElementById('houseNumber').value;
+        const textualSearch = document.getElementById('textualSearch').value;
 
-        // Prepare the data to be sent to the Django backend
         const buildingData = {
-            address: `${selectedBuilding.openbareRuimteNaam} ${selectedBuilding.huisnummer}${selectedBuilding.huisletter || ''}`,
-            constructionYear: selectedBuilding.oorspronkelijkBouwjaar?.[0] || 'n/a',
-            usage: selectedBuilding.gebruiksdoelen?.join(', ') || 'n/a',
-            coordinates: selectedBuilding.adresseerbaarObjectGeometrie.punt.coordinates  // Assuming it's an array [lon, lat]
-            // Add any other necessary details here
+             building: {
+                address: `${selectedBuilding.openbareRuimteNaam} ${selectedBuilding.huisnummer}${selectedBuilding.huisletter || ''}`,
+                postcode: selectedBuilding.postcode || 'n/a',
+                city: selectedBuilding.woonplaatsNaam || 'n/a',
+                constructionYear: selectedBuilding.oorspronkelijkBouwjaar?.[0] || 'n/a',
+                usage: selectedBuilding.gebruiksdoelen?.join(', ') || 'n/a',
+                area: selectedBuilding.oppervlakte || 'n/a', // Assuming 'oppervlakte' is the area in the API response
+                coordinates: selectedBuilding.adresseerbaarObjectGeometrie.punt.coordinates
+            },
+            searchParams: {
+                zipCode: zipCode,
+                houseNumber: houseNumber,
+                textualSearch: textualSearch
+            }
         };
 
-        // Call the saveSelectedBuilding function to send the data to the backend
         saveSelectedBuilding(buildingData);
     }
+}
 
     function saveSelectedBuilding(buildingData) {
-        // Define the URL to which you want to send the POST request
-        const postUrl = '/api/buildings/save_selected/';
+    // Define the URL to which you want to send the POST request
+    const postUrl = '/api/buildings/session/search';
 
-        fetch(postUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),  // Assuming you're using Django's standard CSRF cookie
-            },
-            body: JSON.stringify({building: buildingData})
-        })
-            .then(response => {
-                if (response.ok) {
-                    // If the backend confirms the data is saved, redirect to the next page
-                    window.location.href = "/buildings/import/detail";
-                } else {
-                    console.error('Failed to save building selection.');
-                    // Handle failure (maybe show a message to the user)
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
+    // Extract the building and searchParams from the buildingData
+    const { building, searchParams } = buildingData;
+
+    // Construct the payload with the expected top-level keys
+    const payload = {
+        selected_building: building,  // Rename 'building' to 'selected_building'
+        search_params: searchParams,  // Rename 'searchParams' to 'search_params'
+    };
+    fetch(postUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // Assuming you're using Django's standard CSRF cookie
+        },
+        body: JSON.stringify(payload)  // Serialize the payload as JSON
+    })
+    .then(response => {
+        console.log("Received response: ", response);  // Log the entire response object
+        if (response.ok) {
+            return response.json();  // Only parse the JSON if the response was ok
+        } else {
+            throw new Error('Network response was not ok.');
+        }
+    })
+    .then(data => {
+        console.log("Parsed data: ", data);  // Log the parsed data
+        // Redirect or handle the success case
+        // window.location.href = "/buildings/import/detail";
+    })
+    .catch(error => {
+        console.log("Data" + JSON.stringify(payload));
+        console.error('Error:', error);  // Log any error
+    });
 }
+
+
 
 var currentOpenPopup = null;  // Variable to keep track of the currently opened popup
 
@@ -369,6 +419,52 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+ // --- Event Listeners and Initialization ---
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (searchParams) {
+            // Set search input values from session data
+            document.getElementById('zipCode').value = searchParams.zipCode || '';
+            document.getElementById('houseNumber').value = searchParams.houseNumber || '';
+            document.getElementById('textualSearch').value = searchParams.textualSearch || '';
+        }
+
+        updateSearchButtonState();
+
+        if (selectedBuilding && selectedBuilding.coordinates) {
+        // Center the map on the selected building's coordinates
+        focusMapOn(selectedBuilding.coordinates);
+
+        // Display the marker on the map for the selected building
+        const marker = new mapboxgl.Marker()
+            .setLngLat(selectedBuilding.coordinates)
+            .addTo(map);
+
+        // Create a popup and set its content
+        const popupContent = generatePopupContentForSelectedBuilding(selectedBuilding);
+        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent);
+
+        // Attach the popup to the marker
+        marker.setPopup(popup);
+
+        // Optionally open the popup immediately
+        popup.addTo(map);
+    }
+    });
+
+function generatePopupContentForSelectedBuilding(building) {
+    // Customize this content to include whatever details are relevant
+    return `
+        <h3>${building.address || 'Unknown'}</h3>
+        <p><strong>Postcode:</strong> ${building.postcode || 'n/a'}</p>
+        <p><strong>City:</strong> ${building.city || 'n/a'}</p>
+        <p><strong>Usage:</strong> ${building.usage || 'n/a'}</p>
+        <p><strong>Area:</strong> ${building.area || 'n/a'} m²</p>
+        <p><strong>Construction Year:</strong> ${building.constructionYear || 'n/a'}</p>
+    `;
+}
+
 
     </script>
 </body>

@@ -1,5 +1,6 @@
 {% if request.path == "/buildings/import/detail" %}
 <a
+        id="nextButton"
   href="/buildings/import/images"
   class="bg-stone-400 rounded-3xl px-10 ml-4 border-sky-900 text-white font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 >
@@ -7,13 +8,15 @@
 </a>
 {% endif %} {% if request.path == "/buildings/import/images" %}
 <a
+        id="nextButton"
   href="/buildings/import/timeline"
   class="bg-stone-400 rounded-3xl px-10 ml-4 border-sky-900 text-white font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 >
-  <p class="mt-2">Next</p>
+  <p class="mt-2">Save and Continue</p>
 </a>
 {% endif %} {% if request.path == "/buildings/import/timeline" %}
 <a
+        id="nextButton"
   href="/buildings/import/audioguides"
   class="bg-stone-400 rounded-3xl px-10 ml-4 border-sky-900 text-white font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 >
@@ -21,6 +24,7 @@
 </a>
 {% endif %} {% if request.path == "/buildings/import/audioguides" %}
 <a
+        id="nextButton"
   href="/buildings/import/review"
   class="bg-stone-400 rounded-3xl px-10 ml-4 border-sky-900 text-white font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 >
@@ -28,6 +32,7 @@
 </a>
 {% endif %} {% if request.path == "/buildings/import/position" %}
 <a
+        id="nextButton"
   href="/buildings/import/detail"
   class="bg-stone-400 rounded-3xl px-10 ml-4 border-sky-900 text-white font-\[\'Oswald\'\]] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 >

@@ -1,5 +1,6 @@
 import bson
 from bson import ObjectId as BsonObjectId
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import URLValidator
 from djongo.models.fields import ObjectIdField
@@ -16,18 +17,18 @@ class Building(TimeStampedModel):
     """
     _id = ObjectIdField()  # Use the custom field for the primary key
 
-    # preview_image_url: A URL pointing to an image of the building. It's validated to ensure it's a well-formed URL and
-    # matches the expected Azure Blob Storage URL pattern.
-    preview_image_url = models.CharField(
-        max_length=1024,
-        validators=[URLValidator(), validate_azure_blob_url],
-        help_text="URL to a preview image of the building."
-    )
-
     # location: A Custom JSON field storing the geographic location of the building as a GeoJSON point. This allows for
     # efficient geospatial queries within Cosmos DB.
     location = CustomJSONField(
         help_text="GeoJSON formatted point data representing the building's location."
+    )
+
+    # Optional Name of the Buidling // Will be used for the search function and as alternative to the Address in the frontend
+    name = models.CharField(
+        max_length=255,
+        help_text="Name of the building.",
+        blank=True,
+        default=""
     )
 
     # address: A string field storing the physical address of the building.
@@ -110,16 +111,47 @@ class Building(TimeStampedModel):
         if self.location is None or 'type' not in self.location or self.location['type'] != 'Point':
             raise ValueError("Location must be a GeoJSON point")
 
+        main_images = [img for img in self.image_urls if img.get('is_main', False)]
+        if len(main_images) > 1:
+            raise ValidationError("There can be only one main image.")
+
         # Call the parent class's save method with all arguments
         super().save(*args, **kwargs)
 
-    def add_image(self, image_url, source):
+    def add_image(self, image_url, source, year=None, is_main=False):
         """
-        Method to add an image and its source to the building. This allows for dynamic addition of images
-        without needing to directly manipulate the image_urls field.
+        Modified method to add an image. Validates the image URL using the Azure Blob Storage URL pattern.
         """
-        self.image_urls.append({'url': image_url, 'source': source})
+        try:
+            # Validate the image URL using your custom Azure URL validator
+            validate_azure_blob_url(image_url)
+        except ValidationError:
+            # Handle the case where the URL is invalid
+            raise ValueError(f"Invalid Azure Blob Storage URL.")
+
+        image_data = {
+            'url': image_url,
+            'source': source,
+            'year': year,
+            'is_main': is_main
+        }
+
+        if is_main:
+            # Reset the main image flag for all other images
+            for img in self.image_urls:
+                img['is_main'] = False
+
+        self.image_urls.append(image_data)
         self.save()
+
+    def get_main_image(self):
+        """
+        Retrieves the main image from the image_urls list. If no main image is set, returns None or a default image.
+        """
+        for img in self.image_urls:
+            if img['is_main']:
+                return img['url']
+        return None  # Or return a default image URL if you have one
 
 
     def century(self):
@@ -164,8 +196,6 @@ class Building(TimeStampedModel):
 
     def total_images_count(self):
         count = len(self.image_urls)
-        if self.preview_image_url:
-            count += 1
         return count
 
     def __str__(self):
