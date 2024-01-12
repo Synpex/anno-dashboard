@@ -340,8 +340,8 @@ function selectBuildingFromPopup(index) {
     })
     .then(data => {
         console.log("Parsed data: ", data);  // Log the parsed data
-        // Redirect or handle the success case
-        // window.location.href = "/buildings/import/detail";
+        // Redirect to the next page
+        window.location.href = "/buildings/import/detail";
     })
     .catch(error => {
         console.log("Data" + JSON.stringify(payload));

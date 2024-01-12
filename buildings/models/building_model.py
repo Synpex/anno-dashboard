@@ -2,12 +2,18 @@ import bson
 from bson import ObjectId as BsonObjectId
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.core.validators import URLValidator
+from django.core.validators import URLValidator, MaxValueValidator
 from djongo.models.fields import ObjectIdField
+from datetime import datetime
+
 
 from buildings.fields import CustomJSONField
 from buildings.models.timestamp_model import TimeStampedModel  # Base model with timestamps
 from Core.validators import validate_azure_blob_url, validate_timeline  # Custom validators
+
+# Method required for validating the construction year
+def current_year():
+    return datetime.now().year
 
 class Building(TimeStampedModel):
     """
@@ -39,6 +45,7 @@ class Building(TimeStampedModel):
 
     # construction_year: An integer field representing the year the building was constructed.
     construction_year = models.IntegerField(
+        validators=[MaxValueValidator(current_year)],
         help_text="Year when the building was constructed."
     )
 
@@ -116,6 +123,7 @@ class Building(TimeStampedModel):
             raise ValidationError("There can be only one main image.")
 
         # Call the parent class's save method with all arguments
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def add_image(self, image_url, source, year=None, is_main=False):
@@ -197,6 +205,7 @@ class Building(TimeStampedModel):
     def total_images_count(self):
         count = len(self.image_urls)
         return count
+
 
     def __str__(self):
         """

@@ -4,7 +4,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .api import BuildingViewSet, AudioguideViewSet
 from buildings.views.api_views import BuildingByYearList, SortedBuildingsView, BuildingSearchView, api_proxy_view, \
-update_building_details, update_search_params, upload_temp_images
+update_building_details, update_search_params, upload_temp_images, remove_image_from_session, update_timeline, publish_building
 
 router = DefaultRouter()
 router.register(r'buildings', BuildingViewSet, basename='buildings')
@@ -12,6 +12,9 @@ router.register(r'audioguides', AudioguideViewSet, basename='audioguides')  # Re
 
 
 urlpatterns = [
+    path('buildings/session/publish', publish_building, name='publishBuilding'),
+    path('buildings/session/timeline', update_timeline, name='updateSessionTimeline'),
+    path('buildings/session/images/remove', remove_image_from_session, name='removeSessionImage'),
     path('buildings/session/images', upload_temp_images, name='updateSessionImages'),
     path('buildings/session/search', update_search_params, name='updateSessionSearch'),
     path('buildings/session/details', update_building_details, name='updateSessionDetails'),

@@ -124,10 +124,18 @@ var processedFiles = new Map(); // To keep track of processed files
 var selectedPreviewId = null;
 
 // Creates an image box for each file
-function createImageBox(imageData, index) {
+function createImageBox(imageData, index,  isSessionImage=false,  fileIdentifier) {
     var box = document.createElement('div');
     box.className = 'image-box';
     box.id = 'imageBox-' + index;
+    box.setAttribute('data-session-image', isSessionImage)
+
+
+    // Check if this image is marked as preview in the session data
+    if (imageData.is_preview) {
+        box.classList.add('selected-preview');
+        selectedPreviewId = box.id;  // Set this box as the selected preview
+    }
 
     var img = new Image();
      if (imageData.blob) {
@@ -144,6 +152,7 @@ function createImageBox(imageData, index) {
         if (selectedPreviewId) document.getElementById(selectedPreviewId).classList.remove('selected-preview');
         box.classList.add('selected-preview');
         selectedPreviewId = box.id;
+        updateSubmitButtonState();
     };
     box.appendChild(img);
 
@@ -177,6 +186,14 @@ function createImageBox(imageData, index) {
         imageBoxCount--;
         if (box.id === selectedPreviewId) selectedPreviewId = null;
         updateAddButton();
+
+        if(isSessionImage) {
+            removeImageFromSession(index);
+        }
+        else
+        {
+            processedFiles.delete(fileIdentifier);
+        }
     };
     box.appendChild(closeBtn);
 
@@ -191,10 +208,10 @@ function readAndPreview(file) {
     if (processedFiles.has(fileIdentifier)) return;
     processedFiles.set(fileIdentifier, file);
 
-    if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
+    if ( /\.(jpe?g|png|gif|webp)$/i.test(file.name) ) {
         var reader = new FileReader();
         reader.onload = function() {
-            createImageBox({blob: reader.result, source: '', year: '', is_preview: false}, imageBoxCount++);
+            createImageBox({blob: reader.result, source: '', year: '', is_preview: false}, imageBoxCount++, false, fileIdentifier);
         };
         reader.readAsDataURL(file);
     }
@@ -209,6 +226,12 @@ function previewImages() {
 
 // Prepares and sends the FormData with images and metadata to the server
 function submitImagesMetadata() {
+
+    if (!isPreviewImageSelected()) {
+        alert('Please select a preview image');
+        return;
+    }
+
     var formData = new FormData();
     var index = 0; // Initialize a shared index
 
@@ -233,6 +256,8 @@ function submitImagesMetadata() {
         index++; // Increment the index for each set of metadata
     });
 
+
+
     // Proceed with the fetch request
     fetch("/api/buildings/session/images", {
         method: 'POST',
@@ -249,7 +274,7 @@ function submitImagesMetadata() {
     })
     .then(data => {
         console.log("Success:", data);
-        // Optional: Redirect or perform some action upon success
+        createImageBoxesFromSession();
     })
     .catch(error => {
         console.error("Error:", error);
@@ -268,6 +293,14 @@ function updateAddButton() {
     }
 }
 
+function updateSubmitButtonState() {
+    var submitButton = document.getElementById('nextButton');
+    if (isPreviewImageSelected()) {
+        submitButton.removeAttribute('disabled');
+    } else {
+        submitButton.setAttribute('disabled', 'disabled');
+    }
+}
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -283,13 +316,43 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function isPreviewImageSelected() {
+    return selectedPreviewId !== null;
+}
+
+function removeImageFromSession(index) {
+    fetch("/api/buildings/session/images/remove", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({index: index})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Image removed:", data);
+        // Refresh the image boxes
+        // Delayed to allow the server to delete the image
+        setTimeout(createImageBoxesFromSession, 200);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
 var imagesMetadata = {{ images_metadata_json|safe }};
 
     // Function to create image boxes from session data
     function createImageBoxesFromSession() {
         imagesMetadata.forEach(function(image, index) {
             image.src = `/buildings/temp/${image.file_path}`
-            createImageBox(image, index);
+            createImageBox(image, index, true);
         });
     }
 

@@ -17,114 +17,144 @@
 
     <section class="px-10 mt-24">
         <div class="container mx-auto px-4 py-8">
-            {# Status Bar #} {% include 'import_status_bar.html'%}
+            {% include 'import_status_bar.html' %}
 
-
-
-            <!-- Disclaimer -->
             <div class="mb-4 text-gray-600">
                 <p><strong>Disclaimer:</strong> The timeline you create will be stored and presented in the order you add the events. Please ensure the accuracy and order of events before submitting.</p>
             </div>
-             <!-- Initial Timeline Element with Add Button -->
+
             <div id="initialTimeline" class="bg-white shadow rounded-lg p-4 flex items-center justify-between">
-                <!-- Year Input -->
                 <div class="flex items-center">
                     <label for="year_1" class="block text-sm font-medium text-gray-700 mr-4">Year</label>
-                    <input
-                        type="text"
-                        id="year_1"
-                        name="year"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
-                        placeholder="1903"
-                    />
-                </div>
-                <!-- Event Input -->
-                <div class="flex-1 ml-4">
-                    <input
-                        type="text"
-                        id="event_1"
-                        name="event"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
-                        placeholder="Enter the first event description"
-                    />
-                </div>
-                <!-- Add Button -->
-                <button
-                    id="addTimeline"
-                    class="ml-4 bg-sky-900 p-2 rounded-full text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    <!-- SVG for Plus Icon -->
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-
-             <!-- Timeline Template (Hidden) -->
-            <div id="timelineTemplate" class="bg-white shadow rounded-lg p-4 flex items-center justify-between" style="display:none;">
-                <!-- Inputs are the same as the initial element -->
-                <div class="flex items-center">
-                    <label class="block text-sm font-medium text-gray-700 mr-4">Year</label>
-                    <input
-                        type="text"
-                        class="yearInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
-                        placeholder="1903"
-                    />
+                    <input type="text" id="year_1" name="year" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md" placeholder="1903" />
                 </div>
                 <div class="flex-1 ml-4">
-                    <input
-                        type="text"
-                        class="eventInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
-                        placeholder="Event description"
-                    />
+                    <input type="text" id="event_1" name="event" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md" placeholder="Enter the first event description" />
                 </div>
-                <!-- Remove Button (For Cloned Elements) -->
-                <button
-                    class="deleteButton ml-4 bg-red-900 p-2 rounded-full text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                >
-                    <!-- SVG for Minus Icon -->
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
+                <button id="addTimeline" class="ml-4 bg-sky-900 p-2 rounded-full text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"><i class="fas fa-plus"></i></button>
             </div>
 
+            <template id="timelineTemplate">
+                <div class="timeline-item bg-white shadow rounded-lg p-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <label class="block text-sm font-medium text-gray-700 mr-4">Year</label>
+                        <input type="text" class="yearInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md" placeholder="1903" />
+                    </div>
+                    <div class="flex-1 ml-4">
+                        <input type="text" class="eventInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md" placeholder="Event description" />
+                    </div>
+                    <button class="deleteButton ml-4 bg-red-900 p-2 rounded-full text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"><i class="fas fa-minus"></i></button>
+                </div>
+            </template>
 
-
-               <!-- Timeline Container -->
             <div id="timelineContainer"></div>
 
-
-            <!-- Continue and Previous Buttons -->
-            <<div class="flex justify-center mt-8">
-      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
-      {% include 'next-button.html' %}
-    </div>
+            <div class="flex justify-center mt-8">
+                {% include 'cancel-button.html' %}
+                {% include 'previous-button.html' %}
+                {% include 'next-button.html' %}
+            </div>
         </div>
     </section>
-    <script>
-        $(document).ready(function() {
-            let idCounter = 2; // Start from 2 since we already have one timeline entry
+<script>
 
-            // Function to add a new timeline entry
-            function addTimelineEntry() {
-                // Clone the template and make it visible
-                const clonedElement = $("#timelineTemplate").clone().removeAttr('id').show();
+    var timelineDataFromSession;
+    try {
+        // Attempt to parse the timeline data from the Django template
+        timelineDataFromSession = JSON.parse('{{ timeline_data|safe }}');
+    } catch(e) {
+        // If parsing fails, default to an empty array
+        timelineDataFromSession = [];
+    }
+    console.log('Timeline Data from Session:', timelineDataFromSession);
 
-                // Update attributes for the new inputs
-                clonedElement.find('.yearInput').attr('id', 'year_' + idCounter);
-                clonedElement.find('.eventInput').attr('id', 'event_' + idCounter);
+    $(document).ready(function() {
+        let idCounter = 2; // Start from 2 since we already have one timeline entry
 
-                // Append the cloned element to the container
-                $("#timelineContainer").append(clonedElement);
-                idCounter++; // Increment the ID counter
+        // Function to add a new timeline entry
+        function addTimelineEntry() {
+            const template = document.querySelector('#timelineTemplate');
+            if (!template) {
+                console.error('Timeline template not found');
+                return;
             }
 
-            // Event listener for adding new timeline entries
-            $("#addTimeline").click(function() {
-                addTimelineEntry();
-            });
+            const clonedElement = template.content.cloneNode(true).querySelector('.timeline-item');
+            // Update attributes for the new inputs
+            clonedElement.querySelector('.yearInput').setAttribute('id', 'year_' + idCounter);
+            clonedElement.querySelector('.eventInput').setAttribute('id', 'event_' + idCounter);
 
-            // Event delegation for removing a timeline entry
-            $("#timelineContainer").on('click', '.deleteButton', function() {
-                $(this).closest(".bg-white").remove();
-            });
+            // Append the cloned element to the container
+            document.getElementById('timelineContainer').appendChild(clonedElement);
+            idCounter++; // Increment the ID counter
+        }
+
+        // Event listener for adding new timeline entries
+        document.getElementById('addTimeline').addEventListener('click', function() {
+            addTimelineEntry();
         });
-    </script>
+
+        // Event delegation for removing a timeline entry
+        document.getElementById('timelineContainer').addEventListener('click', function(event) {
+            if (event.target.classList.contains('deleteButton')) {
+                event.target.closest('.timeline-item').remove();
+            }
+        });
+    });
+
+    function submitTimeline() {
+        var timelineData = [];
+
+        // Include the initial timeline entry
+        const initialYear = document.getElementById('year_1').value;
+        const initialEvent = document.getElementById('event_1').value;
+        if (initialYear && initialEvent) {
+            timelineData.push({ year: initialYear, event: initialEvent });
+        }
+
+        // Include additional timeline entries
+        document.querySelectorAll('#timelineContainer .timeline-item').forEach(function(element) {
+            var year = element.querySelector('.yearInput').value;
+            var eventDesc = element.querySelector('.eventInput').value;
+            if (year && eventDesc) {
+                timelineData.push({ year: year, event: eventDesc });
+            }
+        });
+
+        fetch('/api/buildings/session/timeline', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ timeline: timelineData }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Timeline updated:", data);
+        })
+        .catch(error => {
+            console.error("Error updating timeline:", error);
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.getElementById('nextButton').addEventListener('click', function(event) {
+        event.preventDefault();
+        submitTimeline();
+    });
+</script>

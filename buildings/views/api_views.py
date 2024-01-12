@@ -3,6 +3,8 @@ import logging
 import os
 import re
 
+from azure.storage.blob import BlobServiceClient
+from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -27,7 +29,7 @@ logger = logging.getLogger(__name__)
 # views.py
 import requests
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.conf import settings
 
 
@@ -175,39 +177,33 @@ def upload_temp_images(request):
     if request.method == 'POST':
         logger.debug(f"Received request to upload images: {request.FILES}")
         logger.debug(f"Received request to upload metadata: {request.POST}")
+
         try:
             images_metadata = []
             user_id = request.user.id
+            session_id = request.session.session_key
 
-            # Define the path for the temporary folder within MEDIA_ROOT
-            temp_folder_path = os.path.join(settings.MEDIA_ROOT, f'temp/user_{user_id}')
-            if not os.path.exists(temp_folder_path):
-                os.makedirs(temp_folder_path, exist_ok=True)  # Create the temp folder if it doesn't exist
+            temp_folder_path = os.path.join(settings.MEDIA_ROOT, f'temp/user_{user_id}_{session_id}')
+            os.makedirs(temp_folder_path, exist_ok=True)
 
-            #uploaded_images = request.session.get(f'uploaded_images_user_{user_id}', None)
-            #if uploaded_images is None:
-            #    uploaded_images = set()
+            # Retrieve the set of uploaded images from the session, converting it from a list to a set
+            uploaded_images = set(request.session.get('uploaded_images', []))
 
-            # Use FileSystemStorage with the location set to the temp folder path
             fs = FileSystemStorage(location=temp_folder_path)
 
-            # Iterate based on the keys in request.FILES
             for key in request.FILES:
                 if key.startswith('image_'):
                     index = key.split('_')[1]
                     image = request.FILES[key]
+                    new_filename = f"{user_id}_{session_id}_{image.name}"
 
-                    # Create a filename using the user's ID and the original image name
-                    new_filename = f"{user_id}_{image.name}"
+                    if new_filename in uploaded_images:
+                        logger.info(f"Skipping already uploaded image: {new_filename}")
+                        continue
 
-                    # Check if the image has already been uploaded
-                    #if new_filename in uploaded_images:
-                    #    logger.info(f"Skipping already uploaded image: {new_filename}")
-                    #    continue
-
-                    #uploaded_images.add(new_filename)
-
+                    uploaded_images.add(new_filename)
                     metadata_key = f'metadata_{index}'
+
                     if metadata_key in request.POST:
                         meta = json.loads(request.POST[metadata_key])
                         filename = fs.save(new_filename, image)
@@ -224,8 +220,8 @@ def upload_temp_images(request):
                     else:
                         logger.error(f"No metadata found for image key: {key}")
 
-            # Update the session data
-            #request.session[f'uploaded_images_user_{user_id}'] = list(uploaded_images)
+            # Convert the set back to a list before storing it in the session
+            request.session['uploaded_images'] = list(uploaded_images)
             request.session['images_metadata'] = images_metadata
             request.session.modified = True
 
@@ -237,6 +233,57 @@ def upload_temp_images(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method. This endpoint supports POST only.'}, status=405)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@login_required
+def remove_image_from_session(request):
+    if request.method == 'POST':
+        try:
+            index = request.data.get('index', None)
+            user_id = request.user.id  # Assuming you have access to the user ID here
+            session_key = request.session.session_key  # Get the session key
+
+            if index is not None and 'images_metadata' in request.session:
+                images_metadata = request.session['images_metadata']
+                if 0 <= index < len(images_metadata):
+                    # Construct the path to the user's temp folder
+                    user_folder = os.path.join(settings.MEDIA_ROOT, 'temp', f'user_{user_id}_{session_key}')
+                    file_path = images_metadata[index]['file_path']
+                    full_path = os.path.join(user_folder, file_path.lstrip('/'))
+
+                    logger.debug(f"Attempting to remove image at index {index}: {full_path}")
+
+                    # Remove the image metadata from the session
+                    images_metadata.pop(index)
+                    request.session['images_metadata'] = images_metadata
+                    request.session.modified = True
+
+                    # Attempt to delete the file from the filesystem
+                    if os.path.exists(full_path):
+                        os.remove(full_path)
+                        logger.info(f"Successfully removed file: {full_path}")
+
+                        # Check if the folder is now empty, and if so, delete it
+                        if not os.listdir(user_folder):
+                            os.rmdir(user_folder)
+                            logger.info(f"Removed empty folder: {user_folder}")
+
+                        return JsonResponse({'status': 'success', 'message': 'Image and file removed'})
+
+                    else:
+                        logger.warning(f"File not found for removal: {full_path}")
+                        return JsonResponse({'status': 'warning', 'message': 'Image metadata removed, but file was not found'})
+                else:
+                    logger.error(f"Invalid index provided for removal: {index}")
+                    return JsonResponse({'status': 'error', 'message': 'Invalid index'}, status=400)
+            else:
+                logger.error("No index provided or no images in session for removal.")
+                return JsonResponse({'status': 'error', 'message': 'Index not provided or no images in session'}, status=400)
+        except Exception as e:
+            logger.error(f"Error in removing image from session: {e}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method. This endpoint supports POST only.'}, status=405)
 class BuildingByYearList(generics.ListAPIView):
     serializer_class = BuildingSerializer
 
@@ -248,6 +295,102 @@ class BuildingByYearList(generics.ListAPIView):
         year = self.kwargs['year']
         return Building.objects.filter(construction_year=year)
 
+
+@login_required
+@require_POST
+def update_timeline(request):
+    try:
+        # Decode JSON from the request body
+        data = json.loads(request.body)
+        timeline_data = data.get('timeline', [])
+
+        # Log the received data
+        logger.debug(f"Received timeline data: {timeline_data}")
+
+        # Update the session with the new timeline data
+        request.session['timeline'] = timeline_data
+        request.session.modified = True
+
+        return JsonResponse({'status': 'success', 'message': 'Timeline updated successfully'})
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def publish_building(request):
+    if request.method == 'POST':
+        # Azure Storage settings
+        account_name = settings.AZURE_ACCOUNT_NAME
+        account_key = settings.AZURE_ACCOUNT_KEY
+        container_name = "buildings"
+
+        logger.info("Connecting to Azure Blob Storage")
+        blob_service_client = BlobServiceClient(account_url=f"https://{account_name}.blob.core.windows.net",
+                                                credential=account_key)
+
+        # Directory where images are stored on your server
+        local_images_directory = f'{settings.MEDIA_ROOT}/temp/user_{request.user.id}_{request.session.session_key}'
+
+        # Get images metadata from the session
+        images_metadata = request.session.get('images_metadata', [])
+        image_urls = []
+
+        # Upload each image to Azure Blob Storage and transform image data
+        for image_meta in images_metadata:
+            local_image_path = os.path.join(local_images_directory, image_meta['file_path'])
+            if os.path.exists(local_image_path):
+                with open(local_image_path, 'rb') as image_file:
+                    blob_client = blob_service_client.get_blob_client(container=container_name,
+                                                                      blob=image_meta['file_path'])
+                    blob_client.upload_blob(image_file, overwrite=True)
+                    logger.info(f"Uploaded image {image_meta['file_path']} to Azure Blob Storage")
+
+                image_url = f"https://{account_name}.blob.core.windows.net/{container_name}/{image_meta['file_path']}"
+                image_urls.append({
+                    'url': image_url,
+                    'source': image_meta.get('source', ''),
+                    'year': image_meta.get('year', ''),
+                    'is_main': image_meta.get('is_preview', False)
+                })
+
+                os.remove(local_image_path)
+                logger.info(f"Deleted local image file {local_image_path}")
+
+        # Transform selected_building data
+        selected_building = request.session.get('selected_building', {})
+        coordinates = selected_building.get('coordinates')
+        if not coordinates or len(coordinates) != 2:
+            logger.error("Invalid or missing coordinates in selected_building.")
+            return JsonResponse({'error': 'Invalid or missing coordinates'}, status=400)
+
+        building, created = Building.objects.get_or_create(
+            _id=selected_building.get('_id')
+        )
+        logger.info(f"{'Created' if created else 'Updated'} building record with ID: {building._id}")
+
+        building.name = selected_building.get('alternative_name', '') if selected_building.get('alternative_name',
+                                                                                               '') else building.name
+        building.address = f"{selected_building.get('address', '')}, {selected_building.get('city', '')}, {selected_building.get('postcode', '')}"
+        building.construction_year = selected_building.get('constructionYear', building.construction_year)
+        building.type_of_use = selected_building.get('typeOfUse', building.type_of_use)
+        building.tags = selected_building.get('tags', building.tags)
+        building.location = {"type": "Point", "coordinates": coordinates}
+        building.image_urls = image_urls
+        building.description = selected_building.get('description', building.description)
+
+        try:
+            building.save()
+            logger.info(f"Saved building data for {_id}")
+        except Exception as e:
+            logger.error(f"Error saving building data: {e}")
+            return JsonResponse({'error': 'Error saving building data'}, status=500)
+
+        return JsonResponse({'status': 'success', 'building_id': str(building._id)})
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
 
 class BuildingSearchView(APIView):
     """
@@ -322,7 +465,8 @@ class SortedBuildingsView(APIView):
                         'near': {'type': 'Point', 'coordinates': [lon, lat]},
                         'distanceField': 'distance',
                         'spherical': True,
-                        'key': 'location.coordinates' #2dsphereIndex
+                        'key': 'location.coordinates', #2dsphereIndex
+                        'maxDistance': 500
                     }
                 },
                 {'$match': {'active': True}}
