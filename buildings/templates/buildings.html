@@ -13,17 +13,17 @@
         <script type="module" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
         {% tailwind_css %}
 
-        <style >
-            .map-container {
-                width: 100%; /* Full width */
-                height: 50vh; /* Adjust height as needed */
-                margin-bottom: 5%;
-
-                /* Responsive adjustments */
-                @media (max-width: 768px) {
-                    height: 40vh; /* Smaller height on smaller screens */
-                }
-            }
+        <style>
+            {#.map-container {#}
+            {#    width: 100%; /* Full width */#}
+            {#    height: 50vh; /* Adjust height as needed */#}
+            {#    margin-bottom: 5%;#}
+            {##}
+            {#    /* Responsive adjustments */#}
+            {#    @media (max-width: 768px) {#}
+            {#        height: 40vh; /* Smaller height on smaller screens */#}
+            /*    }
+            }*/
 
           .dataTables_filter {
               margin-top: 1%;
@@ -44,7 +44,7 @@
               background-position-y: center;
               width: 50px;
           }
-}
+
         </style>
 </head>
 <body>
@@ -153,12 +153,7 @@
                 <tr class="">
                     <th class="font-medium text-gray-600 text-sm" data-sort="false">
                         <span>
-                            <input onclick="checkAllBoxes()" type="checkbox" name="top-checkbox" class="mr-3"/>
-                            <button onclick="toggleActions()" class=" py-2 mr-10 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
-                            <svg class="w-[10px] h-[10px] stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                            </svg>
-                        </button>
+                            <input onclick="checkAllBoxes()" type="checkbox" name="top-checkbox" class="mr-16"/>
                         ADDRESS
                         </span>
                     </th>
@@ -172,11 +167,11 @@
             </thead>
             <tbody class="bg-white mt-5">
             {% for building in buildings %}
-            <tr class="building-row" data-status="{% if building.active %}active{% else %}inactive{% endif %}" data-te-selectable="true">
+            <tr id="row-{{ building.public_id }}" class="building-row" data-status="{% if building.active %}active{% else %}inactive{% endif %}" data-te-selectable="true">
                 <td class="px-4 sm:px-8">
                     <span>
-                        <input id="checkbox-{{ building.public_id }}" onclick="checkABox('checkbox-{{ building.public_id }}'); toggleRowClass('checkbox-{{ building.public_id }}');" type="checkbox" name="row-checkbox"/>
-                        <button id="dropdown-{{ building.public_id }}" onclick="toggleDetails('{{building.public_id}}')" class=" py-2 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
+                        <input id="checkbox-{{ building.public_id }}" onclick="checkABox('checkbox-{{ building.public_id }}')" type="checkbox" name="row-checkbox"/>
+                        <button id="dropdown-{{ building.public_id }}" onclick="toggleDetails('{{ building.public_id }}')" class=" py-2 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
                             <svg class="w-[10px] h-[10px] ms-3 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                             </svg>
@@ -213,86 +208,6 @@
                 </ul>
             </td>
                 <td class="font-medium text-sky-950 text-sm px-8"> <p class="px-2">{{ building.type_of_use }}</p></td>
-            </tr>
-                <!-- Dropdown building details-->
-            <tr id="building-detail-{{ building.public_id }}" class="shadow-lg" hidden="hidden">
-                <td class="h-5">
-                    <div class="bg-white px-6 shadow-md flex flex-col">
-                    <h1 class="text-md font-bold mb-2 mt-6 text-sky-900">Anno {{ building.construction_year }}</h1>
-                    <h2 class="text-md font-bold mb-2 text-sky-900">{{ building.address }}</h2>
-                    <div class="flex flex-wrap items-center">
-                      <span class="text-xs bg-gray-200 px-2 py-1 mb-2">
-                        {{ building.type_of_use }}
-                      </span>
-                    </div>
-                    <div class="flex flex-wrap items-center mb-6">
-                     {% for tag in building.tags %}
-                        <span class="text-xs bg-gray-200 px-2 py-1 mr-2 mb-2">
-                          {{ tag }}
-                        </span>
-                      {% endfor %}
-                    </div>
-                    <p class="mb-6 text-xs">
-                      {{ building.description }}
-                    </p>
-                  </div>
-                </td>
-
-                <!-- Timeline  -->
-                <td>
-                    <div class="bg-white px-6 shadow-l flex flex-col">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-md font-bold text-sky-900">TIMELINE</h2>
-          </div>
-          <div class="relative text-xs">
-            <div class="absolute left-2 w-0.5 bg-custom-blue rounded-b-3xl rounded-t-3xl"></div>
-            <div class="space-y-4 ml-8">
-              {% for event in building.timeline %}
-                <div class="flex items-center">
-                  <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-1"></div>
-                  <div class="text-sky-900">{{ event.year }}</div>
-                  <div class="font-semibold ml-3">{{ event.description }}</div>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-                </td>
-
-            <!-- Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed -->
-            <td class=""></td>
-
-
-                <td class="items-center -mb-56">
-                    <h2 class="text-md font-bold text-sky-900">INFORMATION</h2>
-                    <div class="space-y-4 text-xs items-center">
-                      <div class="flex items-center">
-                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.total_images_count }}</span> pictures uploaded</button>
-                      </div>
-                      <div class="flex items-center">
-                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.timeline|length }}</span> timeline entries</button>
-                      </div>
-                      <div class="flex items-center">
-                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.tags|length }}</span> tags added</button>
-                      </div>
-                    <div class="flex items-center">
-                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">{{ building.audio_guides|length }}</span> audio-guides added</button>
-                      </div>
-                    </div>
-
-                </td>
-
-            <!-- Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed -->
-            <td class=""></td>
-
-            <!-- Map -->
-                <td>
-                {% include 'map_with_marker.html' with building=building %}
-            </td>
-
-            <!-- Empty tables columns to satisfy DataTables, since no colspan and rowspan allowed -->
-            <td class=""></td>
-
             </tr>
             {% endfor %}
             </tbody>
@@ -336,34 +251,188 @@
 </body>
 
 <script>
+    var buildings = JSON.parse('{{ buildings_json | safe | default_if_none:"[]" | escapejs}}');
+    var table;
+
+  function formatChildRow(building){
+      const public_id = building.pk;
+      const construction_year = building.fields.construction_year;
+      const address = building.fields.address;
+      const type_of_use = building.fields.type_of_use;
+      const tags = building.fields.tags;
+      const tagsCount = tags === null ? 0 : building.fields.tags.length;
+      const description = building.fields.description;
+      const timeline = building.fields.timeline;
+      const timelineCount = timeline.length;
+      const imageUrls = building.fields.image_urls;
+      const imageCount = imageUrls.length;
+      const audioguideCount = building.fields.audioguides.length;
+      let main_image;
+
+      imageUrls.forEach((image) => {
+          if(image.is_main){
+              main_image = image.url;
+          }
+      });
+
+        var childRowHtml = `<style>
+                .map-container {
+                width: 40%; /* Full width */
+                height: 50vh; /* Adjust height as needed */
+                margin-bottom: 5%;
+                border-radius: 3px;
+                padding: 10px;
+
+
+                /* Responsive adjustments */
+                @media (max-width: 768px) {
+                    height: 40vh; /* Smaller height on smaller screens */
+                }
+            }
+            </style>
+            <table class="border-separate border-spacing-2 w-full py-6 px-8">
+            <thead class="font-medium text-gray-600 text-sm hidden">
+                <th>Details</th>
+                <th>Timeline</th>
+                <th>Map</th>
+                <th>Information</th>
+
+            </thead>
+            <tbody>
+            <!-- Dropdown building details-->
+            <tr id="building-detail-${ public_id }" class="">
+                <td class="w-48 h-100">
+                    <img src="${main_image}" class="rounded-t">
+                    <div class="bg-white px-4 flex flex-col overflow-auto rounded shadow -mt-3">
+                    <h1 class="text-white text-md font-semibold mb-2 bg-red-800 rounded min-w-24 px-3"><span class=""> ANNO ${ construction_year } </span> </h1>
+                    <h2 class="text-md font-bold mb-2 text-sky-900">${ address }</h2>
+                    <div class="flex flex-wrap items-center">
+                      <span class="text-xs bg-gray-200 px-2 py-1 mb-2">
+                        ${ type_of_use }
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap items-center mb-6">`;
+        if (tagsCount !== 0){
+            tags.forEach((tag) => {
+                childRowHtml += `<span class="text-xs bg-gray-200 px-2 py-1 mr-2 mb-2">
+                                  ${ tag }
+                                </span>`;
+            });
+        }
+
+
+        childRowHtml += `
+                    </div>
+                    <p class="mb-6 text-xs">
+                      ${ description }
+                    </p>
+                  </div>
+                </td>
+                <!-- Timeline  -->
+                <td class="rounded shadow w-60 h-100" >
+                    <div class="bg-white px-6 flex flex-col">
+                        <img src="Core/static/media/images/building-1.png"/>
+                        <h2 class="text-md font-bold text-sky-900">TIMELINE</h2>
+                      <div class="relative text-xs overflow-auto">
+                        <div class="absolute left-2 w-0.5 bg-custom-blue"></div>
+                        <div class="space-y-4 ml-8">`;
+        if (timelineCount !== 0){
+            timeline.forEach((event) => {
+            childRowHtml += `<div class="flex items-center mt-3">
+                              <div class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-2"></div>
+                              <div class="text-sky-900">${ event.year }</div>
+                              <div class="font-semibold ml-3">${ event.description }</div>
+                            </div>`;
+            });
+        }
+
+        else{
+            childRowHtml +=`<p class="mb-6 text-xs">No Timeline events available.</p>`
+        }
+
+            childRowHtml += `
+                        </div>
+                      </div>
+                    </div>
+                </td>
+                <!-- Map -->
+                <td id="map-${ public_id }" class="map-container"></td>
+                <!-- Information -->
+                <td class="items-center -mb-56 w-60 px-6 shadow">
+                    <h2 class="text-md font-bold text-sky-900">INFORMATION</h2>
+                    <div class="space-y-4 text-xs items-center">
+                      <div class="flex items-center">
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">${ imageCount }</span> pictures uploaded</button>
+                      </div>
+                      <div class="flex items-center">
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">${ timelineCount }</span> timeline entries</button>
+                      </div>
+                      <div class="flex items-center">
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">${ tagsCount }</span> tags added</button>
+                      </div>
+                    <div class="flex items-center">
+                        <button><span class="bg-gray-100 text-gray-600 rounded-md font-medium px-2">${ audioguideCount }</span> audio-guides added</button>
+                      </div>
+                    </div>
+                </td>
+            </tr></tbody></table>`;
+        return (childRowHtml);
+  }
+
+  function buildMap(building){
+      // Extracts and parses floating-point numbers from building.fields.location
+      var coordinates = (building.fields.location.match(/-?\d+\.\d+/g).map((str) => parseFloat(str)));
+
+      mapboxgl.accessToken = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ';
+        var map = new mapboxgl.Map({
+            container: 'map-' + building.pk,  // Unique ID for each map
+            style: 'mapbox://styles/pnuam/clq5cvgqm00he01plhkuv8kj0',
+            center: [coordinates[0], coordinates[1]],  // Dynamic center from building's location
+            zoom: 15,
+            attributionControl: false
+        });
+
+    // Create a new marker and set its position to the building's location
+    new mapboxgl.Marker()
+        .setLngLat([coordinates[0], coordinates[1]])
+        .addTo(map);
+  }
+
   function toggleDetails(buildingId) {
-    let element = document.getElementById('building-detail-' + buildingId);
-    let tableRow = document.getElementById('dropdown-' + buildingId).closest('tr');
+      let buildingRow = table.row('#row-' + buildingId);
+      buildings.forEach((building) => {
+          if (building.pk === buildingId){
+              console.log(building.fields);
+              const childRow = formatChildRow(building);
 
-    if (element) {
-      if (element.hasAttribute('hidden')) {
-          element.removeAttribute('hidden');
-
-          // Change the background color of the selected row
-          tableRow.style.backgroundColor = '#C5D9E0';
-      } else {
-        element.setAttribute('hidden', 'hidden');
-        // Change the background color back to white
-          tableRow.style.backgroundColor = 'white';
-      }
-    }
+              if (buildingRow.child.isShown()){
+                  buildingRow.child.hide();
+              }
+              else{
+                  buildingRow.child(childRow).show();
+                  buildMap(building)
+              }
+          }
+          else{
+              // if another row is open it should be hidden
+              let otherRow = table.row('#row-' + building.pk);
+              if (otherRow.child.isShown()){
+                  otherRow.child.hide();
+              }
+          }
+      });
   }
 
-  function toggleActions(){
-      let element = document.getElementById('building-actions');
-    if (element) {
-      if (element.hasAttribute('hidden')) {
-        element.removeAttribute('hidden');
-      } else {
-        element.setAttribute('hidden', 'hidden');
-      }
-    }
-  }
+  {#function toggleActions(){#}
+  {#    let element = document.getElementById('building-actions');#}
+  {#  if (element) {#}
+  {#    if (element.hasAttribute('hidden')) {#}
+  {#      element.removeAttribute('hidden');#}
+  {#    } else {#}
+  {#      element.setAttribute('hidden', 'hidden');#}
+  {#    }#}
+  {#  }#}
+  //}
 
   function deleteBuildingPopUp() {
     let element = document.getElementById('delete-building');
@@ -391,16 +460,6 @@
       $('#buildings-data').DataTable().draw();
   }
 
-  {#function changeRowBackground(checkboxID){#}
-  {#    const checkBox = document.getElementById(checkboxID);#}
-  {##}
-  {#    // Get table row#}
-  {#    const tableRow = checkBox.closest('tr');#}
-  {##}
-  {#   // Change the background color of the selected row#}
-  {#   tableRow.style.backgroundColor = '#C5D9E0';#}
-  //}
-
   var boxesChecked = 0;
   function checkAllBoxes(){
       const topCheckBox = document.querySelector("input[type=checkbox][name=top-checkbox]");
@@ -419,6 +478,7 @@
                   boxesChecked = checkBoxes.length;
 
                   // updates number of checked boxes
+                  document.getElementById("selected-rows").textContent = boxesChecked + " selected";
               });
           } else {
               checkBoxes.forEach((checkBox) => {
@@ -459,12 +519,11 @@
 
       // updates number of checked boxes
     document.getElementById("selected-rows").textContent = boxesChecked + " selected";
-
   }
 
-
+  //import 'js-ordered-dict'
   $(document).ready( function () {
-    var table = $('#buildings-data').DataTable({
+      table = $('#buildings-data').DataTable({
         responsive: true
     });
 
@@ -477,52 +536,8 @@
 
     // Initial filtering (optional)
     filterBuildingsByStatus('all');
-
   });
-
-
-
-  {#console.log(document.querySelectorAll("input[name=row-checkbox]:checked").length);#}
-
-
-  // Get all checkboxes with the 'row-checkbox' class
-  {#const checkboxes = document.querySelectorAll('.row-checkbox');#}
-  {##}
-  {#checkboxes.forEach((checkbox) => {#}
-  {#    checkbox.addEventListener('change', function () {#}
-  {#        // Get the parent row of the clicked checkbox#}
-  {#        const row = this.closest('tr');#}
-  {#        console.log(row);#}
-  {#        // Toggle the 'bg-selected-row' class on the parent row#}
-  {#        if (this.checked) {#}
-  {#            // console.log("Checkbox is checked..");#}
-  {#          row.classList.add('selected-row');#}
-  {#      } else {#}
-  {#            // console.log("Checkbox is not checked..");#}
-  {#          row.classList.remove('selected-row');#}
-  {#      }#}
-  {#    });#}
-  //);
-
-  // Get top-most checkbox
-  //const topCheckbox = document.getElementById('top-checkbox')
-  //topCheckbox.addEventListener('change', function () {
-      //checkboxes.forEach((checkbox) => {
-          //console.log("Checkbox...");
-          //checkbox.checked = this.checked;
-      //});
-
-      {#if (this.checked) {#}
-      {#    console.log("Checkbox is checked..");#}
-      {#    // Get all table rows#}
-      {#    const tableRows = document.querySelectorAll('table tr');#}
-      {#    tableRows.forEach((row) => {#}
-      {##}
-      {#    });#}
-      //}
-  //});
-
-
 </script>
+
 
 </html>

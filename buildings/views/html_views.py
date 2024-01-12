@@ -4,10 +4,13 @@ import uuid
 
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.core.serializers import serialize
+
+
 
 from buildings.models.building_model import Building
 
@@ -24,6 +27,8 @@ def buildings_view(request):
     buildings_without_images_count = Building.objects.filter(image_urls=None).count()
     # Count buildings without a timeline
     buildings_with_incomplete_timeline_count = Building.objects.exclude(timeline__isnull=False).count()
+    # Serialize Buildings QuerySet into JSON
+    buildings_json = serialize('json', buildings)  # use json.dumps instead!!!
 
     mapbox_access_token = settings.MAPBOX_ACCESS_TOKEN
     context = {
@@ -32,7 +37,8 @@ def buildings_view(request):
         'buildings': buildings,
         'buildings_count': buildings_count,
         'buildings_with_incomplete_timeline_count': buildings_with_incomplete_timeline_count,
-        'buildings_without_images_count': buildings_without_images_count
+        'buildings_without_images_count': buildings_without_images_count,
+        'buildings_json' : buildings_json
     }
     return render(request, 'buildings.html', context)
 
