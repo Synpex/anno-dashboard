@@ -40,7 +40,7 @@ stages:
                 $(tag)
 
   - stage: Test
-    displayName: Run Tests on Openshift
+    displayName: Run Unit Tests
     jobs:
       - job: DjangoTests
         displayName: Django Unit Tests
@@ -51,38 +51,26 @@ stages:
           - checkout: self
             submodules: true
           - script: |
-              docker run -e TEST_AZURE_ACCOUNT_KEY="$(TEST_AZURE_ACCOUNT_KEY)" ^
-                         -e TEST_AZURE_ACCOUNT_NAME="$(TEST_AZURE_ACCOUNT_NAME)" ^
-                         -e TEST_AZURE_CONTAINER="$(TEST_AZURE_CONTAINER)" ^
-                         -e TEST_DJANGO_API_KEY="$(TEST_DJANGO_API_KEY)" ^
-                         -e TEST_MONGO_DB="$(TEST_MONGO_DB)" ^
-                         -e TEST_MONGO_DB_CONNECTION_STRING="$(TEST_MONGO_DB_CONNECTION_STRING)" ^
-                         -e TEST_SQL_DB_NAME="$(TEST_SQL_DB_NAME)" ^
-                         -e TEST_SQL_HOST="$(TEST_SQL_HOST)" ^
-                         -e TEST_SQL_PASSWORD="$(TEST_SQL_PASSWORD)" ^
-                         -e TEST_SQL_USER="$(TEST_SQL_USER)" ^
-                         "$(imageName):$(tag)" python manage.py test
+              docker run -e DJANGO_ENV=local "$(imageName):$(tag)" python manage.py test
             displayName: Run Django Unit Tests
   - stage: Deploy
     displayName: Deploy to OpenShift
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))  # Deploy only if tests pass and it's the main branch
     jobs:
-      - job: DeployJob
-        displayName: Deploy Image to OpenShift
-        pool:
-          name: upcode-dev.at  # Specify your custom pool here
-        steps:
-          - checkout: none  # No need to checkout code for deployment
-
-          - task: oc-cmd@3
-            inputs:
-              openshiftServiceConnection: 'OpenShiftConnection'  # Define your OpenShift service connection
-              command: 'oc new-app $(imageName):$(tag) --name=anno-dashboard'  # Deploy the application
-              checkForErrors: 'true'
-
-          - task: oc-cmd@3
-            inputs:
-              openshiftServiceConnection: 'OpenShiftConnection'
-              command: 'oc expose svc/anno-dashboard'  # Expose the service to get an external URL
-              checkForErrors: 'true'   
+    - job: DeployJob
+      displayName: Deploy Image to OpenShift
+      pool:
+        name: upcode-dev.at  # Specify your custom pool here
+      steps:
+        - checkout: none  # No need to checkout code for deployment
+        - task: oc-cmd@3
+          inputs:
+          openshiftServiceConnection: 'OpenShiftConnection'  # Define your OpenShift service connection
+          command: |
+            oc new-app $(imageName):$(tag) --name=anno-dashboard
+            oc set env deployment/anno-dashboard --from=configmap/uat-anno-dashboard
+            oc set env deployment/anno-dashboard --from=secret/uat-anno-dashboard
+            oc expose svc/anno-dashboard  # Expose the service to get an external URL
+          checkForErrors: 'true'
+   
       
