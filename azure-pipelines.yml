@@ -16,7 +16,7 @@ stages:
       - job: Build
         displayName: Build Image
         pool:
-           vmImage: 'ubuntu-latest' 
+          name: upcode-dev.at  # Specify your custom pool here
         steps:
           - checkout: self
             submodules: true
@@ -29,13 +29,7 @@ stages:
               repository: $(imageName)
               tags: |
                 $(tag)
-                
-          - task: Docker@2
-            displayName: Login to Docker Hub
-            inputs:
-              dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
-              command: login
-              
+
           - task: Docker@2
             displayName: Push Image to DockerHub
             inputs:
@@ -51,6 +45,7 @@ stages:
       - job: DjangoTests
         displayName: Django Unit Tests
         pool:
+          name: upcode-dev.at
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
@@ -66,12 +61,12 @@ stages:
     - job: DeployJob
       displayName: Deploy Image to OpenShift
       pool:
-         vmImage: 'ubuntu-latest'
+        name: upcode-dev.at 
       steps:
         - checkout: none 
         - task: oc-cmd@3
           inputs:
-            openshiftServiceConnection: $(OpenShiftConnection)
+            openshiftServiceConnection: $(OpenShiftConnection) 
             command: |
               oc new-app $(imageName):$(tag) --name=anno-dashboard
               oc set env deployment/anno-dashboard --from=configmap/uat-anno-dashboard
@@ -79,4 +74,3 @@ stages:
               oc expose svc/anno-dashboard  # Expose the service to get an external URL
             checkForErrors: 'true'
    
-      
