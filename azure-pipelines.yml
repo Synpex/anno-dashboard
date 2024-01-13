@@ -59,7 +59,7 @@ stages:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))  # Deploy only if tests pass and it's the main branch
     jobs:
     - job: DeployJob
-      displayName: Deploy Image to OpenShift
+      displayName: Deploy Image to OpenShift UAT
       pool:
         name: upcode-dev.at 
       steps:
