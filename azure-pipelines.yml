@@ -63,3 +63,26 @@ stages:
                          -e TEST_SQL_USER="$(TEST_SQL_USER)" ^
                          "$(imageName):$(tag)" python manage.py test
             displayName: Run Django Unit Tests
+  - stage: Deploy
+    displayName: Deploy to OpenShift
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))  # Deploy only if tests pass and it's the main branch
+    jobs:
+      - job: DeployJob
+        displayName: Deploy Image to OpenShift
+        pool:
+          name: upcode-dev.at  # Specify your custom pool here
+        steps:
+          - checkout: none  # No need to checkout code for deployment
+
+          - task: oc-cmd@3
+            inputs:
+              openshiftServiceConnection: 'OpenShiftConnection'  # Define your OpenShift service connection
+              command: 'oc new-app $(imageName):$(tag) --name=anno-dashboard'  # Deploy the application
+              checkForErrors: 'true'
+
+          - task: oc-cmd@3
+            inputs:
+              openshiftServiceConnection: 'OpenShiftConnection'
+              command: 'oc expose svc/anno-dashboard'  # Expose the service to get an external URL
+              checkForErrors: 'true'   
+      
