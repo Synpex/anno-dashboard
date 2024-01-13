@@ -60,12 +60,12 @@ stages:
     - job: DeployJob
       displayName: Deploy Image to OpenShift
       pool:
-        name: upcode-dev.at  # Specify your custom pool here
+        name: upcode-dev.at 
       steps:
-        - checkout: none  # No need to checkout code for deployment
+        - checkout: none 
         - task: oc-cmd@3
           inputs:
-          openshiftServiceConnection: 'OpenShiftConnection'  # Define your OpenShift service connection
+          openshiftServiceConnection: 'OpenShift'  
           command: |
             oc new-app $(imageName):$(tag) --name=anno-dashboard
             oc set env deployment/anno-dashboard --from=configmap/uat-anno-dashboard
