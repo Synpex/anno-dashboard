@@ -68,19 +68,17 @@ stages:
           inputs:
             connectionType: 'OpenShift Connection Service'
             openshiftService: 'OpenShiftConnection'
-            cmd : |
-              set +e
-              # Check if the app already exists
-              oc get dc/anno-dashboard
-              if [ $? -eq 0 ]; then
+            cmd: |
+              oc project anno-amsterdam
+              # Check if the deployment exists
+              if oc get deployment/uat-anno-dashboard; then
                 echo "Deployment exists, updating image..."
-                oc set image deployment/anno-dashboard anno-dashboard=$(imageName):$(tag)
+                oc set image deployment/uat-anno-dashboard uat-anno-dashboard=$(imageName):$(tag)
               else
                 echo "Deployment does not exist, creating new app..."
-                oc new-app $(imageName):$(tag) --name=anno-dashboard
+                oc new-app $(imageName):$(tag) --name=uat-anno-dashboard
                 oc set env deployment/anno-dashboard --from=configmap/uat-anno-dashboard
                 oc set env deployment/anno-dashboard --from=secret/uat-anno-dashboard
-                oc expose svc/anno-dashboard  # Expose the service to get an external URL
+                oc expose svc/uat-anno-dashboard 
               fi
-              set -e
             checkForErrors: 'true'
