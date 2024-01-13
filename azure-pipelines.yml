@@ -69,7 +69,6 @@ stages:
             connectionType: 'OpenShift Connection Service'
             openshiftService: 'OpenShiftConnection'
             cmd: |
-              oc project anno-amsterdam
               # Check if the deployment exists
               if oc get deployment/uat-anno-dashboard; then
                 echo "Deployment exists, updating image..."
