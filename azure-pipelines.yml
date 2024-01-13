@@ -66,11 +66,11 @@ stages:
         - checkout: none 
         - task: oc-cmd@3
           inputs:
-            openshiftServiceConnection: $(OpenShiftConnection) 
-            command: |
+            connectionType: 'OpenShift Connection Service'
+            openshiftService: 'OpenShiftConnection'
+            cmd : |
               oc new-app $(imageName):$(tag) --name=anno-dashboard
               oc set env deployment/anno-dashboard --from=configmap/uat-anno-dashboard
               oc set env deployment/anno-dashboard --from=secret/uat-anno-dashboard
               oc expose svc/anno-dashboard  # Expose the service to get an external URL
             checkForErrors: 'true'
-   
