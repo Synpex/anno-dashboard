@@ -5,14 +5,13 @@ LABEL authors="spreis"
 # Set the working directory in the container to /app
 WORKDIR /app
 
-# Install system dependencies required for PyODBC and Node.js
+# Install system dependencies required for PyODBC, Node.js, and PostgreSQL
 RUN apt-get update \
   && apt-get install -y build-essential curl unixodbc-dev gnupg g++ \
-  # Node.js and other dependencies
   && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
   && apt-get update \
   && apt-get install -y nodejs --no-install-recommends \
-  # Clean up
+  && apt-get install -y libpq-dev \
   && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man \
   && apt-get clean
 
