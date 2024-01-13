@@ -16,7 +16,7 @@ stages:
       - job: Build
         displayName: Build Image
         pool:
-          name: upcode-dev.at  # Specify your custom pool here
+           vmImage: 'ubuntu-latest' 
         steps:
           - checkout: self
             submodules: true
@@ -45,7 +45,6 @@ stages:
       - job: DjangoTests
         displayName: Django Unit Tests
         pool:
-          name: upcode-dev.at
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
@@ -61,7 +60,7 @@ stages:
     - job: DeployJob
       displayName: Deploy Image to OpenShift
       pool:
-        name: upcode-dev.at 
+         vmImage: 'ubuntu-latest'
       steps:
         - checkout: none 
         - task: oc-cmd@3
