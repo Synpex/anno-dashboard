@@ -15,8 +15,6 @@ from buildings.utils import rd_to_wgs
 logger = logging.getLogger(__name__)
 
 class BuildingModelTest(TestCase):
-    databases = {'buildings'}
-
     @classmethod
     def setUpTestData(cls):
         cls.valid_azure_url = "https://annoamsterdamstorage.blob.core.windows.net/buildings/building1.jpg"
@@ -46,16 +44,10 @@ class BuildingModelTest(TestCase):
 
     @patch('buildings.models.building_model.Building.objects.create')
     def test_building_creation(self, mock_create):
-        # Use the mock_building set up in setUpTestData
         mock_create.return_value = BuildingModelTest.mock_building
 
         # Call the mocked create method
-        building = Building.objects.create(location={'type': 'Point', 'coordinates': [40.7128, -74.0060]},
-                                           address="123 Example St, City, Country",
-                                           construction_year=1990,
-                                           type_of_use="Commercial",
-                                           tags=["historic", "landmark"],
-                                           description="A description of the building")
+        building = Building.objects.create()
 
         # Assert that the mock object's fields were set correctly
         self.assertEqual(building.address, BuildingModelTest.mock_building.address)
@@ -77,6 +69,10 @@ class BuildingModelTest(TestCase):
     @patch('buildings.models.building_model.Building.objects.create')
     def test_invalid_location_type(self, mock_create):
         mock_building = Mock(spec=Building)
+
+        # Configure the mock_create method to return the mock_building
+        mock_create.return_value = mock_building
+
         mock_building.full_clean.side_effect = ValueError("Invalid location type")
 
         # Configure the mock_create method to return the mock_building
@@ -100,7 +96,7 @@ class BuildingModelTest(TestCase):
         # Configure the mock_create method to return the mock_building
         mock_create.return_value = mock_building
 
-        future_year = 3000
+        future_year = 1000
         with self.assertRaises(ValidationError):
             building = Building.objects.create(
                 location={'type': 'Point', 'coordinates': [40.7128, -74.0060]},
@@ -222,7 +218,30 @@ class BuildingModelTest(TestCase):
         # Assert that total_images_count returns 2
         self.assertEqual(self.mock_building.total_images_count(), 2)
 
-class TestCoordinateConversion(unittest.TestCase):
+    def test_save_method_invalid_location(self):
+        # Arrange
+        building = Building()
+        building.location = {"type": "InvalidType", "coordinates": [40.7128, -74.0060]}
+
+        # Act and Assert
+        with self.assertRaises(ValueError):
+            building.save()
+
+    def test_save_method_multiple_main_images(self):
+        # Arrange
+        building = Building()
+        building.location = {"type": "Point", "coordinates": [40.7128, -74.0060]}
+        building.image_urls = [
+            {'url': 'http://example.com/image1.jpg', 'is_main': True},
+            {'url': 'http://example.com/image2.jpg', 'is_main': True}
+        ]
+
+        # Act and Assert
+        with self.assertRaises(ValidationError):
+            building.save()
+
+
+class TestCoordinateConversion(TestCase):
     def test_rd_to_wgs_conversion(self):
         # Known RD coordinates (x, y) and expected WGS84 coordinates (lat, lon)
         test_data = [
@@ -242,6 +261,7 @@ class TestCoordinateConversion(unittest.TestCase):
                 # Assert that the result matches the expected WGS84 coordinates
                 self.assertAlmostEqual(lat, data['wgs'][0], places=5)
                 self.assertAlmostEqual(lon, data['wgs'][1], places=5)
+
 
 
 

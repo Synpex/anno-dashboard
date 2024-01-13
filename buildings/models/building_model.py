@@ -11,9 +11,8 @@ from buildings.fields import CustomJSONField
 from buildings.models.timestamp_model import TimeStampedModel  # Base model with timestamps
 from Core.validators import validate_azure_blob_url, validate_timeline  # Custom validators
 
-# Method required for validating the construction year
-def current_year():
-    return datetime.now().year
+def current_year_validator():
+    return MaxValueValidator(datetime.now().year)
 
 class Building(TimeStampedModel):
     """
@@ -45,7 +44,7 @@ class Building(TimeStampedModel):
 
     # construction_year: An integer field representing the year the building was constructed.
     construction_year = models.IntegerField(
-        validators=[MaxValueValidator(current_year)],
+        validators=[current_year_validator()],
         help_text="Year when the building was constructed."
     )
 

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os.path
 import platform
+import sys
 from pathlib import Path
 import djongo
 
@@ -24,9 +25,8 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
-
+# Determine the environment (local, production, etc.)
+ENVIRONMENT = os.getenv('DJANGO_ENV', 'local')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -35,10 +35,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&aacbf=n&fwpa@!ibc4rdj**4*_$vct48%&4xgh9l$^!_+j%17'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if ENVIRONMENT == 'local':
+    DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['fal-1.upcode-dev.at', 'localhost']
-
 
 # Application definition
 
@@ -97,43 +99,54 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'annodashboard.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-def get_env_variable(var_name):
-    """Get the environment variable or return exception."""
-    try:
-        return os.environ[var_name]
-    except KeyError:
-        error_msg = f'Set the {var_name} environment variable'
-        raise ImproperlyConfigured(error_msg)
-
-# in your settings.py
-
-
-
-DATABASES = {
-    'buildings': {
-        'ENGINE': 'djongo',
-        'NAME': os.getenv('MONGO_DB_NAME'),
-        'CLIENT': {
-            'host': os.getenv('MONGO_DB_CONNECTION_STRING')
+if ENVIRONMENT == 'local':
+    # Use SQLite for local development and testing
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         },
-        'TEST': {
-            'NAME': 'buildings_test',
-            'DEPENDENCIES': [],
-        }
-    },
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('SQL_DB_NAME'),
-        'USER': os.getenv('SQL_USER'),
-        'PASSWORD': os.getenv('SQL_PASSWORD'),
-        'HOST': os.getenv('SQL_HOST'),
-        'PORT': os.getenv('SQL_PORT')
-        }
+        'buildings': {
+            'ENGINE': 'djongo',
+            'NAME': os.getenv('MONGO_DB_NAME'),
+            'CLIENT': {
+                'host': os.getenv('MONGO_DB_CONNECTION_STRING')
+            },
+            'TEST': {
+                'NAME': 'buildings_test',
+                'DEPENDENCIES': [],
+            }
+        },
     }
+else:
+    DATABASES = {
+        'buildings': {
+            'ENGINE': 'djongo',
+            'NAME': os.getenv('MONGO_DB_NAME'),
+            'CLIENT': {
+                'host': os.getenv('MONGO_DB_CONNECTION_STRING')
+            },
+            'TEST': {
+                'NAME': 'buildings_test',
+                'DEPENDENCIES': [],
+            }
+        },
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('SQL_DB_NAME'),
+            'USER': os.getenv('SQL_USER'),
+            'PASSWORD': os.getenv('SQL_PASSWORD'),
+            'HOST': os.getenv('SQL_HOST'),
+            'PORT': os.getenv('SQL_PORT'),
+            'TEST': {
+                'ENGINE': 'django.db.backends.dummy',
+            },
+        },
+    }
+
 
 #region Azure Storage Variables
 
@@ -142,9 +155,6 @@ AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
 AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
 AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')
 AZURE_SSL = True
-
-
-
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #MEDIA_URL = '/media/'
@@ -211,7 +221,7 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-TEST_RUNNER = 'annodashboard.test_runner.DisableMigrations'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 
 # Configuration Tailwind
@@ -236,12 +246,9 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
+# API Configuration
 MY_API_KEY = os.environ.get('MY_DJANGO_API_KEY')
 BAG_API_BASE_URL = os.getenv('BAG_API_BASE_URL')
 BAG_API_KEY = os.getenv('BAG_API_KEY')
 
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ'
-
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
-
-
