@@ -53,4 +53,4 @@ RUN SECRET_KEY=nothing python manage.py tailwind build --no-input
 RUN SECRET_KEY=nothing python manage.py collectstatic --no-input
 
 # Command to run the Django application
-CMD ["/entrypoint.sh"]
+CMD /entrypoint.sh
