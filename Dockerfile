@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Install system dependencies required for PyODBC, Node.js, and PostgreSQL
 RUN apt-get update \
-  && apt-get install -y build-essential curl unixodbc-dev gnupg g++ \
+  && apt-get install -y build-essential curl unixodbc-dev gnupg g++ dos2unix \
   && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
   && apt-get update \
   && apt-get install -y nodejs --no-install-recommends \
@@ -44,8 +44,9 @@ ENV DEBUG="${DEBUG}" \
 COPY --chown=python:python . .
 
 # Copy the entrypoint script and make it executable
-COPY --chown=python:python entrypoint.sh /app/entrypoint.sh
-RUN chmod +x entrypoint.sh
+COPY entrypoint.sh /app/
+RUN dos2unix /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Install Tailwind and build static files
 RUN SECRET_KEY=nothing python manage.py tailwind install --no-input
