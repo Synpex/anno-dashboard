@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Check if in production mode
 if [ "$DJANGO_ENV" = "production" ]; then
     # Start Gunicorn with Waitress serving the Django application
