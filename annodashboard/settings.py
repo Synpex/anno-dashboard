@@ -80,6 +80,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'annodashboard.monitoring.PrometheusMonitoringMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
