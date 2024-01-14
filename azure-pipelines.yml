@@ -51,8 +51,8 @@ stages:
           - checkout: self
             submodules: true
           - script: |
-              docker run -e DJANGO_ENV=local "$(imageName):$(tag)" python manage.py migrate
-              docker run -e DJANGO_ENV=local "$(imageName):$(tag)" python manage.py test
+              docker run -e DJANGO_ENV=production "$(imageName):$(tag)" python manage.py migrate
+              docker run -e DJANGO_ENV=production "$(imageName):$(tag)" python manage.py test
             displayName: Run Django Unit Tests
   - stage: Deploy
     displayName: Deploy to OpenShift UAT
@@ -64,13 +64,6 @@ stages:
         name: upcode-dev.at 
       steps:
         - checkout: none
-
-        - task: ManualValidation@0
-          timeoutInMinutes: 4320 # Timeout for manual approval, set as needed (here 3 days)
-          displayName: 'Awaiting Manual Approval'
-          inputs:
-            instructions: 'Please review the build and deployment details and approve for deployment to UAT'
-
         - task: oc-cmd@3
           displayName: 'Create New OpenShift Deployment'
           continueOnError: true
