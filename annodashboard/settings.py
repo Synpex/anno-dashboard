@@ -40,7 +40,7 @@ if ENVIRONMENT == 'local':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['fal-1.upcode-dev.at', 'localhost']
+ALLOWED_HOSTS = ['fal-1.upcode-dev.at', 'localhost', 'uat-anno-dashboard-route-anno-amsterdam.apps.ocp1-inholland.joran-bergfeld.com' ]
 
 # Application definition
 
