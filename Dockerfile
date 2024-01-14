@@ -19,6 +19,11 @@ RUN apt-get update \
 RUN useradd --create-home python \
   && chown python:python -R /app
 
+# Grant write permissions to all users for the /app directory and the home directory of the python user
+# This is necessary for OpenShift which runs containers with arbitrary user IDs
+RUN chmod -R 777 /app \
+  && chmod -R 777 /home/python
+
 # Switch to non-root user
 USER python
 
