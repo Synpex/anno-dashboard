@@ -45,7 +45,7 @@ COPY --chown=python:python . .
 
 # Copy the entrypoint script and make it executable
 COPY --chown=python:python entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 # Install Tailwind and build static files
 RUN SECRET_KEY=nothing python manage.py tailwind install --no-input
@@ -53,4 +53,4 @@ RUN SECRET_KEY=nothing python manage.py tailwind build --no-input
 RUN SECRET_KEY=nothing python manage.py collectstatic --no-input
 
 # Command to run the Django application
-CMD ["/app/entrypoint.sh"]
+CMD ["./entrypoint.sh"]
