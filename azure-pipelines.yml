@@ -63,14 +63,26 @@ stages:
       pool:
         name: upcode-dev.at 
       steps:
-        - checkout: none 
+        - checkout: none
+
         - task: oc-cmd@3
+          displayName: 'Create New OpenShift Deployment'
+          continueOnError: true
           inputs:
             connectionType: 'OpenShift Connection Service'
             openshiftService: 'OpenShiftConnection'
-            cmd : |
-              oc new-app $(imageName):$(tag) --name=anno-dashboard
+            cmd: |
+              oc new-app $(imageName):$(tag) --name=uat-anno-dashboard
               oc set env deployment/anno-dashboard --from=configmap/uat-anno-dashboard
               oc set env deployment/anno-dashboard --from=secret/uat-anno-dashboard
-              oc expose svc/anno-dashboard  # Expose the service to get an external URL
+              oc expose svc/anno-dashboard 
+            checkForErrors: 'false'
+
+        - task: oc-cmd@3
+          displayName: 'Update Existing OpenShift Deployment'
+          inputs:
+            connectionType: 'OpenShift Connection Service'
+            openshiftService: 'OpenShiftConnection'
+            cmd: |
+              oc set image deployment/uat-anno-dashboard uat-anno-dashboard=$(imageName):$(tag)
             checkForErrors: 'true'
