@@ -45,7 +45,7 @@ COPY --chown=python:python . .
 
 # Copy the entrypoint script and make it executable
 COPY --chown=python:python entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Install Tailwind and build static files
 RUN SECRET_KEY=nothing python manage.py tailwind install --no-input
