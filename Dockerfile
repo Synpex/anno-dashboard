@@ -30,7 +30,8 @@ USER python
 # Copy Python requirements files and install Python dependencies
 COPY --chown=python:python requirements*.txt ./
 RUN pip install --upgrade pip \
-  && pip install -r requirements.txt
+  && pip install -r requirements.txt \
+    && pip install waitress
 
 # Set environment variables
 ENV DEBUG="${DEBUG}" \
@@ -48,4 +49,4 @@ RUN SECRET_KEY=nothing python manage.py tailwind build --no-input
 RUN SECRET_KEY=nothing python manage.py collectstatic --no-input
 
 # Command to run the Django application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["/entrypoint.sh"]
