@@ -43,6 +43,10 @@ ENV DEBUG="${DEBUG}" \
 # Copy the application source code
 COPY --chown=python:python . .
 
+# Copy the entrypoint script and make it executable
+COPY --chown=python:python entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Install Tailwind and build static files
 RUN SECRET_KEY=nothing python manage.py tailwind install --no-input
 RUN SECRET_KEY=nothing python manage.py tailwind build --no-input
