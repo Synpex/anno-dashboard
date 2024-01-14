@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Install system dependencies required for PyODBC, Node.js, and PostgreSQL
 RUN apt-get update \
-  && apt-get install -y build-essential curl unixodbc-dev gnupg g++ dos2unix \
+  && apt-get install -y build-essential curl unixodbc-dev gnupg g++ \
   && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
   && apt-get update \
   && apt-get install -y nodejs --no-install-recommends \
@@ -31,7 +31,7 @@ USER python
 COPY --chown=python:python requirements*.txt ./
 RUN pip install --upgrade pip \
   && pip install -r requirements.txt \
-    && pip install waitress
+  && pip install waitress
 
 # Set environment variables
 ENV DEBUG="${DEBUG}" \
@@ -43,16 +43,10 @@ ENV DEBUG="${DEBUG}" \
 # Copy the application source code
 COPY --chown=python:python . .
 
-# Copy the entrypoint script and make it executable
-COPY entrypoint.sh /app/
-RUN chmod 777 /app/entrypoint.sh && \
-    dos2unix /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
-
 # Install Tailwind and build static files
 RUN SECRET_KEY=nothing python manage.py tailwind install --no-input
 RUN SECRET_KEY=nothing python manage.py tailwind build --no-input
 RUN SECRET_KEY=nothing python manage.py collectstatic --no-input
 
 # Command to run the Django application
-CMD ["./entrypoint.sh"]
+CMD ["waitress-serve", "--port=8000", "annodashboard.wsgi:application"]
