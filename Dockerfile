@@ -36,7 +36,7 @@ RUN pip install --upgrade pip \
 ENV DEBUG="${DEBUG}" \
     PYTHONUNBUFFERED="true" \
     PATH="${PATH}:/home/python/.local/bin" \
-    USER="python"
+    USER="python" \
     PYTHONPATH="/home/python/.local/lib/python3.11/site-packages"
 
 # Copy the application source code
