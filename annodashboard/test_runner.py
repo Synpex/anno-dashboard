@@ -1,5 +1,6 @@
 # test_runner.py
-from django.test.runner import DiscoverRunner
+
+"""from django.test.runner import DiscoverRunner
 from django.apps import apps
 
 class DisableMigrations(DiscoverRunner):
@@ -9,4 +10,4 @@ class DisableMigrations(DiscoverRunner):
 
     def teardown_databases(self, old_config, **kwargs):
         # No-op to prevent database destruction
-        pass
+        pass"""

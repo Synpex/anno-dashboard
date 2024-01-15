@@ -7,7 +7,7 @@ from django.conf import settings
 def validate_azure_blob_url(value):
     # Fetch Azure storage details from settings
     account_name = settings.AZURE_ACCOUNT_NAME
-    container_name = settings.AZURE_CONTAINER
+    container_name = "buildings"
 
     # regular expression pattern for Azure Blob Storage URLs
     pattern = rf'https://{account_name}.blob.core.windows.net/{container_name}/.+'

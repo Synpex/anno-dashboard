@@ -141,12 +141,14 @@ def import_images_view(request):
     return render(request, 'import_images.html', context)
 
 @login_required
-
 def import_timeline_view(request):
-    # You can add your logic here to pass context to your dashboard template
+    # Retrieve timeline data from the session
+    timeline_data = request.session.get('timeline', [])
+
+    # Pass the timeline data to the context after converting it to JSON
     context = {
         'section': 'import',
-        # Add more context variables here
+        'timeline_data_json': json.dumps(timeline_data)  # Convert to JSON for use in JavaScript
     }
     return render(request, 'import_timeline.html', context)
 
@@ -181,20 +183,35 @@ def import_position_view(request):
     return render(request, 'import_position.html', context)
 
 @login_required
-
 def import_review_view(request):
+    # Extract specific fields from the session data
+    search_params = request.session.get('search_params', {})
+    selected_building = request.session.get('selected_building', {})
+    uploaded_images = request.session.get('uploaded_images', [])
+    images_metadata = request.session.get('images_metadata', [])
+    timeline = request.session.get('timeline', [])
+
     # You can add your logic here to pass context to your dashboard template
     context = {
+        'MEDIA_URL': settings.MEDIA_URL,
         'section': 'import',
+        'search_params': search_params,
+        'selected_building': selected_building,
+        'selected_building_json': json.dumps(selected_building),
+        'uploaded_images_json': json.dumps(uploaded_images),
+        'timeline_json': json.dumps(timeline),
+        'timeline': timeline,
+        'images_metadata': images_metadata,
         # Add more context variables here
     }
+
     return render(request, 'import_review.html', context)
 
 
 @login_required
 def serve_temp_image(request, image_path):
     user_id = request.user.id
-    file_path = os.path.join(settings.MEDIA_ROOT, f'temp/user_{user_id}', image_path)
+    file_path = os.path.join(settings.MEDIA_ROOT, f'temp/user_{user_id}_{request.session.session_key}', image_path)
 
     # Check if the file belongs to the user
     if not os.path.isfile(file_path) or str(user_id) not in image_path:
