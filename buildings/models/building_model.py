@@ -204,3 +204,4 @@ class Building(TimeStampedModel):
         In this case, it returns the address of the building.
         """
         return self.address
+
