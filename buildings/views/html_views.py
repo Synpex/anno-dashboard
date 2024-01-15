@@ -5,12 +5,11 @@ import uuid
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.serializers import serialize
-
-
+from djongo.models import ObjectIdField
 
 from buildings.models.building_model import Building
 
@@ -38,9 +37,24 @@ def buildings_view(request):
         'buildings_count': buildings_count,
         'buildings_with_incomplete_timeline_count': buildings_with_incomplete_timeline_count,
         'buildings_without_images_count': buildings_without_images_count,
-        'buildings_json' : buildings_json
+        'buildings_json' : buildings_json,
     }
     return render(request, 'buildings.html', context)
+
+@login_required
+def edit_building_view(request, building_public_id):
+    # Prepare your context data
+    selected_building = [building for building in Building.objects.all() if str(building.public_id) == str(building_public_id)][0]
+
+    building_detail = request.POST
+
+    context = {
+                  'section': 'buildings',
+                  'selected_building': selected_building,
+                  'detail': building_detail,
+    }
+    return render(request, 'edit_building.html', context)
+
 
 @login_required
 def import_view(request):
@@ -49,7 +63,6 @@ def import_view(request):
     context = {
         'section': 'import',
         'mapbox_access_token': mapbox_access_token,
-        # Add more context variables here
     }
     return render(request, 'import.html', context)
 

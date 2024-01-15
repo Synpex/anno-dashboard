@@ -152,11 +152,16 @@
             <thead class="">
                 <tr class="">
                     <th class="font-medium text-gray-600 text-sm" data-sort="false">
-                        <span>
-                            <input onclick="checkAllBoxes()" type="checkbox" name="top-checkbox" class="mr-16"/>
-                        ADDRESS
-                        </span>
+                        <input onclick="checkAllBoxes()" type="checkbox" name="top-checkbox" class="mr-1"/>
+                        <button onclick="toggleActions()" class="ml-8" id="menu-button" aria-expanded="true" aria-haspopup="true">
+                            <svg class="w-4 h-4 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 14">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                            </svg>
+                        </button>
+                        {% include 'popUp.html' %}
+
                     </th>
+                    <th class="font-medium text-gray-600 text-sm">ADDRESS</th>
                     <th class="font-medium text-gray-600 text-sm">ANNO</th>
                     <th class="font-medium text-gray-600 text-sm">STATUS</th>
                     <th class="font-medium text-gray-600 text-sm">LAST UPDATE</th>
@@ -168,20 +173,34 @@
             <tbody class="bg-white mt-5">
             {% for building in buildings %}
             <tr id="row-{{ building.public_id }}" class="building-row" data-status="{% if building.active %}active{% else %}inactive{% endif %}" data-te-selectable="true">
-                <td class="px-4 sm:px-8">
+                <td>
                     <span>
                         <input id="checkbox-{{ building.public_id }}" onclick="checkABox('checkbox-{{ building.public_id }}')" type="checkbox" name="row-checkbox"/>
+                        <!-- Child row drop-down button -->
                         <button id="dropdown-{{ building.public_id }}" onclick="toggleDetails('{{ building.public_id }}')" class=" py-2 stroke-sky-900 md:w-auto  md:border-0 md:hover:text-sky-600 md:p-0">
                             <svg class="w-[10px] h-[10px] ms-3 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                             </svg>
                         </button>
-                        <button class="my-2 ml-10 mr-1.5">
-                            <svg class="w-4 h-4 fill-sky-950 stroke-sky-950" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <button onclick="toggleActions()">
+                            <svg class="w-4 h-4 ml-2 mt-3 stroke-sky-950 fill-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 14">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                            </svg>
+                        </button>
+                        {% include 'popUp.html' %}
+                    </span>
+                </td>
+                <td class="px-4 sm:px-8">
+                    <span>
+                        <!-- Edit button -->
+                        <button class="my-2 mr-1.5">
+                            <a href="{% url 'edit_building_view' building_public_id=building.public_id %}">
+                                <svg class="w-4 h-4 fill-sky-950 stroke-sky-950" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                 <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"/>
                                 <path d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"/>
                                 <path d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"/>
-                            </svg>
+                                </svg>
+                            </a>
                         </button>
                         {{ building.address }}
                     </span>
@@ -207,43 +226,17 @@
                     {% endfor %}
                 </ul>
             </td>
-                <td class="font-medium text-sky-950 text-sm px-8"> <p class="px-2">{{ building.type_of_use }}</p></td>
+                <td class="font-medium text-sky-950 text-sm px-8">
+                    <p class="px-2">
+                        {{ building.type_of_use }}
+                    </p>
+
+                </td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-
-  <!-- Pop-ups -->
-    <div id="building-actions" class="flex items-center justify-center h-screen" hidden="hidden">
-    <div class="text-center">
-      <div id="popup-window" class="bg-white p-6 w-80 bg-white rounded-lg shadow-lg max-w-sm">
-      <div>
-          <p><button class="text-sky-950 my-2 hover:bg-gray-300">Set selected active</button></p>
-          <p><button class="text-yellow-700 mb-2 hover:bg-gray-300">Set selected inactive</button></p>
-          <p><button onclick="deleteBuildingPopUp()" class="text-rose-600 mb-2 hover:bg-red-300">Delete selected buildings</button></p>
-      </div>
-      <button id="close-button" class="text-red-800 hover:bg-text-red-800 hover:text-white">Close</button>
-    </div>
-  </div>
-</div>
-  <br>
-    <div id="delete-building" class="flex items-center justify-center h-screen" hidden="hidden">
-  <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm">
-    <div class="text-center">
-      <h1 class="text-2xl font-semibold mb-4">Delete these buildings?</h1>
-      <p class="mb-6">Are you sure you want to delete Single 140-142 & Single 180? If you delete, it will be permanently lost.</p>
-      <div class="flex justify-center">
-        <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center mr-10">
-          Cancel
-        </button>
-        <button class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
   </div>
 </section>
 
@@ -254,6 +247,13 @@
     var buildings = JSON.parse('{{ buildings_json | safe | default_if_none:"[]" | escapejs}}');
     var table;
 
+function image_html(image){
+    if (image !== 'undefined'){
+        // console.log(`<img src="${image}" class="rounded-t">`)
+        return (`<img src="${image}" class="rounded-t">`);
+    }
+
+}
   function formatChildRow(building){
       const public_id = building.pk;
       const construction_year = building.fields.construction_year;
@@ -278,7 +278,7 @@
         var childRowHtml = `<style>
                 .map-container {
                 width: 40%; /* Full width */
-                height: 50vh; /* Adjust height as needed */
+                height: 60vh; /* Adjust height as needed */
                 margin-bottom: 5%;
                 border-radius: 3px;
                 padding: 10px;
@@ -290,7 +290,7 @@
                 }
             }
             </style>
-            <table class="border-separate border-spacing-2 w-full py-6 px-8">
+            <table class="border-separate border-spacing-2 w-full h-50 py-6 px-8">
             <thead class="font-medium text-gray-600 text-sm hidden">
                 <th>Details</th>
                 <th>Timeline</th>
@@ -301,9 +301,9 @@
             <tbody>
             <!-- Dropdown building details-->
             <tr id="building-detail-${ public_id }" class="">
-                <td class="w-48 h-100">
-                    <img src="${main_image}" class="rounded-t">
-                    <div class="bg-white px-4 flex flex-col overflow-auto rounded shadow -mt-3">
+                <td class="w-52 shadow rounded">
+                    ${image_html(main_image)}
+                    <div class="bg-white px-4 flex flex-col overflow-auto -mt-3 h-full">
                     <h1 class="text-white text-md font-semibold mb-2 bg-red-800 rounded min-w-24 px-3"><span class=""> ANNO ${ construction_year } </span> </h1>
                     <h2 class="text-md font-bold mb-2 text-sky-900">${ address }</h2>
                     <div class="flex flex-wrap items-center">
@@ -329,12 +329,23 @@
                   </div>
                 </td>
                 <!-- Timeline  -->
-                <td class="rounded shadow w-60 h-100" >
-                    <div class="bg-white px-6 flex flex-col">
-                        <img src="Core/static/media/images/building-1.png"/>
+                <td class="rounded shadow w-52 h-100 overflow-y-auto" >`
+
+                imageUrls.forEach((image) => function (){
+                    console.log(image_html(image.url));
+                   // childRowHtml += `<img src="${image.url}" class="rounded-t">`;
+                });
+
+                childRowHtml +=    `<span class="text-gray-400 text-xs px-6 mt-2 mb-8 ml-3 flex items-center">
+                            <svg class="w-4 h-4 fill-gray-400 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="gray" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                            </svg>
+                            Side scroll to see all images
+                    </span>
+                    <div class="bg-white px-4 flex flex-col">
                         <h2 class="text-md font-bold text-sky-900">TIMELINE</h2>
                       <div class="relative text-xs overflow-auto">
-                        <div class="absolute left-2 w-0.5 bg-custom-blue"></div>
+                        <div class="absolute ml-3 mt-3 top-0 bottom-0 w-0.5 bg-custom-blue rounded-b-3xl rounded-t-3xl"></div>
                         <div class="space-y-4 ml-8">`;
         if (timelineCount !== 0){
             timeline.forEach((event) => {
@@ -399,7 +410,8 @@
   }
 
   function toggleDetails(buildingId) {
-      let buildingRow = table.row('#row-' + buildingId);
+    const rowID = 'row-' + buildingId;
+      let buildingRow = table.row('#' + rowID);
       buildings.forEach((building) => {
           if (building.pk === buildingId){
               console.log(building.fields);
@@ -407,42 +419,60 @@
 
               if (buildingRow.child.isShown()){
                   buildingRow.child.hide();
+                  document.getElementById(rowID).style.backgroundColor = 'white';
               }
               else{
                   buildingRow.child(childRow).show();
-                  buildMap(building)
+                  buildMap(building);
+                  document.getElementById(rowID).style.backgroundColor = '#C5D9E0';
+
               }
           }
           else{
               // if another row is open it should be hidden
-              let otherRow = table.row('#row-' + building.pk);
+              const otherRowID = 'row-' + building.pk;
+              let otherRow = table.row('#' + otherRowID);
               if (otherRow.child.isShown()){
                   otherRow.child.hide();
+                  document.getElementById(otherRowID).style.backgroundColor = 'white';
               }
           }
       });
   }
 
-  {#function toggleActions(){#}
-  {#    let element = document.getElementById('building-actions');#}
-  {#  if (element) {#}
-  {#    if (element.hasAttribute('hidden')) {#}
-  {#      element.removeAttribute('hidden');#}
-  {#    } else {#}
-  {#      element.setAttribute('hidden', 'hidden');#}
-  {#    }#}
-  {#  }#}
-  //}
+  function toggleActions(){
+      let element = document.getElementById('building-actions');
+      console.log('element: ' + element)
+    if (element) {
+      if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+      } else {
+        element.classList.add('hidden', 'hidden');
+      }
+    }
+  }
 
   function deleteBuildingPopUp() {
     let element = document.getElementById('delete-building');
     if (element) {
-      if (element.hasAttribute('hidden')) {
-        element.removeAttribute('hidden');
+      if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
       } else {
-        element.setAttribute('hidden', 'hidden');
+        element.classList.add('hidden', 'hidden');
       }
     }
+  }
+
+  function closePopUp(popUpId){
+    let element = document.getElementById(popUpId);
+    if (popUpId === 'building-actions'){
+        element.classList.add('hidden');
+        document.getElementById('delete-building').classList.add('hidden')
+    }
+    else{
+        element.classList.add('hidden');
+    }
+
   }
 
   function filterBuildingsByStatus(status) {
@@ -524,7 +554,10 @@
   //import 'js-ordered-dict'
   $(document).ready( function () {
       table = $('#buildings-data').DataTable({
-        responsive: true
+        responsive: true,
+          "columnDefs": [
+            { "orderable": false, "targets": 0 }
+        ]
     });
 
     // Event listener for the filter dropdown

@@ -1,0 +1,356 @@
+{% load static tailwind_tags %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ANNO Amsterdam</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    {% tailwind_css %}
+
+    <style>
+      .map-container {
+        width: 50%; /* Full width */
+        height: 50vh; /* Adjust height as needed */
+        margin-bottom: 5%;
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          height: 40vh; /* Smaller height on smaller screens */
+        }
+      }
+    </style>
+  </head>
+
+  {% block content %} {% include 'navbar.html' %}
+  <section class="px-10 mt-24">
+    <form method="post">
+      <h2 class="text-sky-900 text-2xl font-bold uppercase">
+        {{ selected_building.address }}
+      </h2>
+
+      <div class="p-8 text-sky-900">
+        <div class="flex flex-wrap -mx-2 mb-4">
+          <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
+            <label for="latitude" class="block text-sm font-medium text-sky-900"
+              >Latitude</label
+            >
+            <input
+              type="number"
+              step=".00000000000001"
+              id="latitude"
+              name="latitude"
+              value="{{ selected_building.location.coordinates.0 }}"
+              class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div class="w-full md:w-1/2 px-2">
+            <label
+              for="longitude"
+              class="block text-sm font-medium text-sky-900"
+              >Longitude</label
+            >
+            <input
+              type="number"
+              step=".0000000000001"
+              id="longitude"
+              name="longitude"
+              value="{{ selected_building.location.coordinates.1 }}"
+              class="mt-1 mb-4 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+        </div>
+        <div class="md: grid gap-8">
+          <div>
+            <div class="flex flex-wrap -mx-2 mb-4">
+              <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
+                <label class="block text-sm font-semibold mb-2">Address</label>
+                <input
+                  type="text"
+                  name="address"
+                  id="address"
+                  placeholder="Address ..."
+                  class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:border-sky-900"
+                  value="{{ selected_building.address }}"
+                  required
+                />
+              </div>
+              <div class="w-full md:w-1/2 px-2">
+                <label class="block text-sm font-semibold mb-2"
+                  >Construction year</label
+                >
+                <input
+                  type="text"
+                  value="{{ selected_building.construction_year }}"
+                  name="constructionYear"
+                  class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                  value="{{ selected_building.constructionYear }}"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="flex flex-wrap -mx-2 mb-4">
+              <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
+                <label for="typeOfUse" class="block text-sm font-semibold mb-2"
+                  >Type of Use</label
+                >
+                <input
+                  id="typeOfUse"
+                  name="typeOfUse"
+                  class="w-full p-1/2 border border-gray-300 rounded-lg mb-4"
+                  value="{{ selected_building.type_of_use }}"
+                  required
+                />
+              </div>
+              <div class="w-full md:w-1/2 px-2">
+                <label class="block text-sm font-semibold mb-2"
+                  >Name of the building (to show an alternative name instead of
+                  the address)</label
+                >
+                <input
+                  type="text"
+                  id="buildingName"
+                  name="buildingName"
+                  class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                  value="{{ selected_building.alternative_name }}"
+                />
+              </div>
+            </div>
+            <label class="block text-sm font-semibold mb-2">Tags</label>
+            <input
+              id="tags"
+              name="tags"
+              value="{{ selected_building.tags }}"
+              class="w-full p-1/2 border border-gray-300 rounded-lg mb-4"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2"
+              >Description (250+ characters)</label
+            >
+            <textarea
+              name="description"
+              id="description"
+              class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              rows="3"
+              required
+            >
+{{ selected_building.description }}</textarea
+            >
+          </div>
+        </div>
+        <div>
+          <h2 class="text-md font-bold text-sky-900 uppercase">Images</h2>
+          <div
+            class="flex shadow rounded-xl bg-gray-100 overflow-x-auto overflow-y-auto mt-4 p-4"
+          >
+            {% for image in selected_building.image_urls %}
+            <img src="{{ image.url }}" class="px-1 rounded-xl" />
+            {% endfor %}
+          </div>
+
+          <div>
+            <h2 class="text-md font-bold text-sky-900 uppercase mt-8">
+              TIMELINE
+            </h2>
+            <div
+              class="bg-white px-4 flex flex-col my-6 rounded overflow-y-auto"
+            >
+              <div class="relative overflow-auto">
+                <div
+                  class="absolute ml-3 mt-3 top-0 bottom-0 w-0.5 bg-custom-blue rounded-b-3xl rounded-t-3xl"
+                ></div>
+                <div class="space-y-4 ml-8 my-4 w-full">
+                  {% for event in selected_building.timeline %}
+                  <div class="flex items-center mt-3">
+                    <div
+                      id="initialTimeline"
+                      class="bg-white shadow rounded-lg p-4 flex items-center justify-between w-full"
+                    >
+                      <!-- Year Input -->
+                      <div class="flex items-center">
+                        <label
+                          for="year_1"
+                          class="block text-sm font-medium text-gray-700 mr-4"
+                          ><div
+                            class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-2"
+                          ></div
+                        ></label>
+                        <input
+                          type="text"
+                          id="year_1"
+                          name="year"
+                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
+                          value="{{ event.year }}"
+                        />
+                      </div>
+                      <!-- Event Input -->
+                      <div class="flex-1 ml-4">
+                        <input
+                          type="text"
+                          id="event_1"
+                          name="event"
+                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
+                          value="{{ event.description }}"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="mb-4 text-gray-600">
+              <p>
+                <strong>Disclaimer:</strong> The timeline will be stored and
+                presented in the order you add the events. Please ensure the
+                accuracy and order of events before submitting.
+              </p>
+            </div>
+            <!-- Initial Timeline Element with Add Button -->
+            <div
+              id="initialTimeline"
+              class="bg-white shadow rounded-lg p-4 flex items-center justify-between"
+            >
+              <!-- Year Input -->
+              <div class="flex items-center">
+                <label
+                  for="year_1"
+                  class="block text-sm font-medium text-gray-700 mr-4"
+                  >Year</label
+                >
+                <input
+                  type="text"
+                  id="year_1"
+                  name="year"
+                  class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
+                  placeholder="1903"
+                />
+              </div>
+              <!-- Event Input -->
+              <div class="flex-1 ml-4">
+                <input
+                  type="text"
+                  id="event_1"
+                  name="event"
+                  class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
+                  placeholder="Enter event description"
+                />
+              </div>
+              <!-- Add Button -->
+              <button
+                id="addTimeline"
+                class="ml-4 bg-sky-900 p-2 rounded-full text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <!-- SVG for Plus Icon -->
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+
+            <!-- Timeline Template (Hidden) -->
+            <div
+              id="timelineTemplate"
+              class="bg-white shadow rounded-lg p-4 flex items-center justify-between"
+              style="display: none"
+            >
+              <!-- Inputs are the same as the initial element -->
+              <div class="flex items-center">
+                <label class="block text-sm font-medium text-gray-700 mr-4"
+                  >Year</label
+                >
+                <input
+                  type="text"
+                  class="yearInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
+                  placeholder="1903"
+                />
+              </div>
+              <div class="flex-1 ml-4">
+                <input
+                  type="text"
+                  class="eventInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
+                  placeholder="Event description"
+                />
+              </div>
+              <!-- Remove Button (For Cloned Elements) -->
+              <button
+                class="deleteButton ml-4 bg-red-900 p-2 rounded-full text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <!-- SVG for Minus Icon -->
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Timeline Container -->
+          <div id="timelineContainer"></div>
+        </div>
+
+        <div class="flex justify-center mt-8">
+          {% include 'cancel-button.html' %}
+          <button
+            id="saveButton"
+            class="py-2 sm:px-8 px-6 bg-gray-500 rounded-3xl shadow text-white"
+            type="submit"
+            disabled
+          >
+            Save Details
+          </button>
+        </div>
+      </div>
+    </form>
+
+    {{ detail }}
+  </section>
+  {% endblock %}
+  <script>
+    function saveButtonPopUp() {
+      button = document.getElementById("saveButton");
+      button.addEventListener("click", function () {});
+    }
+
+    $(document).ready(function () {
+      let idCounter = 2; // Start from 2 since we already have one timeline entry
+
+      // Function to add a new timeline entry
+      function addTimelineEntry() {
+        // Clone the template and make it visible
+        const clonedElement = $("#timelineTemplate")
+          .clone()
+          .removeAttr("id")
+          .show();
+
+        // Update attributes for the new inputs
+        clonedElement.find(".yearInput").attr("id", "year_" + idCounter);
+        clonedElement.find(".eventInput").attr("id", "event_" + idCounter);
+
+        // Append the cloned element to the container
+        $("#timelineContainer").append(clonedElement);
+        idCounter++; // Increment the ID counter
+      }
+
+      // Event listener for adding new timeline entries
+      $("#addTimeline").click(function () {
+        addTimelineEntry();
+      });
+
+      // Event delegation for removing a timeline entry
+      $("#timelineContainer").on("click", ".deleteButton", function () {
+        $(this).closest(".bg-white").remove();
+      });
+    });
+  </script>
+</html>
