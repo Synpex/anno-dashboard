@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.serializers import serialize
 from djongo.models import ObjectIdField
+from bson import ObjectId as BsonObjectId
 
 from buildings.models.building_model import Building
 
@@ -44,8 +45,8 @@ def buildings_view(request):
 @login_required
 def edit_building_view(request, building_public_id):
     # Prepare your context data
-    selected_building = [building for building in Building.objects.all() if str(building.public_id) == str(building_public_id)][0]
-
+    queryset = Building.objects.all()
+    selected_building = queryset.get(_id=BsonObjectId(building_public_id))
     building_detail = request.POST
 
     context = {
