@@ -157,6 +157,7 @@ def update_search_params(request):
     logger.warning(f"User {user_id} made an invalid request method to update search parameters.")
     return Response({'status': 'error', 'message': 'Invalid request method. This endpoint supports POST only.'}, status=405)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @swagger_auto_schema(auto_schema=None)
@@ -171,18 +172,24 @@ def update_building_details(request):
             selected_building = request.session.get('selected_building', {})
             new_selected_building = request.data.get('new_selected_building', {})
 
+            if not new_selected_building:
+                messages.error(request, 'No new building details provided.')
+                return Response({'status': 'error', 'message': 'No new building details provided.'}, status=400)
+
             selected_building.update(new_selected_building)
             request.session['selected_building'] = selected_building
             request.session.modified = True
 
+            messages.success(request, 'Building details updated successfully.')
             logger.info(f"User {user_id} successfully updated building details in session.")
-
             return Response({'status': 'success', 'data': {'selected_building': selected_building}})
 
         except Exception as e:
+            messages.error(request, 'An error occurred while updating building details.')
             logger.error(f"User {user_id} encountered an error in updating building details: {e}", exc_info=True)
             return Response({'status': 'error', 'message': str(e)}, status=500)
 
+    messages.error(request, 'Invalid request method. This endpoint supports POST only.')
     logger.warning(f"User {user_id} made an invalid request method to update building details.")
     return Response({'status': 'error', 'message': 'Invalid request method. This endpoint supports POST only.'}, status=405)
 
@@ -240,14 +247,17 @@ def upload_temp_images(request):
             request.session['images_metadata'] = images_metadata
             request.session.modified = True
 
+            messages.success(request, 'Images uploaded successfully.')
             logger.info(f"User {user_id} successfully uploaded images. Metadata updated in session.")
 
             return JsonResponse({'status': 'success', 'data': images_metadata})
 
         except Exception as e:
+            messages.error(request, 'An error occurred while processing images.')
             logger.error(f"User {user_id} encountered an error in processing images: {e}", exc_info=True)
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+    messages.error(request, 'Invalid request method. This endpoint supports POST only.')
     logger.warning(f"User {user_id} made an invalid request method to upload images.")
     return JsonResponse({'status': 'error', 'message': 'Invalid request method. This endpoint supports POST only.'}, status=405)
 
@@ -287,22 +297,28 @@ def remove_image_from_session(request):
                             os.rmdir(user_folder)
                             logger.info(f"User {user_id} removed empty folder: {user_folder}")
 
+                        messages.success(request, 'Image and file removed successfully.')
                         return JsonResponse({'status': 'success', 'message': 'Image and file removed'})
 
                     else:
                         logger.warning(f"User {user_id} could not find file for removal: {full_path}")
+                        messages.warning(request, 'Image metadata removed, but file was not found.')
                         return JsonResponse({'status': 'warning', 'message': 'Image metadata removed, but file was not found'})
                 else:
                     logger.error(f"User {user_id} provided invalid index for image removal: {index}")
+                    messages.error(request, 'Invalid index provided for image removal.')
                     return JsonResponse({'status': 'error', 'message': 'Invalid index'}, status=400)
             else:
                 logger.error(f"User {user_id} attempted to remove an image without providing an index or with no images in session.")
+                messages.error(request, 'Index not provided or no images in session.')
                 return JsonResponse({'status': 'error', 'message': 'Index not provided or no images in session'}, status=400)
         except Exception as e:
             logger.error(f"User {user_id} encountered an error in removing image from session: {e}", exc_info=True)
+            messages.error(request, 'An error occurred while removing the image from the session.')
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
         logger.warning(f"User {user_id} made an invalid request method to remove image from session.")
+        messages.error(request, 'Invalid request method. This endpoint supports POST only.')
         return JsonResponse({'status': 'error', 'message': 'Invalid request method. This endpoint supports POST only.'}, status=405)
 class BuildingByYearList(generics.ListAPIView):
     serializer_class = BuildingSerializer
@@ -342,14 +358,17 @@ def update_timeline(request):
         request.session['timeline'] = timeline_data
         request.session.modified = True
 
+        messages.success(request, 'Timeline updated successfully.')
         logger.info(f"User {user_id} successfully updated the timeline for {building_address}.")
         return JsonResponse({'status': 'success', 'message': 'Timeline updated successfully'})
 
     except json.JSONDecodeError as e:
+        messages.error(request, 'Error updating timeline: Invalid JSON provided.')
         logger.error(f"User {user_id} provided invalid JSON for {building_address}: {e}")
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
     except Exception as e:
+        messages.error(request, 'Error updating timeline.')
         logger.error(f"User {user_id} encountered an error while updating timeline for {building_address}: {e}",
                      exc_info=True)
         return JsonResponse({'status': 'error', 'message': 'Error updating timeline'}, status=500)
