@@ -39,7 +39,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = ENVIRONMENT == 'local'
 
 if ENVIRONMENT == 'production':
-    ALLOWED_HOSTS = ['uat-anno-dashboard-route-anno-amsterdam.apps.ocp1-inholland.joran-bergfeld.com']
+    ALLOWED_HOSTS = ['uat-anno-dashboard-route-anno-amsterdam.apps.ocp1-inholland.joran-bergfeld.com', 'fal-1.upcode-dev.at']
     X_FRAME_OPTIONS = 'DENY'
 
 else:
@@ -78,6 +78,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
     'django.middleware.common.CommonMiddleware',
+    #'django.contrib.staticfiles',
     'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'annodashboard.monitoring.PrometheusMonitoringMiddleware',
@@ -177,6 +178,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'node_modules'),
 ]
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 DATABASE_ROUTERS = ['annodashboard.router.NoMigrateRouter']
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Or another valid session engine
@@ -251,7 +255,9 @@ REST_FRAMEWORK = {
    # ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
-
+SWAGGER_SETTINGS = {
+    "exclude_namespaces": ["internal_api_patterns"], # Here you can exclude namespaces from openAPI documentation
+}
 # API Configuration
 MY_API_KEY = os.environ.get('MY_DJANGO_API_KEY')
 BAG_API_BASE_URL = os.getenv('BAG_API_BASE_URL')

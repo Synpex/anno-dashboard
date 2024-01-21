@@ -50,3 +50,4 @@ RUN SECRET_KEY=nothing python manage.py collectstatic --no-input
 
 # Command to run the Django application
 CMD ["waitress-serve", "--port=8000", "annodashboard.wsgi:application"]
+#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

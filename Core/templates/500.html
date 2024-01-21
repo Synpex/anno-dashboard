@@ -1,0 +1,19 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Internal Server Error - ANNO Amsterdam</title>
+    {% tailwind_css %}
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto text-center py-20">
+        <h1 class="text-6xl font-bold">500</h1>
+        <p class="text-2xl mt-4">Internal Server Error</p>
+        <p class="mt-4">We're sorry, something went wrong on our end. Please try again later or contact support if the problem persists.</p>
+        <a href="{% url 'buildings' %}" class="mt-8 inline-block bg-blue-500 text-white px-6 py-3 rounded">Go Home</a>
+    </div>
+</body>
+</html>

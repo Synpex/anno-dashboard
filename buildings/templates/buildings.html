@@ -239,8 +239,8 @@
     </div>
   </div>
 </section>
-
     {% endblock %}
+{% include '_toast_messages.html' %}
 </body>
 
 <script>
@@ -258,6 +258,7 @@ function image_html(image){
       const public_id = building.pk;
       const construction_year = building.fields.construction_year;
       const address = building.fields.address;
+      const name = building.fields.name;
       const type_of_use = building.fields.type_of_use;
       const tags = building.fields.tags;
       const tagsCount = tags === null ? 0 : building.fields.tags.length;
@@ -268,6 +269,8 @@ function image_html(image){
       const imageCount = imageUrls.length;
       const audioguideCount = building.fields.audioguides.length;
       let main_image;
+
+      console.log(timeline)
 
       imageUrls.forEach((image) => {
           if(image.is_main){
@@ -306,6 +309,7 @@ function image_html(image){
                     <div class="bg-white px-4 flex flex-col overflow-auto -mt-3 h-full">
                     <h1 class="text-white text-md font-semibold mb-2 bg-red-800 rounded min-w-24 px-3"><span class=""> ANNO ${ construction_year } </span> </h1>
                     <h2 class="text-md font-bold mb-2 text-sky-900">${ address }</h2>
+                    <h3 class="text-md font-bold mb-2 text-sky-700">"${ name }"</h3>
                     <div class="flex flex-wrap items-center">
                       <span class="text-xs bg-gray-200 px-2 py-1 mb-2">
                         ${ type_of_use }

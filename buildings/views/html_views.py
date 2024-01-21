@@ -94,6 +94,7 @@ def import_detail_view(request):
 
 @login_required
 def import_images_view(request):
+    building_address = request.session.get('selected_building', '')  # Retrieve building address from session
     if request.method == 'POST':
         # Process the uploaded images
         images = request.FILES.getlist('images')
@@ -130,6 +131,7 @@ def import_images_view(request):
     context = {
         'section': 'import',
         'images_metadata_json': json.dumps([], cls=DjangoJSONEncoder),
+        'building': building_address,
     }
 
     # Only update images_metadata_json in the context if it's present in the session
@@ -180,6 +182,7 @@ def import_position_view(request):
         'api_base_url': api_base_url,
         'search_params': search_params if search_params is not None else {},
         'selected_building': selected_building if selected_building is not None else {},
+
     }
     return render(request, 'import_position.html', context)
 

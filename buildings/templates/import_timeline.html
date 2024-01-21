@@ -56,12 +56,12 @@
             </div>
         </div>
     </section>
+    {% include '_toast_messages.html' %}
 <script>
-
     var timelineDataFromSession;
     try {
         // Attempt to parse the timeline data from the Django template
-        timelineDataFromSession = JSON.parse('{{ timeline_data|safe }}');
+        timelineDataFromSession = JSON.parse('{{ timeline_data_json|safe }}');
     } catch(e) {
         // If parsing fails, default to an empty array
         timelineDataFromSession = [];
@@ -69,10 +69,10 @@
     console.log('Timeline Data from Session:', timelineDataFromSession);
 
     $(document).ready(function() {
-        let idCounter = 2; // Start from 2 since we already have one timeline entry
+        let idCounter = 2; // Start from 2 since we start with one timeline item
 
         // Function to add a new timeline entry
-        function addTimelineEntry() {
+        function addTimelineEntry(year = '', event = '') {
             const template = document.querySelector('#timelineTemplate');
             if (!template) {
                 console.error('Timeline template not found');
@@ -83,6 +83,9 @@
             // Update attributes for the new inputs
             clonedElement.querySelector('.yearInput').setAttribute('id', 'year_' + idCounter);
             clonedElement.querySelector('.eventInput').setAttribute('id', 'event_' + idCounter);
+            // Set values if provided
+            clonedElement.querySelector('.yearInput').value = year;
+            clonedElement.querySelector('.eventInput').value = event;
 
             // Append the cloned element to the container
             document.getElementById('timelineContainer').appendChild(clonedElement);
@@ -100,8 +103,19 @@
                 event.target.closest('.timeline-item').remove();
             }
         });
-    });
 
+        // Populate timeline with existing data from session
+        timelineDataFromSession.forEach(function(item, index) {
+            if (index === 0) {
+                // Set the initial timeline item
+                document.getElementById('year_1').value = item.year;
+                document.getElementById('event_1').value = item.event;
+            } else {
+                // Add new timeline items
+                addTimelineEntry(item.year, item.event);
+            }
+        });
+    });
     function submitTimeline() {
         var timelineData = [];
 

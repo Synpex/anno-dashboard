@@ -99,14 +99,15 @@
 
 <!-- Display number of timeline entries -->
 <div class="flex items-center">
-  <i class="fas fa-stream text-blue-500 mr-2"></i>
-  <div>{{ timeline|length }} timeline entries</div>
-  {% if timeline|length > 0 %}
-    <i class="fas fa-check text-green-500 ml-2"></i>
-  {% else %}
-    <i class="fas fa-times text-red-500 ml-2"></i>
-  {% endif %}
-</div>
+                        <i class="fas fa-stream text-blue-500 mr-2"></i>
+                        <div>{{ timeline|length }} timeline entries</div>
+                        {% if timeline|length > 0 %}
+                            <i class="fas fa-check text-green-500 ml-2"></i>
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle text-yellow-500 ml-2"></i>
+                        {% endif %}
+                    </div>
+
 
 <!-- Display number of tags -->
 <div class="flex items-center">
@@ -139,35 +140,48 @@
     </div>
   </div>
 </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="justify-center mt-8 md:flex">
-      {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
-      <a
-  href="/buildings/import/review"
-  class="py-2 sm:px-8 px-6 bg-sky-900 rounded-3xl shadow text-white ml-1"
-  >Publish</a>
-    </div>
+</div>
+</div>
+</div>
+   <div class="justify-center mt-8 md:flex">
+    {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
+    <button
+        class="py-2 sm:px-8 px-6 rounded-3xl shadow text-white ml-1
+               {% if selected_building.description|length == 0 or images_metadata|length == 0 %}
+                   bg-gray-500 cursor-not-allowed
+               {% else %}
+                   bg-sky-900 hover:bg-sky-700
+               {% endif %}"
+        {% if selected_building.description|length == 0 or images_metadata|length == 0 %}
+            disabled
+        {% else %}
+            onclick="uploadData();"
+        {% endif %}
+    >
+        Publish
+    </button>
+</div>
   </div>
 </section>
     {% endblock %}
+    {% include '_toast_messages.html' %}
 <script>
   // Constants
   const mapboxAccessToken = 'pk.eyJ1IjoicG51YW0iLCJhIjoiY2xxM3R1dDB6MDAzazJrbG9oa3VyeWd3OSJ9.czZwXxAxPv4CRxe-E0_SPQ';
+  const csrfToken = '{{ csrf_token }}';
   // Data
     var selectedBuilding = JSON.parse('{{ selected_building_json|escapejs }}');
     var uploadedImages = JSON.parse('{{ uploaded_images_json|safe }}');
-    var timeline = JSON.parse('{{ timeline_json|safe }}');
+    var timeline = {{ timeline_json|safe }};
 
-
-  console.log(selectedBuilding.coordinates);
+    console.log(selectedBuilding);
+    console.log(uploadedImages);
+    console.log(timeline);
+    console.log(selectedBuilding.coordinates);
 
   // Function to initialize Mapbox map with marker
   function initializeMap() {
     mapboxgl.accessToken = mapboxAccessToken;
-
       // Check if selectedBuilding has coordinates
       if (selectedBuilding.coordinates && selectedBuilding.coordinates.length === 2) {
         var buildingCoordinates = selectedBuilding.coordinates;
@@ -184,13 +198,12 @@
     new mapboxgl.Marker().setLngLat(buildingCoordinates).addTo(map);
   }
 
-  // Function to handle data upload
   function uploadData() {
-    fetch('/your-api-endpoint/', {
+    fetch('/api/buildings/session/publish', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Include other necessary headers
+        'X-CSRFToken': csrfToken
       },
       body: JSON.stringify({
         selectedBuilding: selectedBuilding,
@@ -200,21 +213,15 @@
     })
       .then(response => response.json())
       .then(data => {
-        // Handle the response data
-        console.log('Success:', data);
+        // Redirect to the building page
+        window.location.href = '/buildings/';
+        console.log('Publish Success:', data);
       })
       .catch((error) => {
-        console.error('Error:', error);
+        console.error('Publish Error:', error);
       });
   }
+    initializeMap();
 
-  // Main function to initialize the map and upload data
-  function initializeMapAndUploadData() {
-    initializeMap(); // Initialize the Mapbox map
-    uploadData();    // Upload data
-  }
-
-  // Call the main function to execute the code
-  initializeMapAndUploadData();
 </script>
 </html>
