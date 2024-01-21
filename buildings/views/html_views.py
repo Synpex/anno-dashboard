@@ -12,6 +12,7 @@ from django.core.serializers import serialize
 from djongo.models import ObjectIdField
 from bson import ObjectId as BsonObjectId
 
+from buildings.building_form import BuildingForm
 from buildings.models.building_model import Building
 
 
@@ -47,12 +48,18 @@ def edit_building_view(request, building_public_id):
     # Prepare your context data
     queryset = Building.objects.all()
     selected_building = queryset.get(_id=BsonObjectId(building_public_id))
-    building_detail = request.POST
+    form = BuildingForm()
+
+    if request.method == 'POST':
+        form = BuildingForm(request.POST, instance=selected_building)
+
+        if form.is_valid():
+            return HttpResponse('ok')
 
     context = {
                   'section': 'buildings',
                   'selected_building': selected_building,
-                  'detail': building_detail,
+                  'form': form,
     }
     return render(request, 'edit_building.html', context)
 

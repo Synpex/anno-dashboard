@@ -35,13 +35,14 @@
 
   {% block content %} {% include 'navbar.html' %}
   <section class="px-10 mt-24">
-   {% csrf_token %}
-    <form method="patch">
+      <form method="post">
+
       <h2 class="text-sky-900 text-2xl font-bold uppercase">
         {{ selected_building.address }}
       </h2>
 
       <div class="p-8 text-sky-900">
+          {% csrf_token %}
         <div class="flex flex-wrap -mx-2 mb-4">
           <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
             <label for="latitude" class="block text-sm font-medium text-sky-900"
@@ -94,9 +95,8 @@
                 <input
                   type="text"
                   value="{{ selected_building.construction_year }}"
-                  name="constructionYear"
+                  name="construction_year"
                   class="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                  value="{{ selected_building.constructionYear }}"
                   required
                 />
               </div>
@@ -104,12 +104,12 @@
 
             <div class="flex flex-wrap -mx-2 mb-4">
               <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
-                <label for="typeOfUse" class="block text-sm font-semibold mb-2"
+                <label for="type_of_use" class="block text-sm font-semibold mb-2"
                   >Type of Use</label
                 >
                 <input
-                  id="typeOfUse"
-                  name="typeOfUse"
+                  id="type_of_use"
+                  name="type_of_use"
                   class="w-full p-1/2 border border-gray-300 rounded-lg mb-4"
                   value="{{ selected_building.type_of_use }}"
                   required
@@ -122,10 +122,10 @@
                 >
                 <input
                   type="text"
-                  id="buildingName"
-                  name="buildingName"
+                  id="name"
+                  name="name"
                   class="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                  value="{{ selected_building.alternative_name }}"
+                  value="{{ selected_building.name }}"
                 />
               </div>
             </div>
@@ -158,9 +158,14 @@
             class="flex shadow rounded-xl bg-gray-100 overflow-x-auto overflow-y-auto mt-4 p-4"
           >
             {% for image in selected_building.image_urls %}
-            <img src="{{ image.url }}" class="px-1 rounded-xl" />
+
+                <div class="flex justify-center flex-wrap mt-4">
+                    <img src="{{ image.url }}" alt="" class="imagePreview px-1 rounded-xl" />
+                </div>
+
             {% endfor %}
           </div>
+        {% include 'images.html' %}
 
           <div>
             <h2 class="text-md font-bold text-sky-900 uppercase mt-8">
@@ -313,15 +318,36 @@
         </div>
       </div>
     </form>
-
-    {{ detail }}
+  {{ name }}
   </section>
   {% endblock %}
+
   <script>
     function saveButtonPopUp() {
       button = document.getElementById("saveButton");
       button.addEventListener("click", function () {});
     }
+
+    //var images = document.querySelectorAll('.imagePreview');
+    //console.log(images);
+    var closeBtn = document.createElement('span');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'close-btn';
+    closeBtn.onclick = function(event) {
+        event.stopPropagation();
+        box.remove();
+        imageBoxCount--;
+        if (box.id === selectedPreviewId) selectedPreviewId = null;
+        updateAddButton();
+
+        if(isSessionImage) {
+            removeImageFromSession(index);
+        }
+        else
+        {
+            processedFiles.delete(fileIdentifier);
+        }
+    };
 
     $(document).ready(function () {
       let idCounter = 2; // Start from 2 since we already have one timeline entry

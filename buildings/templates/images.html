@@ -1,88 +1,4 @@
-{% load static tailwind_tags %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>ANNO Amsterdam</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Include your Tailwind CSS here -->
-      {% tailwind_css %}
-    <style>
-        /* Style for image preview boxes */
-        .image-box {
-            width: 300px; /* Increased Width of the box */
-            height: 300px; /* Increased Height of the box */
-            margin: 30px 10px 40px; /* Space between boxes */
-            border: 1px solid #ccc; /* Border around the box */
-            border-radius: 5%;
-
-            position: relative; /* Positioning context for the close button */
-            display: inline-block; /* Align boxes in a grid */
-        }
-        .image-box img {
-            width: 100%; /* Make image fill the box */
-            height: 100%; /* Make image fill the box */
-            object-fit: cover; /* Ensure aspect ratio is maintained */
-            border-radius: 5%;
-        }
-         .image-box .close-btn {
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        background: red;
-        color: white;
-        border-radius: 50%; /* Adjusted for a more squared appearance */
-        padding: 5px 10px; /* Adjust padding as needed */
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: bold; /* Make the '×' symbol more prominent */
-
-        }
-        .image-box .add-btn {
-            position: absolute;
-            bottom: -10px; /* Position at the bottom */
-            right: -10px; /* Adjust position */
-            background: green; /* Green background for add button */
-            color: white;
-            border-radius: 50%;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .image-info{
-            display: flex; /* Use flexbox for horizontal layout */
-            justify-content: space-between; /* Distribute space between children */
-            padding-top: 14px;
-            padding-bottom: 14px;
-        }
-        .selected-preview {
-        box-shadow: 0px 0px 20px 4px #4CAF50; /* Larger green glow */
-    }
-         #imagePreview {
-            margin-bottom: 50px; /* Adjust as needed for ample space */
-        }
-    </style>
-</head>
-<body>
-{% include 'navbar.html' %}
-    <!-- Include your navbar.html here -->
-    <section class="px-10 mt-24">
-        <div class="container mx-auto px-4 py-8">
-            <!-- Include your import_status_bar.html here -->
-            {% include 'import_status_bar.html' %}
-
-
-            <div id="disclaimer" class="mb-4 text-gray-600" style="display: none;">
-    <p><strong>Disclaimer:</strong> One image will serve as the preview image of the building. In order to select the preview image, just click on the uploaded image.</p>
-</div>
-
-
-            <!-- Image preview area above the buttons -->
+<!-- Image preview area above the buttons -->
             <div id="imagePreview" class="flex justify-center flex-wrap mt-4">
                 <!-- Image thumbnails will be added here in little boxes -->
             </div>
@@ -110,15 +26,7 @@
                 </form>
             </div>
 
-            <!-- Continue and Previous Buttons -->
-            <div class="flex justify-center mt-8">
-                {% include 'cancel-button.html' %} {% include 'previous-button.html' %}
-                {% include 'next-button.html' %}
-            </div>
-        </div>
-    </section>
 <script>
-
     <!-- JavaScript to Preview Images Before Upload -->
 var imageBoxCount = 0;
 var processedFiles = new Map(); // To keep track of processed files
@@ -370,7 +278,4 @@ document.getElementById('nextButton').addEventListener('click', function(event) 
 
 document.getElementById('upload').addEventListener('change', previewImages);
 
-
 </script>
-</body>
-</html>
