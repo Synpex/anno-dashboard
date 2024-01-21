@@ -57,7 +57,8 @@ class Building(TimeStampedModel):
     # tags: A JSON field storing a list of tags related to the building. This allows for flexible tagging as new
     # tags can be added without altering the database schema.
     tags = models.JSONField(
-        help_text="JSON-formatted list of tags related to the building."
+        help_text="JSON-formatted list of tags related to the building.",
+        blank=True
     )
 
     # description: A text field storing a detailed description of the building.
@@ -77,6 +78,7 @@ class Building(TimeStampedModel):
     timeline = models.JSONField(
         help_text="JSON-formatted data representing key events in the building's history.",
         validators = [validate_timeline],
+        blank=True,
         default = list  # Ensures the default is an empty list
     )
 
@@ -89,6 +91,7 @@ class Building(TimeStampedModel):
     # audioguides: A JSON field storing a list of embedded audioguide details. Each entry contains the ID of the audioguide
     audioguides = models.JSONField(
         help_text="JSON-formatted list of audioguides.",
+        blank=True,
         default=list  # Default to an empty list
     )
 

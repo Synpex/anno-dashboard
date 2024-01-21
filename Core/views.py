@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from prometheus_client import generate_latest
+from django.http import HttpResponse
 
 # This decorator ensures that only authenticated users can access the dashboard
 @login_required
@@ -31,3 +33,11 @@ def login_view(request):
     return render(request, 'registration/login.html', context)
 
 
+def metrics(request):
+    return HttpResponse(generate_latest(), content_type='text/plain')
+
+def custom_404_view(request, exception):
+    return render(request, '404.html', {}, status=404)
+
+def custom_500_view(request):
+    return render(request, '500.html', status=500)

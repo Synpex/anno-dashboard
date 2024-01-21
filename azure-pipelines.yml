@@ -1,5 +1,5 @@
 trigger:
-- master 
+- master
 
 resources:
 - repo: self
@@ -55,7 +55,6 @@ stages:
               docker run -e DJANGO_ENV=local "$(imageName):$(tag)" python manage.py test
             displayName: Run Django Unit Tests
   - stage: Deploy
-    trigger: none
     displayName: Deploy to OpenShift UAT
     condition: and(succeeded(), eq(variables['Build.SourceBranch']))  # Deploy only if tests pass and it's the main branch
     jobs:
@@ -65,7 +64,6 @@ stages:
         name: upcode-dev.at 
       steps:
         - checkout: none
-
         - task: oc-cmd@3
           displayName: 'Create New OpenShift Deployment'
           continueOnError: true

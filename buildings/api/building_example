@@ -1,0 +1,31 @@
+    "location": {
+        "type": "Point",
+        "coordinates": [4.613355569593305, 52.387928805602265]
+    },
+    "name": "Veldzigt Residence",
+    "address": "Veldzigtlaan 12, 2015 CV Haarlem",
+    "construction_year": 1905,
+    "type_of_use": "Residential",
+    "tags": ["Historical", "Elegant Design"],
+    "description": "Veldzigt Residence is a beautiful historical building located in Haarlem, Netherlands...",
+    "image_urls": [
+        {
+            "url": "https://annoamsterdamstorage.blob.core.windows.net/buildings/ee41d72ab45389351a0af16bd7b66b40.jpg",
+            "source": "Modern Architecture",
+            "year": 2016,
+            "is_main": True
+        }
+    ],
+    "timeline": [
+        {
+            "year": 1905,
+            "description": "Construction completed."
+        },
+        {
+            "year": 1950,
+            "description": "Underwent a renovation for modern amenities."
+        }
+    ],
+    "active": True,
+    "audioguides": ["123456789"]
+}

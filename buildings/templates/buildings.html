@@ -250,10 +250,7 @@
 function image_html(image){
     if (image !== 'undefined'){
         // console.log(`<img src="${image}" class="rounded-t">`)
-        return (`<img src="${image}" alt="" class="rounded-t mb-2 -mt-2">`);
-    }
-    else{
-        return (``);
+        return (`<img src="${image}" class="rounded-t">`);
     }
 
 }
@@ -272,9 +269,7 @@ function image_html(image){
       const audioguideCount = building.fields.audioguides.length;
       let main_image;
 
-      var imagesSideScroll = ``;
       imageUrls.forEach((image) => {
-          imagesSideScroll += image_html(image.url);
           if(image.is_main){
               main_image = image.url;
           }
@@ -309,8 +304,8 @@ function image_html(image){
                 <td class="w-52 shadow rounded">
                     ${image_html(main_image)}
                     <div class="bg-white px-4 flex flex-col overflow-auto -mt-3 h-full">
-                    <h1 class="absolute text-white text-lg font-semibold -ml-2 mb-2 -mt-3 bg-red-800 rounded min-w-24 px-3"><span class=""> ANNO ${ construction_year } </span> </h1>
-                    <h2 class="text-md font-bold mt-6 mb-2 text-sky-900">${ address }</h2>
+                    <h1 class="text-white text-md font-semibold mb-2 bg-red-800 rounded min-w-24 px-3"><span class=""> ANNO ${ construction_year } </span> </h1>
+                    <h2 class="text-md font-bold mb-2 text-sky-900">${ address }</h2>
                     <div class="flex flex-wrap items-center">
                       <span class="text-xs bg-gray-200 px-2 py-1 mb-2">
                         ${ type_of_use }
@@ -334,18 +329,14 @@ function image_html(image){
                   </div>
                 </td>
                 <!-- Timeline  -->
-                <td class="rounded shadow w-52">
-                    <div class="overflow-y-auto flex space-x-2">`
+                <td class="rounded shadow w-52 h-100 overflow-y-auto" >`
 
-                // imageUrls.forEach((image) => function (){
-                    // console.log(image_html(image.url));
-                   // childRowHtml += image_html(image.url);
-                // });
+                imageUrls.forEach((image) => function (){
+                    console.log(image_html(image.url));
+                   // childRowHtml += `<img src="${image.url}" class="rounded-t">`;
+                });
 
-                childRowHtml += imagesSideScroll;
-
-                childRowHtml += `</div>
-                                 <span class="text-gray-400 text-xs px-6 mt-2 mb-8 ml-3 flex items-center">
+                childRowHtml +=    `<span class="text-gray-400 text-xs px-6 mt-2 mb-8 ml-3 flex items-center">
                             <svg class="w-4 h-4 fill-gray-400 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="gray" viewBox="0 0 20 20">
                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                             </svg>

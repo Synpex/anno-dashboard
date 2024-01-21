@@ -99,8 +99,8 @@
                     </label>
 
                     <!-- Button for Google Maps Search (functionality to be implemented) -->
-                    <button type="button" class="btn-same-height border-2 rounded-3xl border-sky-900 px-12 text-sky-900 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                        Browse Google Maps for Images
+                    <button type="button" class="btn-same-height border-2 rounded-3xl border-sky-900 px-12 text-sky-900 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" onclick="openAmsterdamArchief()" >
+                        Browse Amsterdam Stadsarchief for Images
                     </button>
 
                     <!-- Image preview area -->
@@ -117,12 +117,14 @@
             </div>
         </div>
     </section>
+{% include '_toast_messages.html' %}
 <script>
 
     <!-- JavaScript to Preview Images Before Upload -->
 var imageBoxCount = 0;
 var processedFiles = new Map(); // To keep track of processed files
 var selectedPreviewId = null;
+var buildingAddress = "{{ building.address|escapejs }}";
 
 // Creates an image box for each file
 function createImageBox(imageData, index,  isSessionImage=false,  fileIdentifier) {
@@ -276,6 +278,8 @@ function submitImagesMetadata() {
     .then(data => {
         console.log("Success:", data);
         createImageBoxesFromSession();
+        // Redirect to the next page
+        window.location.href = '/buildings/import/review/';
     })
     .catch(error => {
         console.error("Error:", error);
@@ -320,6 +324,11 @@ function getCookie(name) {
 function isPreviewImageSelected() {
     return selectedPreviewId !== null;
 }
+
+function openAmsterdamArchief() {
+        var url = "https://archief.amsterdam/beeldbank/?mode=gallery&view=horizontal&q=" + encodeURIComponent(buildingAddress) + "&page=1&reverse=0";
+        window.open(url, '_blank').focus();
+    }
 
 function removeImageFromSession(index) {
     fetch("/api/buildings/session/images/remove", {

@@ -12,7 +12,7 @@
           >
             <img
               class="w-auto h-5 inline-flex ml-2"
-              src="../static/media/images/anno-logo.png"
+              src="../staticfiles/media/images/anno-logo.png"
               alt=""
             />
             <span
@@ -23,15 +23,14 @@
           <div
             class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
           >
-            {# TODO: Implement dynamic retrieval of userID #}
-            <a href="user123">
+            <a href="{% url "profile" %}">
               <img
                 class="w-auto h-11 inline-flex -my-5"
-                src="../static/media/images/profile.png"
-                alt=""
+                 src="{% if user.profile.picture %}{{ user.profile.picture.url }}{% else %} '../staticfiles/media/images/profile.png' {% endif %}"
+                 alt="{{ user.username }}'s profile picture"
               />
             </a>
-            <a href="/login">
+            <a href="{% url "logout" %}">
               <svg
                 class="ml-4 mt-1.5 w-[19px] h-[19px] text-gray-800 dark:text-white stroke-gray-600 fill-none"
                 aria-hidden="true"
@@ -78,7 +77,7 @@
             >
               <li>
                 <a
-                  href="/buildings"
+                  href="{% url "buildings" %}"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800 {% if request.path == "localhost:8001/buildings/" %} text-red-800 {% endif %}"
                   aria-current="page"
                   >Buildings</a
@@ -86,7 +85,7 @@
               </li>
               <li>
                 <a
-                  href="/buildings/import/position"
+                  href="{% url "import-position" %}"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
                   aria-current="page"
                   >Import</a
@@ -94,20 +93,20 @@
               </li>
               <li>
                 <a
-                  href="/users"
+                  href="{% url "users" %}"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
                   aria-current="page"
                   >Users</a
                 >
               </li>
-              <li>
+              <!-- DEACTIVATED <li>
                 <a
                   href="/statistics"
                   class="block py-2 px-3 mr-10 rounded md:bg-transparent md:p-0 text-sky-950 md:dark:hover:text-red-800"
                   aria-current="page"
                   >Statistics</a
                 >
-              </li>
+              </li>--->
             </ul>
           </div>
         </div>

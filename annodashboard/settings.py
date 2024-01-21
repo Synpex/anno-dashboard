@@ -32,15 +32,20 @@ ENVIRONMENT = os.getenv('DJANGO_ENV', 'local')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&aacbf=n&fwpa@!ibc4rdj**4*_$vct48%&4xgh9l$^!_+j%17'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENVIRONMENT == 'local':
-    DEBUG = True
-else:
-    DEBUG = False
+DEBUG = ENVIRONMENT == 'local'
 
-ALLOWED_HOSTS = ['fal-1.upcode-dev.at', 'localhost', 'uat-anno-dashboard-route-anno-amsterdam.apps.ocp1-inholland.joran-bergfeld.com' ]
+if ENVIRONMENT == 'production':
+    ALLOWED_HOSTS = ['uat-anno-dashboard-route-anno-amsterdam.apps.ocp1-inholland.joran-bergfeld.com', 'fal-1.upcode-dev.at']
+    X_FRAME_OPTIONS = 'DENY'
+
+else:
+    # Local development-specific settings
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'fal-1.upcode-dev.at']
+
 
 # Application definition
 
@@ -72,8 +77,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    #'django.contrib.staticfiles',
+    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'annodashboard.monitoring.PrometheusMonitoringMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -162,13 +170,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = 'staticfiles/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'node_modules'),
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 DATABASE_ROUTERS = ['annodashboard.router.NoMigrateRouter']
 
@@ -198,7 +209,6 @@ LOGIN_URL = 'login'
 
 # Set redirection to dashboard after login
 LOGIN_REDIRECT_URL = 'buildings'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -234,7 +244,7 @@ else:
 
 
 # Internal IPs
-INTERNAL_IPS = ['127.0.0.1',]
+INTERNAL_IPS = ['127.0.0.1']
 
 # Configuration for Tailwind CSS dists
 TAILWIND_CSS_PATH = 'css/dist/styles.css'
@@ -245,7 +255,9 @@ REST_FRAMEWORK = {
    # ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
-
+SWAGGER_SETTINGS = {
+    "exclude_namespaces": ["internal_api_patterns"], # Here you can exclude namespaces from openAPI documentation
+}
 # API Configuration
 MY_API_KEY = os.environ.get('MY_DJANGO_API_KEY')
 BAG_API_BASE_URL = os.getenv('BAG_API_BASE_URL')

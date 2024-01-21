@@ -1,3 +1,4 @@
+"""
 from storages.backends.azure_storage import AzureStorage
 
 class BuildingStorage(AzureStorage):
@@ -6,4 +7,5 @@ class BuildingStorage(AzureStorage):
 
 class AudioguideStorage(AzureStorage):
     azure_container = 'audioguides'
-    expiration_secs = None
+    expiration_secs = None"
+"""

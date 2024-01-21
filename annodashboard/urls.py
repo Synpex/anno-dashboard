@@ -33,7 +33,6 @@ schema_view = get_schema_view(
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
-
 )
 
 urlpatterns = [
@@ -47,5 +46,7 @@ urlpatterns = [
     path('buildings/', include('buildings.urls')),
     path('users/', include('users.urls')),
     path('statistics/', include('stats.urls')),
-
 ]
+handler404 = 'Core.views.custom_404_view'
+handler500 = 'Core.views.custom_500_view'
+

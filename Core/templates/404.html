@@ -1,0 +1,28 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Page Not Found - ANNO Amsterdam</title>
+    {% tailwind_css %}
+    <style>
+        .super-large-text {
+            font-size: 10rem; /* You can adjust this value as needed */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    {% include 'navbar.html' %}
+
+    <div class="container mx-auto flex justify-center items-center h-screen">
+        <div class="text-center">
+            <h1 class="super-large-text font-bold text-gray-800">404</h1>
+            <p class="text-2xl mt-4">Oops! Page not found.</p>
+            <p class="mt-4">The page you are looking for does not exist or has been moved.</p>
+            <a href="{% url 'buildings' %}" class="mt-8 inline-block bg-blue-500 text-white px-6 py-3 rounded">Go Home</a>
+        </div>
+    </div>
+</body>
+</html>
