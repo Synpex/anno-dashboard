@@ -16,6 +16,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 
     {% tailwind_css %}
 
@@ -201,13 +203,8 @@
           <div
             class="flex shadow rounded-xl bg-gray-100 overflow-x-auto overflow-y-auto mt-4 p-4"
           >
-            {% for image in selected_building.image_urls %}
-
                 <div class="image-box flex justify-center flex-wrap mt-4">
-                    <img src="{{ image.url }}" alt="" class="imagePreview px-1 rounded-xl" />
                 </div>
-
-            {% endfor %}
           </div>
         <!-- Image preview area above the buttons -->
             <div id="imagePreview" class="flex justify-center flex-wrap mt-4">
@@ -695,32 +692,6 @@
         return cookieValue;
     }
 
-    function checkMandatoryFields() {
-    var address = document.querySelector('input[name="address"]').value.trim();
-    var typeOfUse = typeOfUseTagify.value.length > 0 ? typeOfUseTagify.value[0].value.trim() : '';
-    var description = document.querySelector('textarea[name="description"]').value.trim();
-    var constructionYear = document.querySelector('input[name="constructionYear"]').value.trim();
-
-    if (address && typeOfUse && description && constructionYear) {
-      document.getElementById('saveButton').classList.remove('bg-gray-500', 'cursor-not-allowed');
-      document.getElementById('saveButton').classList.add('bg-blue-500', 'hover:bg-blue-700');
-      document.getElementById('saveButton').disabled = false;
-    } else {
-      document.getElementById('saveButton').classList.add('bg-gray-500', 'cursor-not-allowed');
-      document.getElementById('saveButton').classList.remove('bg-blue-500', 'hover:bg-blue-700');
-      document.getElementById('saveButton').disabled = true;
-    }
-  }
-
-  // Event listeners for input changes
-  document.querySelector('input[name="address"]').addEventListener('input', checkMandatoryFields);
-  typeOfUseTagify.on('change', checkMandatoryFields);
-  document.querySelector('textarea[name="description"]').addEventListener('input', checkMandatoryFields);
-  document.querySelector('input[name="constructionYear"]').addEventListener('input', checkMandatoryFields);
-
-  // Initial check on page load
-  checkMandatoryFields();
-
 document.addEventListener('DOMContentLoaded', function() {
         var savedTypeOfUse = "{{ selected_building.typeOfUse|escapejs }}";
         if(savedTypeOfUse) {
@@ -977,12 +948,12 @@ function removeImageFromSession(index) {
     });
 }
 
-var imagesMetadata = {{ images_metadata_json|safe }};
+var imagesMetadata = {{ selected_building.image_urls|safe }};
 
     // Function to create image boxes from session data
     function createImageBoxesFromSession() {
         imagesMetadata.forEach(function(image, index) {
-            image.src = `/buildings/temp/${image.file_path}`
+            image.src = `imagesMetadata.url`
             createImageBox(image, index, true);
         });
     }
