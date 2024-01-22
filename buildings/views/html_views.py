@@ -48,13 +48,13 @@ def edit_building_view(request, building_public_id):
     # Prepare your context data
     queryset = Building.objects.all()
     selected_building = queryset.get(_id=BsonObjectId(building_public_id))
-    form = BuildingForm()
+    form = BuildingForm(instance=selected_building)
 
     if request.method == 'POST':
         form = BuildingForm(request.POST, instance=selected_building)
-
         if form.is_valid():
-            return HttpResponse('ok')
+            form.save()
+            return redirect('buildings')
 
     context = {
                   'section': 'buildings',

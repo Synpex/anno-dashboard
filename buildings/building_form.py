@@ -4,11 +4,9 @@ from .models.building_model import Building
 class BuildingForm(forms.ModelForm):
     class Meta:
         model = Building
-        fields = [
-            'location', 'name', 'address', 'construction_year',
+        fields = ('location', 'name', 'address', 'construction_year',
             'type_of_use', 'tags', 'description', 'image_urls',
-            'timeline', 'active', 'audioguides'
-        ]
+            'timeline', 'active', 'audioguides',)
 
     # def clean_location(self):
     #     return self.clean_json_field('location', required_keys=['type', 'coordinates'])

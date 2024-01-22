@@ -19,57 +19,101 @@
 
     {% tailwind_css %}
 
-    <style>
-      .map-container {
-        width: 50%; /* Full width */
-        height: 50vh; /* Adjust height as needed */
-        margin-bottom: 5%;
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-          height: 40vh; /* Smaller height on smaller screens */
+    <style>
+        /* Style for image preview boxes */
+        .image-box {
+            width: 300px; /* Increased Width of the box */
+            height: 300px; /* Increased Height of the box */
+            margin: 30px 10px 40px; /* Space between boxes */
+            border: 1px solid #ccc; /* Border around the box */
+            border-radius: 5%;
+
+            position: relative; /* Positioning context for the close button */
+            display: inline-block; /* Align boxes in a grid */
         }
-      }
+        .image-box img {
+            width: 100%; /* Make image fill the box */
+            height: 100%; /* Make image fill the box */
+            object-fit: cover; /* Ensure aspect ratio is maintained */
+            border-radius: 5%;
+        }
+         .image-box .close-btn {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: red;
+        color: white;
+        border-radius: 50%; /* Adjusted for a more squared appearance */
+        padding: 5px 10px; /* Adjust padding as needed */
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold; /* Make the '×' symbol more prominent */
+
+        }
+        .image-box .add-btn {
+            position: absolute;
+            bottom: -10px; /* Position at the bottom */
+            right: -10px; /* Adjust position */
+            background: green; /* Green background for add button */
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .image-info{
+            display: flex; /* Use flexbox for horizontal layout */
+            justify-content: space-between; /* Distribute space between children */
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+        .selected-preview {
+        box-shadow: 0px 0px 20px 4px #4CAF50; /* Larger green glow */
+    }
+         #imagePreview {
+            margin-bottom: 50px; /* Adjust as needed for ample space */
+        }
     </style>
   </head>
 
   {% block content %} {% include 'navbar.html' %}
   <section class="px-10 mt-24">
       <form method="post">
+        {% csrf_token %}
 
       <h2 class="text-sky-900 text-2xl font-bold uppercase">
         {{ selected_building.address }}
       </h2>
 
       <div class="p-8 text-sky-900">
-          {% csrf_token %}
         <div class="flex flex-wrap -mx-2 mb-4">
           <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
-            <label for="latitude" class="block text-sm font-medium text-sky-900"
+            <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-sky-900"
               >Latitude</label
             >
             <input
               type="number"
               step=".00000000000001"
-              id="latitude"
-              name="latitude"
+              id="{{ form.location.id_for_label }}"
+              name="{{ form.location.id_for_label }}"
               value="{{ selected_building.location.coordinates.0 }}"
-              class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              class="mt-1 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
           <div class="w-full md:w-1/2 px-2">
             <label
-              for="longitude"
+              for="{{ form.location.id_for_label }}"
               class="block text-sm font-medium text-sky-900"
               >Longitude</label
             >
             <input
               type="number"
               step=".0000000000001"
-              id="longitude"
-              name="longitude"
+              id="{{ form.location.id_for_label }}"
+              name="{{ form.location.id_for_label }}"
               value="{{ selected_building.location.coordinates.1 }}"
-              class="mt-1 mb-4 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              class="mt-1 mb-4 block w-full pl-2 pr-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
         </div>
@@ -77,11 +121,11 @@
           <div>
             <div class="flex flex-wrap -mx-2 mb-4">
               <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
-                <label class="block text-sm font-semibold mb-2">Address</label>
+                <label for="{{ form.address.id_for_label }}" class="block text-sm font-semibold mb-2">Address</label>
                 <input
                   type="text"
-                  name="address"
-                  id="address"
+                  name="{{ form.address.id_for_label }}"
+                  id="{{ form.address.id_for_label }}"
                   placeholder="Address ..."
                   class="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:border-sky-900"
                   value="{{ selected_building.address }}"
@@ -89,13 +133,13 @@
                 />
               </div>
               <div class="w-full md:w-1/2 px-2">
-                <label class="block text-sm font-semibold mb-2"
+                <label for="{{ form.construction_year.id_for_label }}" class="block text-sm font-semibold mb-2"
                   >Construction year</label
                 >
                 <input
                   type="text"
                   value="{{ selected_building.construction_year }}"
-                  name="construction_year"
+                  name="{{ form.construction_year.id_for_label }}"
                   class="w-full p-2 border border-gray-300 rounded-lg mb-4"
                   required
                 />
@@ -104,46 +148,46 @@
 
             <div class="flex flex-wrap -mx-2 mb-4">
               <div class="w-full px-2 mb-4 md:w-1/2 md:mb-0">
-                <label for="type_of_use" class="block text-sm font-semibold mb-2"
+                <label for="{{ form.type_of_use.id_for_label }}" class="block text-sm font-semibold mb-2"
                   >Type of Use</label
                 >
                 <input
-                  id="type_of_use"
-                  name="type_of_use"
+                  id="typeOfUseSelect"
+                  name="{{ form.type_of_use.id_for_label }}"
                   class="w-full p-1/2 border border-gray-300 rounded-lg mb-4"
                   value="{{ selected_building.type_of_use }}"
                   required
                 />
               </div>
               <div class="w-full md:w-1/2 px-2">
-                <label class="block text-sm font-semibold mb-2"
+                <label for="{{ form.name.id_for_label }}" class="block text-sm font-semibold mb-2"
                   >Name of the building (to show an alternative name instead of
                   the address)</label
                 >
                 <input
                   type="text"
-                  id="name"
-                  name="name"
+                  id="{{ form.name.id_for_label }}"
+                  name="{{ form.name.id_for_label }}"
                   class="w-full p-2 border border-gray-300 rounded-lg mb-4"
                   value="{{ selected_building.name }}"
                 />
               </div>
             </div>
-            <label class="block text-sm font-semibold mb-2">Tags</label>
+            <label for="{{ form.tags.id_for_label }}" class="block text-sm font-semibold mb-2">Tags</label>
             <input
-              id="tags"
-              name="tags"
+              id="tagInput"
+              name="{{ form.tags.id_for_label }}"
               value="{{ selected_building.tags }}"
               class="w-full p-1/2 border border-gray-300 rounded-lg mb-4"
             />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-2"
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold mb-2"
               >Description (250+ characters)</label
             >
             <textarea
-              name="description"
-              id="description"
+              name="{{ form.description.id_for_label }}"
+              id="{{ form.description.id_for_label }}"
               class="w-full p-2 border border-gray-300 rounded-lg mb-4"
               rows="3"
               required
@@ -159,13 +203,40 @@
           >
             {% for image in selected_building.image_urls %}
 
-                <div class="flex justify-center flex-wrap mt-4">
+                <div class="image-box flex justify-center flex-wrap mt-4">
                     <img src="{{ image.url }}" alt="" class="imagePreview px-1 rounded-xl" />
                 </div>
 
             {% endfor %}
           </div>
-        {% include 'images.html' %}
+        <!-- Image preview area above the buttons -->
+            <div id="imagePreview" class="flex justify-center flex-wrap mt-4">
+                <!-- Image thumbnails will be added here in little boxes -->
+            </div>
+
+            <!-- Form for Image Upload and Google Maps Search -->
+            <div class="flex space-x-4 justify-center items-center my-2">
+                <form method="post" enctype="multipart/form-data" class="p-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 font-[\'Oswald\']">
+                    <!-- Hidden input for file upload -->
+                    <input type="file" id="upload" name="images" multiple class="hidden" onchange="previewImages()" />
+
+                    <!-- Label acting as button for file upload -->
+                    <label for="upload" class="btn-same-height bg-sky-900 px-12 py-3 justify-center items-center rounded-3xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        Upload Pictures to the Building
+                    </label>
+
+                    <!-- Button for Google Maps Search (functionality to be implemented) -->
+                    <button type="button" class="btn-same-height border-2 rounded-3xl border-sky-900 px-12 py-3 text-sky-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" onclick="openAmsterdamArchief()" >
+                        Browse Amsterdam Stadsarchief for Images
+                    </button>
+
+                    <!-- Image preview area -->
+                    <div id="imagePreview" class="flex flex-wrap mt-4">
+                        <!-- Image thumbnails will be added here -->
+                    </div>
+                </form>
+            </div>
+
 
           <div>
             <h2 class="text-md font-bold text-sky-900 uppercase mt-8">
@@ -379,5 +450,555 @@
         $(this).closest(".bg-white").remove();
       });
     });
+
+    // Define custom suggestions for tags
+  var customSuggestions = [
+    // Architectural Styles
+    "Gothic Revival",
+    "Baroque",
+    "Neoclassical",
+    "Bauhaus",
+    "Art Nouveau",
+    "Beaux-Arts",
+    "Art Deco",
+    "Victorian",
+    "Edwardian",
+    "Colonial Revival",
+    "Renaissance Revival",
+    "Craftsman",
+    "International Style",
+    "Brutalist",
+    "Postmodern",
+    "Deconstructivism",
+    "Streamline Moderne",
+    "Prairie Style",
+    "Futurist",
+    "Parametricism",
+    "High Tech",
+    "Neo-Futurism",
+
+    // Sustainable and Modern Features
+    "Sustainable",
+    "Eco-friendly",
+    "Green Building",
+    "Smart Building",
+    "Energy Efficient",
+    "Solar Powered",
+    "Adaptive Reuse",
+    "Heritage Conservation",
+
+    // Usage Subcategories - Residential
+    "Apartment Complex",
+    "Single-Family Home",
+    "Duplex",
+    "Townhouse",
+    "Condominium",
+    "Cooperative",
+    "Senior Living",
+    "Student Housing",
+
+    // Usage Subcategories - Commercial
+    "Retail Store",
+    "Shopping Mall",
+    "Office Building",
+    "Business Park",
+    "Restaurant",
+    "Hotel",
+    "Convention Center",
+    "Entertainment Venue",
+
+    // Usage Subcategories - Industrial
+    "Factory",
+    "Warehouse",
+    "Distribution Center",
+    "Data Center",
+    "Research Facility",
+    "Light Manufacturing",
+    "Heavy Manufacturing",
+
+    // Usage Subcategories - Institutional
+    "School",
+    "University",
+    "Hospital",
+    "Clinic",
+    "Library",
+    "Museum",
+    "Government Building",
+    "Religious Building",
+
+    // Usage Subcategories - Recreational
+    "Park",
+    "Stadium",
+    "Arena",
+    "Gymnasium",
+    "Swimming Pool",
+    "Community Center",
+    "Golf Course",
+    "Amusement Park",
+
+    // Usage Subcategories - Mixed-Use
+    "Live/Work",
+    "Retail/Residential",
+    "Office/Residential",
+    "Commercial/Cultural",
+    "Transport Hub",
+
+    // Usage Subcategories - Transport
+    "Airport",
+    "Train Station",
+    "Subway Station",
+    "Bus Terminal",
+    "Port",
+    "Parking Garage",
+
+    // Usage Subcategories - Agricultural
+    "Farmhouse",
+    "Barn",
+    "Greenhouse",
+    "Stable",
+    "Vineyard",
+
+    // Usage Subcategories - Specialized
+    "Theater",
+    "Cinema",
+    "Broadcasting Studio",
+    "Laboratory",
+    "Observatory",
+    "Fire Station",
+    "Police Station",
+
+    // Additional Features and Characteristics
+    "Landmark",
+    "Iconic",
+    "Waterfront",
+    "Skyline Defining",
+    "Pedestrian-Friendly",
+    "Transit-Oriented",
+    "Historical",
+    "Contemporary",
+    "Renovated",
+    "Low-rise",
+    "High-rise",
+    "Skyscraper",
+    "Underground",
+    "Floating",
+    "Modular",
+    "Prefabricated"
+    // Add more tags as needed
+];
+
+  // Initialize Tagify on the input element with custom settings
+  var input = document.getElementById('tagInput');
+  var tagify = new Tagify(input, {
+    whitelist: customSuggestions, // Use the custom suggestions
+    dropdown: {
+      enabled: 1, // always show suggestions dropdown when the input gets focus
+      maxItems: 20,
+      position: "text", // place the dropdown near the typed text
+      closeOnSelect: false, // keep the dropdown open after selecting a suggestion
+      highlightFirst: true
+    }
+  });
+
+  // Initialize Tagify on the 'typeOfUseSelect' input element
+  var typeOfUseInput = document.getElementById('typeOfUseSelect');
+  var typeOfUseTagify = new Tagify(typeOfUseInput, {
+    enforceWhitelist: true,
+    whitelist: [
+      "Residential Building",
+      "Commercial Building",
+      "Industrial Building",
+      "Institutional Building",
+      "Recreational Building",
+      "Historical Building",
+      "Mixed-Use Building",
+      "Transport Building",
+      "Agricultural Building",
+      "Specialized Building"
+    ],
+      mode : "select",
+    dropdown: {
+      enabled: 0
+    },
+    maxTags: 1
+  });
+
+  tagify.DOM.scope.classList.add('border', 'border-gray-300', 'rounded-lg', 'p-1', 'bg-white', 'focus:border-blue-500');
+  typeOfUseTagify.DOM.scope.classList.add('border', 'border-gray-300', 'rounded-lg', 'p-1', 'bg-white', 'focus:border-blue-500');
+  // Listen to the 'add' event, which is triggered when a new tag is added
+  tagify.on('add', onAddTag);
+
+  // Function to handle a new tag added
+  function onAddTag(e) {
+    console.log("Added a tag:", e.detail.data.value);
+  }
+
+  // Function to collect data and send it to Django
+    function saveBuildingData() {
+        var address = document.querySelector('input[name="address"]').value;
+        var typeOfUse = typeOfUseTagify.value[0].value; // Getting the first tag's value
+        var description = document.querySelector('textarea[name="description"]').value;
+        var alternativeName = document.querySelector('input[name="buildingName"]').value;
+        var tags = tagify.value.map(tag => tag.value); // Get array of tag values
+        var constructionYear = document.querySelector('input[name="constructionYear"]').value;
+
+        var new_selected_building = {
+          address: address,
+          typeOfUse: typeOfUse,
+          alternative_name: alternativeName,
+          constructionYear: constructionYear,
+          tags: tags,
+          description: description
+        };
+
+         var payload = {
+          new_selected_building: new_selected_building,
+        };
+
+        fetch('/api/buildings/session/details', {  // Use the correct path to your Django view
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')  // Ensure you're getting the CSRF token
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            saveClicked = true;
+            document.getElementById('nextButton').classList.remove('hidden');
+            // Redirect to the next page
+            // window.location.href = "/buildings/import/images";
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Listen for a submit event or button click to trigger saveBuildingData
+    document.getElementById('saveButton').addEventListener('click', saveBuildingData);
+
+    // Helper function to get the CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function checkMandatoryFields() {
+    var address = document.querySelector('input[name="address"]').value.trim();
+    var typeOfUse = typeOfUseTagify.value.length > 0 ? typeOfUseTagify.value[0].value.trim() : '';
+    var description = document.querySelector('textarea[name="description"]').value.trim();
+    var constructionYear = document.querySelector('input[name="constructionYear"]').value.trim();
+
+    if (address && typeOfUse && description && constructionYear) {
+      document.getElementById('saveButton').classList.remove('bg-gray-500', 'cursor-not-allowed');
+      document.getElementById('saveButton').classList.add('bg-blue-500', 'hover:bg-blue-700');
+      document.getElementById('saveButton').disabled = false;
+    } else {
+      document.getElementById('saveButton').classList.add('bg-gray-500', 'cursor-not-allowed');
+      document.getElementById('saveButton').classList.remove('bg-blue-500', 'hover:bg-blue-700');
+      document.getElementById('saveButton').disabled = true;
+    }
+  }
+
+  // Event listeners for input changes
+  document.querySelector('input[name="address"]').addEventListener('input', checkMandatoryFields);
+  typeOfUseTagify.on('change', checkMandatoryFields);
+  document.querySelector('textarea[name="description"]').addEventListener('input', checkMandatoryFields);
+  document.querySelector('input[name="constructionYear"]').addEventListener('input', checkMandatoryFields);
+
+  // Initial check on page load
+  checkMandatoryFields();
+
+document.addEventListener('DOMContentLoaded', function() {
+        var savedTypeOfUse = "{{ selected_building.typeOfUse|escapejs }}";
+        if(savedTypeOfUse) {
+            typeOfUseTagify.addTags([savedTypeOfUse]);
+        }
+    });
+
+  // After initializing Tagify for tagInput
+  // Set the value if it exists in the session
+  document.addEventListener('DOMContentLoaded', function() {
+        var savedTagsJson = '{{ selected_building.tags|safe|default_if_none:"[]"|escapejs }}';
+        try {
+            var savedTags = JSON.parse(savedTagsJson.replace(/'/g, '"'));
+            if(savedTags && savedTags.length > 0) {
+                tagify.addTags(savedTags);
+            }
+        } catch(e) {
+            console.error("Error parsing saved tags: ", e);
+        }
+    });
+
+    <!-- JavaScript to Preview Images Before Upload -->
+var imageBoxCount = 0;
+var processedFiles = new Map(); // To keep track of processed files
+var selectedPreviewId = null;
+var buildingAddress = "{{ building.address|escapejs }}";
+
+// Creates an image box for each file
+function createImageBox(imageData, index,  isSessionImage=false,  fileIdentifier) {
+    var box = document.createElement('div');
+    box.className = 'image-box';
+    box.id = 'imageBox-' + index;
+    box.setAttribute('data-session-image', isSessionImage)
+
+
+    // Check if this image is marked as preview in the session data
+    if (imageData.is_preview) {
+        box.classList.add('selected-preview');
+        selectedPreviewId = box.id;  // Set this box as the selected preview
+    }
+
+    var img = new Image();
+     if (imageData.blob) {
+        // If a blob URL is provided (for new images), use it
+        img.src = imageData.blob;
+    } else if (imageData.file_path) {
+        // If a file path is provided (for already uploaded images), use it
+        img.src = `/buildings/temp${imageData.file_path}`;
+    } else {
+        // Otherwise, set to a placeholder or empty string
+        img.src = '';
+    }
+    img.onclick = function() {
+        if (selectedPreviewId) document.getElementById(selectedPreviewId).classList.remove('selected-preview');
+        box.classList.add('selected-preview');
+        selectedPreviewId = box.id;
+        updateSubmitButtonState();
+    };
+    box.appendChild(img);
+
+    var imageInfo = document.createElement('div');
+    imageInfo.className = 'image-info';
+
+    var sourceInput = document.createElement('input');
+    sourceInput.type = 'text';
+    sourceInput.placeholder = 'Enter image source';
+    sourceInput.className = 'flex-1 p-2 border border-gray-300 rounded-lg';
+    // If imageData has a source, use it
+    sourceInput.value = imageData.source || '';
+    imageInfo.appendChild(sourceInput);
+
+    var yearInput = document.createElement('input');
+    yearInput.type = 'number';
+    yearInput.placeholder = 'Year';
+    yearInput.className = 'flex-[0.67] ml-2 p-2 border border-gray-300 rounded-lg';
+    yearInput.setAttribute('min', '1000');
+    yearInput.setAttribute('max', new Date().getFullYear());
+    // If imageData has a year, use it
+    yearInput.value = imageData.year || '';
+    imageInfo.appendChild(yearInput);
+
+    var closeBtn = document.createElement('span');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'close-btn';
+    closeBtn.onclick = function(event) {
+        event.stopPropagation();
+        box.remove();
+        imageBoxCount--;
+        if (box.id === selectedPreviewId) selectedPreviewId = null;
+        updateAddButton();
+
+        if(isSessionImage) {
+            removeImageFromSession(index);
+        }
+        else
+        {
+            processedFiles.delete(fileIdentifier);
+        }
+    };
+    box.appendChild(closeBtn);
+    box.appendChild(imageInfo);
+    document.getElementById('imagePreview').appendChild(box);
+}
+
+
+// Reads and previews each file
+function readAndPreview(file) {
+    var fileIdentifier = file.name + '-' + file.lastModified;
+    if (processedFiles.has(fileIdentifier)) return;
+    processedFiles.set(fileIdentifier, file);
+
+    if ( /\.(jpe?g|png|gif|webp)$/i.test(file.name) ) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            createImageBox({blob: reader.result, source: '', year: '', is_preview: false}, imageBoxCount++, false, fileIdentifier);
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Triggered when user selects files, calls readAndPreview for each file
+function previewImages() {
+    var files = document.getElementById('upload').files;
+    [].forEach.call(files, readAndPreview);
+    setTimeout(updateAddButton, 100);
+}
+
+// Prepares and sends the FormData with images and metadata to the server
+function submitImagesMetadata() {
+
+    if (!isPreviewImageSelected()) {
+        alert('Please select a preview image');
+        return;
+    }
+
+    var formData = new FormData();
+    var index = 0; // Initialize a shared index
+
+    // Append image files with the index
+    processedFiles.forEach((file) => {
+        formData.append('image_' + index, file);
+        index++; // Increment the index for each file
+    });
+
+    index = 0; // Reset the index for metadata
+
+    // Append metadata with the index
+    document.querySelectorAll('.image-box').forEach(function(box) {
+        var sourceInput = box.querySelector('input[type="text"]');
+        var yearInput = box.querySelector('input[type="number"]');
+        var metadata = {
+            source: sourceInput.value,
+            year: yearInput.value,
+            is_preview: box.id === selectedPreviewId
+        };
+        formData.append(`metadata_${index}`, JSON.stringify(metadata));
+        index++; // Increment the index for each set of metadata
+    });
+
+
+
+    // Proceed with the fetch request
+    fetch("/api/buildings/session/images", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Success:", data);
+        createImageBoxesFromSession();
+        // Redirect to the next page
+        window.location.href = '/buildings/import/timeline';
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+// Utility functions
+function updateAddButton() {
+    var allImageBoxes = document.querySelectorAll('.image-box');
+    if (allImageBoxes.length > 0) {
+        var lastImageBox = allImageBoxes[allImageBoxes.length - 1];
+        var addBtn = document.createElement('span');
+        addBtn.innerHTML = '+';
+        addBtn.className = 'add-btn';
+        addBtn.onclick = function() { document.getElementById('upload').click(); };
+        lastImageBox.appendChild(addBtn);
+    }
+}
+
+function updateSubmitButtonState() {
+    var submitButton = document.getElementById('nextButton');
+    if (isPreviewImageSelected()) {
+        submitButton.removeAttribute('disabled');
+    } else {
+        submitButton.setAttribute('disabled', 'disabled');
+    }
+}
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function isPreviewImageSelected() {
+    return selectedPreviewId !== null;
+}
+
+function openAmsterdamArchief() {
+        var url = "https://archief.amsterdam/beeldbank/?mode=gallery&view=horizontal&q=" + encodeURIComponent(buildingAddress) + "&page=1&reverse=0";
+        window.open(url, '_blank').focus();
+    }
+
+function removeImageFromSession(index) {
+    fetch("/api/buildings/session/images/remove", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({index: index})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Image removed:", data);
+        // Refresh the image boxes
+        // Delayed to allow the server to delete the image
+        setTimeout(createImageBoxesFromSession, 200);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+var imagesMetadata = {{ images_metadata_json|safe }};
+
+    // Function to create image boxes from session data
+    function createImageBoxesFromSession() {
+        imagesMetadata.forEach(function(image, index) {
+            image.src = `/buildings/temp/${image.file_path}`
+            createImageBox(image, index, true);
+        });
+    }
+
+    // Call the function when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+    createImageBoxesFromSession();
+    // Other initialization code...
+});
+
+document.getElementById('nextButton').addEventListener('click', function(event) {
+    event.preventDefault();
+    submitImagesMetadata();
+});
+
+document.getElementById('upload').addEventListener('change', previewImages);
+
   </script>
 </html>

@@ -269,7 +269,9 @@ function image_html(image){
       const audioguideCount = building.fields.audioguides.length;
       let main_image;
 
+      var imagesSideScroll = ``;
       imageUrls.forEach((image) => {
+          imagesSideScroll += image_html(image.url);
           if(image.is_main){
               main_image = image.url;
           }
@@ -329,14 +331,11 @@ function image_html(image){
                   </div>
                 </td>
                 <!-- Timeline  -->
-                <td class="rounded shadow w-52 h-100 overflow-y-auto" >`
+                <td class="rounded shadow w-52" ><div class="overflow-y-auto flex space-x-2">`
 
-                imageUrls.forEach((image) => function (){
-                    console.log(image_html(image.url));
-                   // childRowHtml += `<img src="${image.url}" class="rounded-t">`;
-                });
+                childRowHtml += imagesSideScroll;
 
-                childRowHtml +=    `<span class="text-gray-400 text-xs px-6 mt-2 mb-8 ml-3 flex items-center">
+                childRowHtml +=    `</div><span class="text-gray-400 text-xs px-6 mt-2 mb-8 ml-3 flex items-center">
                             <svg class="w-4 h-4 fill-gray-400 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="gray" viewBox="0 0 20 20">
                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                             </svg>
