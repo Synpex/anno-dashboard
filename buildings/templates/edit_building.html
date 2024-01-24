@@ -81,8 +81,6 @@
 
   {% block content %} {% include 'navbar.html' %}
   <section class="px-10 mt-24">
-      <form method="post">
-        {% csrf_token %}
 
       <h2 class="text-sky-900 text-2xl font-bold uppercase">
         {{ selected_building.address }}
@@ -179,7 +177,7 @@
             <input
               id="tagInput"
               name="{{ form.tags.id_for_label }}"
-              value="{{ selected_building.tags }}"
+              value=""
               class="w-full p-1/2 border border-gray-300 rounded-lg mb-4"
             />
           </div>
@@ -198,18 +196,17 @@
             >
           </div>
         </div>
+      <hr>
         <div>
           <h2 class="text-md font-bold text-sky-900 uppercase">Images</h2>
           <div
             class="flex shadow rounded-xl bg-gray-100 overflow-x-auto overflow-y-auto mt-4 p-4"
           >
-                <div class="image-box flex justify-center flex-wrap mt-4">
-                </div>
-          </div>
-        <!-- Image preview area above the buttons -->
-            <div id="imagePreview" class="flex justify-center flex-wrap mt-4">
+                 <div id="imagePreview" class="flex justify-center flex-wrap mt-4">
                 <!-- Image thumbnails will be added here in little boxes -->
             </div>
+          </div>
+        <!-- Image preview area above the buttons -->
 
             <!-- Form for Image Upload and Google Maps Search -->
             <div class="flex space-x-4 justify-center items-center my-2">
@@ -233,8 +230,7 @@
                     </div>
                 </form>
             </div>
-
-
+        <hr class="py-2">
           <div>
             <h2 class="text-md font-bold text-sky-900 uppercase mt-8">
               TIMELINE
@@ -246,44 +242,7 @@
                 <div
                   class="absolute ml-3 mt-3 top-0 bottom-0 w-0.5 bg-custom-blue rounded-b-3xl rounded-t-3xl"
                 ></div>
-                <div class="space-y-4 ml-8 my-4 w-full">
-                  {% for event in selected_building.timeline %}
-                  <div class="flex items-center mt-3">
-                    <div
-                      id="initialTimeline"
-                      class="bg-white shadow rounded-lg p-4 flex items-center justify-between w-full"
-                    >
-                      <!-- Year Input -->
-                      <div class="flex items-center">
-                        <label
-                          for="year_1"
-                          class="block text-sm font-medium text-gray-700 mr-4"
-                          ><div
-                            class="absolute left-0 w-2.5 h-2.5 bg-sky-900 rounded-full ml-2"
-                          ></div
-                        ></label>
-                        <input
-                          type="text"
-                          id="year_1"
-                          name="year"
-                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
-                          value="{{ event.year }}"
-                        />
-                      </div>
-                      <!-- Event Input -->
-                      <div class="flex-1 ml-4">
-                        <input
-                          type="text"
-                          id="event_1"
-                          name="event"
-                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
-                          value="{{ event.description }}"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  {% endfor %}
-                </div>
+
               </div>
             </div>
 
@@ -336,38 +295,18 @@
             </div>
 
             <!-- Timeline Template (Hidden) -->
-            <div
-              id="timelineTemplate"
-              class="bg-white shadow rounded-lg p-4 flex items-center justify-between"
-              style="display: none"
-            >
-              <!-- Inputs are the same as the initial element -->
-              <div class="flex items-center">
-                <label class="block text-sm font-medium text-gray-700 mr-4"
-                  >Year</label
-                >
-                <input
-                  type="text"
-                  class="yearInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md"
-                  placeholder="1903"
-                />
-              </div>
-              <div class="flex-1 ml-4">
-                <input
-                  type="text"
-                  class="eventInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md"
-                  placeholder="Event description"
-                />
-              </div>
-              <!-- Remove Button (For Cloned Elements) -->
-              <button
-                class="deleteButton ml-4 bg-red-900 p-2 rounded-full text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                <!-- SVG for Minus Icon -->
-                <i class="fas fa-minus"></i>
-              </button>
-            </div>
-          </div>
+             <template id="timelineTemplate">
+                <div class="timeline-item bg-white shadow rounded-lg p-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <label class="block text-sm font-medium text-gray-700 mr-4">Year</label>
+                        <input type="text" class="yearInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-16 text-gray-900 border-gray-300 rounded-md" placeholder="1903" />
+                    </div>
+                    <div class="flex-1 ml-4">
+                        <input type="text" class="eventInput shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-gray-900 border-2 rounded-md" placeholder="Event description" />
+                    </div>
+                    <button class="deleteButton ml-4 bg-red-900 p-2 rounded-full text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"><i class="fas fa-minus"></i></button>
+                </div>
+            </template>
 
           <!-- Timeline Container -->
           <div id="timelineContainer"></div>
@@ -377,27 +316,26 @@
           {% include 'cancel-button.html' %}
           <button
             id="saveButton"
-            class="py-2 sm:px-8 px-6 bg-gray-500 rounded-3xl shadow text-white"
+            class="py-2 sm:px-8 px-6 bg-blue-500 rounded-3xl shadow text-white"
             type="submit"
-            disabled
+            onclick="saveButtonPopUp()"
           >
             Save Details
           </button>
         </div>
       </div>
-    </form>
   {{ name }}
   </section>
   {% endblock %}
 
   <script>
     function saveButtonPopUp() {
-      button = document.getElementById("saveButton");
-      button.addEventListener("click", function () {});
-    }
-
-    //var images = document.querySelectorAll('.imagePreview');
-    //console.log(images);
+    var button = document.getElementById("saveButton");
+    button.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission behavior
+        submitBuildingData();   // Call the function to submit building data
+    });
+}
     var closeBtn = document.createElement('span');
     closeBtn.innerHTML = '&times;';
     closeBtn.className = 'close-btn';
@@ -417,35 +355,62 @@
         }
     };
 
+    var timelineDataOfBuilding;
+    try {
+        // Attempt to parse the timeline data from the Django template
+        timelineDataOfBuilding = {{ timeline|safe }};
+        console.log('Timeline Data from DB', timelineDataOfBuilding)
+    } catch(e) {
+        // If parsing fails, default to an empty array
+        timelineDataOfBuilding = [];
+    }
+
     $(document).ready(function () {
       let idCounter = 2; // Start from 2 since we already have one timeline entry
 
       // Function to add a new timeline entry
-      function addTimelineEntry() {
-        // Clone the template and make it visible
-        const clonedElement = $("#timelineTemplate")
-          .clone()
-          .removeAttr("id")
-          .show();
+        function addTimelineEntry(year = '', event = '') {
+            const template = document.querySelector('#timelineTemplate');
+            if (!template) {
+                console.error('Timeline template not found');
+                return;
+            }
 
-        // Update attributes for the new inputs
-        clonedElement.find(".yearInput").attr("id", "year_" + idCounter);
-        clonedElement.find(".eventInput").attr("id", "event_" + idCounter);
+            const clonedElement = template.content.cloneNode(true).querySelector('.timeline-item');
+            // Update attributes for the new inputs
+            clonedElement.querySelector('.yearInput').setAttribute('id', 'year_' + idCounter);
+            clonedElement.querySelector('.eventInput').setAttribute('id', 'event_' + idCounter);
+            // Set values if provided
+            clonedElement.querySelector('.yearInput').value = year;
+            clonedElement.querySelector('.eventInput').value = event;
 
-        // Append the cloned element to the container
-        $("#timelineContainer").append(clonedElement);
-        idCounter++; // Increment the ID counter
-      }
+            // Append the cloned element to the container
+            document.getElementById('timelineContainer').appendChild(clonedElement);
+            idCounter++; // Increment the ID counter
+        }
 
       // Event listener for adding new timeline entries
-      $("#addTimeline").click(function () {
-        addTimelineEntry();
-      });
+      document.getElementById('addTimeline').addEventListener('click', function() {
+            addTimelineEntry();
+        });
 
       // Event delegation for removing a timeline entry
-      $("#timelineContainer").on("click", ".deleteButton", function () {
-        $(this).closest(".bg-white").remove();
-      });
+        document.getElementById('timelineContainer').addEventListener('click', function(event) {
+            if (event.target.classList.contains('deleteButton')) {
+                event.target.closest('.timeline-item').remove();
+            }
+        });
+        // Populate timeline with existing data from session
+        timelineDataOfBuilding.forEach(function(item, index) {
+            if (index === 0) {
+                // Set the initial timeline item
+                document.getElementById('year_1').value = item.year;
+                document.getElementById('event_1').value = item.description;
+            } else {
+                // Add new timeline items
+                addTimelineEntry(item.year, item.description);
+            }
+        });
     });
 
     // Define custom suggestions for tags
@@ -630,67 +595,7 @@
     console.log("Added a tag:", e.detail.data.value);
   }
 
-  // Function to collect data and send it to Django
-    function saveBuildingData() {
-        var address = document.querySelector('input[name="address"]').value;
-        var typeOfUse = typeOfUseTagify.value[0].value; // Getting the first tag's value
-        var description = document.querySelector('textarea[name="description"]').value;
-        var alternativeName = document.querySelector('input[name="buildingName"]').value;
-        var tags = tagify.value.map(tag => tag.value); // Get array of tag values
-        var constructionYear = document.querySelector('input[name="constructionYear"]').value;
 
-        var new_selected_building = {
-          address: address,
-          typeOfUse: typeOfUse,
-          alternative_name: alternativeName,
-          constructionYear: constructionYear,
-          tags: tags,
-          description: description
-        };
-
-         var payload = {
-          new_selected_building: new_selected_building,
-        };
-
-        fetch('/api/buildings/session/details', {  // Use the correct path to your Django view
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')  // Ensure you're getting the CSRF token
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            saveClicked = true;
-            document.getElementById('nextButton').classList.remove('hidden');
-            // Redirect to the next page
-            // window.location.href = "/buildings/import/images";
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
-
-    // Listen for a submit event or button click to trigger saveBuildingData
-    document.getElementById('saveButton').addEventListener('click', saveBuildingData);
-
-    // Helper function to get the CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 
 document.addEventListener('DOMContentLoaded', function() {
         var savedTypeOfUse = "{{ selected_building.typeOfUse|escapejs }}";
@@ -726,7 +631,6 @@ function createImageBox(imageData, index,  isSessionImage=false,  fileIdentifier
     box.id = 'imageBox-' + index;
     box.setAttribute('data-session-image', isSessionImage)
 
-
     // Check if this image is marked as preview in the session data
     if (imageData.is_preview) {
         box.classList.add('selected-preview');
@@ -737,9 +641,9 @@ function createImageBox(imageData, index,  isSessionImage=false,  fileIdentifier
      if (imageData.blob) {
         // If a blob URL is provided (for new images), use it
         img.src = imageData.blob;
-    } else if (imageData.file_path) {
+    } else if (imageData.url) {
         // If a file path is provided (for already uploaded images), use it
-        img.src = `/buildings/temp${imageData.file_path}`;
+        img.src = imageData.url;
     } else {
         // Otherwise, set to a placeholder or empty string
         img.src = '';
@@ -819,64 +723,6 @@ function previewImages() {
     setTimeout(updateAddButton, 100);
 }
 
-// Prepares and sends the FormData with images and metadata to the server
-function submitImagesMetadata() {
-
-    if (!isPreviewImageSelected()) {
-        alert('Please select a preview image');
-        return;
-    }
-
-    var formData = new FormData();
-    var index = 0; // Initialize a shared index
-
-    // Append image files with the index
-    processedFiles.forEach((file) => {
-        formData.append('image_' + index, file);
-        index++; // Increment the index for each file
-    });
-
-    index = 0; // Reset the index for metadata
-
-    // Append metadata with the index
-    document.querySelectorAll('.image-box').forEach(function(box) {
-        var sourceInput = box.querySelector('input[type="text"]');
-        var yearInput = box.querySelector('input[type="number"]');
-        var metadata = {
-            source: sourceInput.value,
-            year: yearInput.value,
-            is_preview: box.id === selectedPreviewId
-        };
-        formData.append(`metadata_${index}`, JSON.stringify(metadata));
-        index++; // Increment the index for each set of metadata
-    });
-
-
-
-    // Proceed with the fetch request
-    fetch("/api/buildings/session/images", {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Success:", data);
-        createImageBoxesFromSession();
-        // Redirect to the next page
-        window.location.href = '/buildings/import/timeline';
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
-}
 // Utility functions
 function updateAddButton() {
     var allImageBoxes = document.querySelectorAll('.image-box');
@@ -890,35 +736,13 @@ function updateAddButton() {
     }
 }
 
-function updateSubmitButtonState() {
-    var submitButton = document.getElementById('nextButton');
-    if (isPreviewImageSelected()) {
-        submitButton.removeAttribute('disabled');
-    } else {
-        submitButton.setAttribute('disabled', 'disabled');
-    }
-}
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
 
 function isPreviewImageSelected() {
     return selectedPreviewId !== null;
 }
 
 function openAmsterdamArchief() {
-        var url = "https://archief.amsterdam/beeldbank/?mode=gallery&view=horizontal&q=" + encodeURIComponent(buildingAddress) + "&page=1&reverse=0";
+        var url = "https://archief.amsterdam/beeldbank/?mode=gallery&view=horizontal&q=" + encodeURIComponent("{{ selected_building.address }}") + "&page=1&reverse=0";
         window.open(url, '_blank').focus();
     }
 
@@ -948,12 +772,73 @@ function removeImageFromSession(index) {
     });
 }
 
-var imagesMetadata = {{ selected_building.image_urls|safe }};
+// Function to gather and submit building data
+function submitBuildingData() {
+    // Gather data from form fields
+    var buildingData = {
+        'location': {
+            'type': 'Point',
+            'coordinates': [
+                parseFloat(document.getElementById('{{ form.location.id_for_label }}').value),
+                parseFloat(document.getElementById('{{ form.location.id_for_label }}').value)
+            ]
+        },
+        'address': document.getElementById('{{ form.address.id_for_label }}').value,
+        'name': document.getElementById('{{ form.name.id_for_label }}').value,
+        'construction_year': parseInt(document.getElementById('{{ form.construction_year.id_for_label }}').value),
+        'type_of_use': document.getElementById('{{ form.type_of_use.id_for_label }}').value,
+        'description': document.getElementById('{{ form.description.id_for_label }}').value,
+        'tags': tagify.value.map(tag => tag.value),
+        'timeline': getTimelineData(),
+        // EXCLUDE 'images_urls' for NOW
+    };
 
+    fetch('/api/building/update', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(buildingData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            window.location.href = '/buildings';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle error - show error message to the user
+        });
+}
+
+
+// Function to get timeline data from the frontend
+function getTimelineData() {
+    var timelineItems = document.querySelectorAll('.timeline-item');
+    var timelineData = [];
+
+    timelineItems.forEach(function(item) {
+        var year = item.querySelector('.yearInput').value;
+        var description = item.querySelector('.eventInput').value;
+
+        if (year && description) {
+            timelineData.push({
+                'year': parseInt(year),
+                'description': description
+            });
+        }
+    });
+
+    return timelineData;
+}
+
+
+var imagesMetadata = {{ image_urls|safe }};
     // Function to create image boxes from session data
+    console.log(imagesMetadata);
     function createImageBoxesFromSession() {
         imagesMetadata.forEach(function(image, index) {
-            image.src = `imagesMetadata.url`
             createImageBox(image, index, true);
         });
     }
@@ -962,11 +847,6 @@ var imagesMetadata = {{ selected_building.image_urls|safe }};
     document.addEventListener('DOMContentLoaded', function() {
     createImageBoxesFromSession();
     // Other initialization code...
-});
-
-document.getElementById('nextButton').addEventListener('click', function(event) {
-    event.preventDefault();
-    submitImagesMetadata();
 });
 
 document.getElementById('upload').addEventListener('change', previewImages);

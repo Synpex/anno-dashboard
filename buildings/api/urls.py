@@ -4,7 +4,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .api import BuildingViewSet, AudioguideViewSet
 from buildings.views.api_views import BuildingByYearList, SortedBuildingsView, BuildingSearchView, api_proxy_view, \
-update_building_details, update_search_params, upload_temp_images, remove_image_from_session, update_timeline, publish_building
+update_building_details, update_search_params, upload_temp_images, remove_image_from_session, update_timeline, publish_building, clear_building_session_data, \
+update_building
 
 router = DefaultRouter()
 router.register(r'buildings', BuildingViewSet, basename='buildings')
@@ -20,6 +21,8 @@ internal_api_patterns = [
     path('buildings/session/images', upload_temp_images, name='updateSessionImages'),
     path('buildings/session/search', update_search_params, name='updateSessionSearch'),
     path('buildings/session/details', update_building_details, name='updateSessionDetails'),
+    path('buildings/session/clear', clear_building_session_data, name='clearSessionData'),
+    path('building/update', update_building, name='updateBuilding')
 ]
 
 # Public URLs

@@ -56,10 +56,16 @@ def edit_building_view(request, building_public_id):
             form.save()
             return redirect('buildings')
 
+    # Serialize the image metadata
+    image_urls_json = json.dumps(selected_building.image_urls, cls=DjangoJSONEncoder)
+    timeline_json = json.dumps(selected_building.timeline, cls=DjangoJSONEncoder)
+
     context = {
-                  'section': 'buildings',
-                  'selected_building': selected_building,
-                  'form': form,
+        'section': 'buildings',
+        'selected_building': selected_building,
+        'form': form,
+        'image_urls': image_urls_json,
+        'timeline': timeline_json
     }
     return render(request, 'edit_building.html', context)
 
@@ -131,8 +137,6 @@ def import_images_view(request):
         # Save the session (required if using a file-based session backend)
         request.session.modified = True
 
-        # Redirect to the next step or back to the form for additional uploads
-        return redirect('next_view_name')  # Replace with the name of your next view or URL
 
     # Existing context for rendering the form
     context = {

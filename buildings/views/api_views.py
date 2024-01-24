@@ -14,6 +14,7 @@ from pymongo import MongoClient
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from bson import ObjectId as BsonObjectId
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -320,6 +321,8 @@ def remove_image_from_session(request):
         logger.warning(f"User {user_id} made an invalid request method to remove image from session.")
         messages.error(request, 'Invalid request method. This endpoint supports POST only.')
         return JsonResponse({'status': 'error', 'message': 'Invalid request method. This endpoint supports POST only.'}, status=405)
+
+
 class BuildingByYearList(generics.ListAPIView):
     serializer_class = BuildingSerializer
 
@@ -330,6 +333,31 @@ class BuildingByYearList(generics.ListAPIView):
         """
         year = self.kwargs['year']
         return Building.objects.filter(construction_year=year)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def clear_building_session_data(request):
+    user_id = request.user.id
+    logger.info(f"User {user_id} initiated clearing building session data.")
+
+    try:
+        # List of session keys related to buildings that need to be cleared
+        building_session_keys = ['selected_building', 'images_metadata', 'timeline', 'uploaded_images', 'search_params']
+
+        # Clear each key from the session if it exists
+        for key in building_session_keys:
+            if key in request.session:
+                del request.session[key]
+
+        # Mark the session as modified to save changes
+        request.session.modified = True
+
+        logger.info(f"User {user_id} successfully cleared building session data.")
+        return JsonResponse({'status': 'success', 'message': 'Building session data cleared successfully'})
+
+    except Exception as e:
+        logger.error(f"User {user_id} encountered an error in clearing building session data: {e}", exc_info=True)
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
 @login_required
@@ -462,6 +490,61 @@ def publish_building(request):
         logger.error(f"User {user_id}: Error occurred in publish_building method: {e}", exc_info=True)
         return JsonResponse({'error': 'Error processing building publication'}, status=500)
 
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_building(request):
+    user_id = request.user.id
+    logger.info(f"User {user_id} initiated building update.")
+
+    try:
+        data = request.data
+        building_id = data.get('_id')
+        if not building_id:
+            logger.error(f"User {user_id} did not provide a building ID.")
+            return JsonResponse({'status': 'error', 'message': 'Building ID not provided'}, status=400)
+
+        building = Building.objects.get(_id=BsonObjectId(building_id))
+        logger.debug(f"User {user_id} updating existing building: {building_id}")
+
+        # Process and update building fields
+        if 'address' in data:
+            building.address = data.get('address')
+        if 'location' in data:
+            building.location = json.loads(data.get('location'))
+        if 'name' in data:
+            building.name = data.get('name', '')
+        if 'construction_year' in data:
+            building.construction_year = int(data.get('construction_year'))
+        if 'type_of_use' in data:
+            building.type_of_use = data.get('type_of_use')
+        if 'description' in data:
+            building.description = data.get('description')
+        if 'tags' in data:
+            building.tags = json.loads(data.get('tags'))
+        if 'active' in data:
+            building.active = data.get('active', True)
+
+        # Process timeline data
+        if 'timeline' in data:
+            timeline_data = json.loads(data.get('timeline'))
+            building.timeline = timeline_data
+
+        # TODO: Implement Logic for Images
+
+        building.save()
+        logger.info(f"User {user_id} successfully updated building: {building_id}")
+        return JsonResponse({'status': 'success', 'message': 'Building updated successfully'})
+
+    except Building.DoesNotExist:
+        logger.error(f"User {user_id} tried to update a non-existing building: {building_id}")
+        return JsonResponse({'status': 'error', 'message': 'Building not found'}, status=404)
+
+    except Exception as e:
+        logger.error(f"User {user_id} encountered an error in updating building: {str(e)}", exc_info=True)
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@permission_classes([IsAuthenticated])
 def set_buildings_active_status(request):
     user_id = request.user.id
     try:
@@ -475,6 +558,7 @@ def set_buildings_active_status(request):
         logger.error(f"User {user_id}: Error in set_buildings_active_status: {e}", exc_info=True)
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+@permission_classes([IsAuthenticated])
 def delete_buildings(request):
     user_id = request.user.id
     try:
